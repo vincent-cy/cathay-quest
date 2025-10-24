@@ -52,16 +52,28 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <header className="p-6 border-b border-border space-y-4 shadow-lg">
+    <div className={`min-h-screen pb-20 transition-colors duration-500 ${
+      isInFlight ? 'bg-[hsl(164,76%,35%)]' : 'bg-background'
+    }`}>
+      <header className={`p-6 border-b space-y-4 shadow-lg transition-colors duration-500 ${
+        isInFlight ? 'bg-[hsl(164,76%,40%)] border-[hsl(164,76%,50%)]' : 'border-border'
+      }`}>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground drop-shadow-md">Discover Quests</h1>
-            <p className="text-base text-muted-foreground">Swipe to explore missions</p>
+            <h1 className={`text-3xl font-bold drop-shadow-md ${
+              isInFlight ? 'text-white' : 'text-foreground'
+            }`}>Discover Quests</h1>
+            <p className={`text-base ${
+              isInFlight ? 'text-white/80' : 'text-muted-foreground'
+            }`}>Swipe to explore missions</p>
           </div>
           <div className="text-right">
-            <p className="text-base text-muted-foreground">Accepted</p>
-            <p className="text-3xl font-bold text-accent drop-shadow-md">{acceptedQuests.length}</p>
+            <p className={`text-base ${
+              isInFlight ? 'text-white/80' : 'text-muted-foreground'
+            }`}>Accepted</p>
+            <p className={`text-3xl font-bold drop-shadow-md ${
+              isInFlight ? 'text-[hsl(45,100%,55%)]' : 'text-accent'
+            }`}>{acceptedQuests.length}</p>
           </div>
         </div>
         
@@ -69,7 +81,7 @@ const Home = () => {
         <Card 
           className={`p-4 cursor-pointer transition-all shadow-card hover:shadow-elevated ${
             isInFlight 
-              ? "bg-primary/10 border-primary/30" 
+              ? "bg-[hsl(164,76%,45%)] border-[hsl(164,76%,55%)]" 
               : "bg-muted/50 border-border"
           }`}
           style={{
@@ -80,15 +92,15 @@ const Home = () => {
           <div className="flex items-center gap-4">
             {isInFlight ? (
               <>
-                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center shadow-lg">
-                  <Plane className="w-6 h-6 text-primary animate-pulse" />
+                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-white/20 flex items-center justify-center shadow-lg">
+                  <Plane className="w-6 h-6 text-white animate-pulse" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-bold text-foreground text-base">In-Flight Mode Active</p>
-                  <p className="text-sm text-muted-foreground">Flight CX888 • HKG → SIN</p>
+                  <p className="font-bold text-white text-base">In-Flight Mode Active</p>
+                  <p className="text-sm text-white/80">Flight CX888 • HKG → SIN</p>
                 </div>
-                <div className="px-4 py-2 rounded-full bg-primary/20 shadow-md">
-                  <span className="text-sm font-bold text-primary">Active</span>
+                <div className="px-4 py-2 rounded-full bg-[hsl(45,100%,55%)] shadow-md">
+                  <span className="text-sm font-bold text-[hsl(164,76%,35%)]">Active</span>
                 </div>
               </>
             ) : (
@@ -114,6 +126,7 @@ const Home = () => {
           quest={sampleQuests[currentIndex]}
           onAccept={handleAccept}
           onReject={handleReject}
+          isInFlight={isInFlight}
         />
       </div>
 

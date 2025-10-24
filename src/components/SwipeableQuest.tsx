@@ -19,6 +19,7 @@ interface SwipeableQuestProps {
   quest: Quest;
   onAccept: () => void;
   onReject: () => void;
+  isInFlight?: boolean;
 }
 
 const getQuestDetails = (questType: string) => {
@@ -70,7 +71,7 @@ const getQuestDetails = (questType: string) => {
   }
 };
 
-export const SwipeableQuest = ({ quest, onAccept, onReject }: SwipeableQuestProps) => {
+export const SwipeableQuest = ({ quest, onAccept, onReject, isInFlight = false }: SwipeableQuestProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [offset, setOffset] = useState(0);
   const [startX, setStartX] = useState(0);
@@ -224,7 +225,11 @@ export const SwipeableQuest = ({ quest, onAccept, onReject }: SwipeableQuestProp
               }}
             />
             
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/95 z-10" />
+            <div className={`absolute inset-0 z-10 ${
+              isInFlight 
+                ? 'bg-gradient-to-b from-[hsl(164,76%,45%)]/60 via-[hsl(164,76%,45%)]/80 to-[hsl(164,76%,35%)]'
+                : 'bg-gradient-to-b from-transparent via-transparent to-background/95'
+            }`} />
             <img
               src={quest.image}
               alt={quest.title}
@@ -232,12 +237,16 @@ export const SwipeableQuest = ({ quest, onAccept, onReject }: SwipeableQuestProp
             />
             
             <div className="absolute top-6 left-6 right-6 z-20 flex gap-3">
-              <Badge variant="outline" className="bg-background/90 backdrop-blur-md text-base px-4 py-2 shadow-lg" style={{
+              <Badge variant="outline" className={`backdrop-blur-md text-base px-4 py-2 shadow-lg ${
+                isInFlight ? 'bg-white/90 text-[hsl(164,76%,35%)] border-white/50' : 'bg-background/90'
+              }`} style={{
                 transform: 'translateZ(30px)',
               }}>
                 {quest.type}
               </Badge>
-              <Badge className="bg-accent/90 backdrop-blur-md ml-auto text-base px-4 py-2 shadow-lg" style={{
+              <Badge className={`backdrop-blur-md ml-auto text-base px-4 py-2 shadow-lg ${
+                isInFlight ? 'bg-[hsl(45,100%,55%)] text-[hsl(164,76%,35%)] hover:bg-[hsl(45,100%,50%)]' : 'bg-accent/90'
+              }`} style={{
                 transform: 'translateZ(30px)',
               }}>
                 <Trophy className="w-5 h-5 mr-2" />
@@ -249,11 +258,17 @@ export const SwipeableQuest = ({ quest, onAccept, onReject }: SwipeableQuestProp
               transform: 'translateZ(40px)',
             }}>
               <div className="space-y-3">
-                <h2 className="text-4xl font-bold text-foreground drop-shadow-lg">{quest.title}</h2>
-                <p className="text-base text-muted-foreground leading-relaxed drop-shadow-md">{quest.description}</p>
+                <h2 className={`text-4xl font-bold drop-shadow-lg ${
+                  isInFlight ? 'text-white' : 'text-foreground'
+                }`}>{quest.title}</h2>
+                <p className={`text-base leading-relaxed drop-shadow-md ${
+                  isInFlight ? 'text-white/90' : 'text-muted-foreground'
+                }`}>{quest.description}</p>
               </div>
 
-              <div className="flex items-center gap-6 text-base text-muted-foreground">
+              <div className={`flex items-center gap-6 text-base ${
+                isInFlight ? 'text-white/90' : 'text-muted-foreground'
+              }`}>
                 <div className="flex items-center gap-2">
                   <Clock className="w-5 h-5" />
                   <span className="font-medium">{quest.timeLeft}</span>
@@ -269,30 +284,50 @@ export const SwipeableQuest = ({ quest, onAccept, onReject }: SwipeableQuestProp
           </div>
 
           {/* Quest Details Section */}
-          <div className="p-6 space-y-4 bg-background">
+          <div className={`p-6 space-y-4 ${
+            isInFlight ? 'bg-[hsl(164,76%,35%)]' : 'bg-background'
+          }`}>
             {/* Quest Type Description */}
-            <div className="flex items-start gap-3 p-4 bg-card rounded-lg shadow-card">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                <AlertCircle className="w-4 h-4 text-primary" />
+            <div className={`flex items-start gap-3 p-4 rounded-lg shadow-card ${
+              isInFlight ? 'bg-[hsl(164,76%,40%)]' : 'bg-card'
+            }`}>
+              <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                isInFlight ? 'bg-[hsl(45,100%,55%)]' : 'bg-primary/10'
+              }`}>
+                <AlertCircle className={`w-4 h-4 ${
+                  isInFlight ? 'text-[hsl(164,76%,35%)]' : 'text-primary'
+                }`} />
               </div>
               <div className="flex-1">
-                <h3 className="font-bold text-foreground mb-1">{details.title}</h3>
-                <p className="text-xs text-muted-foreground leading-relaxed">
+                <h3 className={`font-bold mb-1 ${
+                  isInFlight ? 'text-white' : 'text-foreground'
+                }`}>{details.title}</h3>
+                <p className={`text-xs leading-relaxed ${
+                  isInFlight ? 'text-white/80' : 'text-muted-foreground'
+                }`}>
                   {details.description}
                 </p>
               </div>
             </div>
 
             {/* Requirements */}
-            <div className="p-4 bg-card rounded-lg shadow-card">
+            <div className={`p-4 rounded-lg shadow-card ${
+              isInFlight ? 'bg-[hsl(164,76%,40%)]' : 'bg-card'
+            }`}>
               <div className="flex items-center gap-2 mb-3">
-                <CheckCircle2 className="w-4 h-4 text-accent" />
-                <h4 className="font-semibold text-sm text-foreground">Requirements</h4>
+                <CheckCircle2 className={`w-4 h-4 ${
+                  isInFlight ? 'text-[hsl(45,100%,55%)]' : 'text-accent'
+                }`} />
+                <h4 className={`font-semibold text-sm ${
+                  isInFlight ? 'text-white' : 'text-foreground'
+                }`}>Requirements</h4>
               </div>
               <ul className="space-y-2">
                 {details.requirements.map((req, index) => (
-                  <li key={index} className="flex items-start gap-2 text-xs text-muted-foreground">
-                    <span className="text-accent mt-0.5">•</span>
+                  <li key={index} className={`flex items-start gap-2 text-xs ${
+                    isInFlight ? 'text-white/80' : 'text-muted-foreground'
+                  }`}>
+                    <span className={isInFlight ? 'text-[hsl(45,100%,55%)]' : 'text-accent'}>•</span>
                     <span>{req}</span>
                   </li>
                 ))}
@@ -300,15 +335,27 @@ export const SwipeableQuest = ({ quest, onAccept, onReject }: SwipeableQuestProp
             </div>
 
             {/* Verification Method */}
-            <div className="p-4 bg-card rounded-lg shadow-card">
+            <div className={`p-4 rounded-lg shadow-card ${
+              isInFlight ? 'bg-[hsl(164,76%,40%)]' : 'bg-card'
+            }`}>
               <div className="flex items-center gap-2 mb-2">
-                <Shield className="w-4 h-4 text-primary" />
-                <h4 className="font-semibold text-sm text-foreground">Verification Method</h4>
+                <Shield className={`w-4 h-4 ${
+                  isInFlight ? 'text-[hsl(45,100%,55%)]' : 'text-primary'
+                }`} />
+                <h4 className={`font-semibold text-sm ${
+                  isInFlight ? 'text-white' : 'text-foreground'
+                }`}>Verification Method</h4>
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className={`text-xs ${
+                isInFlight ? 'text-white/80' : 'text-muted-foreground'
+              }`}>
                 {details.verificationMethod}
               </p>
-              <Badge variant="outline" className="mt-3 text-xs bg-primary/5 text-primary border-primary/20">
+              <Badge variant="outline" className={`mt-3 text-xs ${
+                isInFlight 
+                  ? 'bg-[hsl(45,100%,55%)]/20 text-[hsl(45,100%,55%)] border-[hsl(45,100%,55%)]/40'
+                  : 'bg-primary/5 text-primary border-primary/20'
+              }`}>
                 Fraud-Protected
               </Badge>
             </div>
@@ -318,7 +365,9 @@ export const SwipeableQuest = ({ quest, onAccept, onReject }: SwipeableQuestProp
               <Button
                 variant="outline"
                 size="lg"
-                className="flex-1 h-16 rounded-full text-lg shadow-elevated"
+                className={`flex-1 h-16 rounded-full text-lg shadow-elevated ${
+                  isInFlight ? 'bg-white/20 border-white/40 text-white hover:bg-white/30' : ''
+                }`}
                 onClick={onReject}
               >
                 <X className="w-7 h-7" />
@@ -326,7 +375,11 @@ export const SwipeableQuest = ({ quest, onAccept, onReject }: SwipeableQuestProp
               <Button
                 variant="default"
                 size="lg"
-                className="flex-1 h-16 rounded-full bg-accent hover:bg-accent/90 text-lg shadow-elevated"
+                className={`flex-1 h-16 rounded-full text-lg shadow-elevated ${
+                  isInFlight 
+                    ? 'bg-[hsl(45,100%,55%)] hover:bg-[hsl(45,100%,50%)] text-[hsl(164,76%,35%)]'
+                    : 'bg-accent hover:bg-accent/90'
+                }`}
                 onClick={onAccept}
               >
                 <Heart className="w-7 h-7 mr-2" />
