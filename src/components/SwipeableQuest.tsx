@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Clock, Trophy, X, Heart } from "lucide-react";
+import { MapPin, Clock, Trophy, X, Heart, AlertCircle, CheckCircle2, Shield } from "lucide-react";
 
 interface Quest {
   id: string;
@@ -21,12 +21,63 @@ interface SwipeableQuestProps {
   onReject: () => void;
 }
 
+const getQuestDetails = (questType: string) => {
+  switch (questType.toLowerCase()) {
+    case "weekly":
+      return {
+        title: "Weekly Mission",
+        description: "Complete this quest within the week to earn bonus miles. These missions refresh every Monday and offer higher rewards for consistent participation.",
+        requirements: [
+          "Complete the task within 7 days",
+          "Verification required through app",
+          "Limited to one completion per week"
+        ],
+        verificationMethod: "Partner API + Device Attestation"
+      };
+    case "daily":
+      return {
+        title: "Daily Challenge",
+        description: "Quick missions that help you build a daily streak. The longer your streak, the higher your multiplier bonus on all quest rewards.",
+        requirements: [
+          "Complete within 24 hours",
+          "Maintains your login streak",
+          "Can be completed multiple times"
+        ],
+        verificationMethod: "Geofence + Timestamp"
+      };
+    case "in-flight":
+      return {
+        title: "In-Flight Quest",
+        description: "Special missions available only during your flight. Complete destination quizzes, wellness challenges, or entertainment activities to earn miles while traveling.",
+        requirements: [
+          "Flight mode must be active",
+          "Complete during flight duration",
+          "No internet connection required"
+        ],
+        verificationMethod: "Flight Booking Reference"
+      };
+    default:
+      return {
+        title: "Quest Mission",
+        description: "Earn Asia Miles by completing verified micro-actions. Each quest is designed to be quick, rewarding, and contribute to sustainable travel habits.",
+        requirements: [
+          "Follow quest instructions",
+          "Complete verification steps",
+          "Submit within time limit"
+        ],
+        verificationMethod: "Multi-Factor Verification"
+      };
+  }
+};
+
 export const SwipeableQuest = ({ quest, onAccept, onReject }: SwipeableQuestProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [offset, setOffset] = useState(0);
   const [startX, setStartX] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
   const [exitDirection, setExitDirection] = useState<'left' | 'right' | null>(null);
+  
+  const details = getQuestDetails(quest.type);
 
   const handleStart = (clientX: number) => {
     if (isExiting) return;
@@ -143,85 +194,131 @@ export const SwipeableQuest = ({ quest, onAccept, onReject }: SwipeableQuestProp
             0 ${10 + Math.abs(offset) / 20}px ${20 + Math.abs(offset) / 10}px -5px rgba(0, 0, 0, 0.2)
           `,
         }}>
-          <div className="h-[70vh] relative">
-          {/* Left side red glow when swiping left - 3D enhanced */}
-          <div 
-            className="absolute top-0 bottom-0 left-0 w-4 pointer-events-none z-[15] transition-all"
-            style={{
-              opacity: offset < 0 ? glowIntensity : 0,
-              boxShadow: offset < 0 ? `
-                0 0 ${50 * glowIntensity}px ${25 * glowIntensity}px hsl(0 84% 60%),
-                inset 0 0 ${30 * glowIntensity}px ${10 * glowIntensity}px hsl(0 84% 60%)
-              ` : 'none',
-              background: offset < 0 ? `linear-gradient(to right, hsl(0 84% 60%), transparent)` : 'transparent',
-              transform: `translateZ(${50 * glowIntensity}px)`,
-            }}
-          />
-          
-          {/* Right side green glow when swiping right - 3D enhanced */}
-          <div 
-            className="absolute top-0 bottom-0 right-0 w-4 pointer-events-none z-[15] transition-all"
-            style={{
-              opacity: offset > 0 ? glowIntensity : 0,
-              boxShadow: offset > 0 ? `
-                0 0 ${50 * glowIntensity}px ${25 * glowIntensity}px hsl(164 76% 45%),
-                inset 0 0 ${30 * glowIntensity}px ${10 * glowIntensity}px hsl(164 76% 45%)
-              ` : 'none',
-              background: offset > 0 ? `linear-gradient(to left, hsl(164 76% 45%), transparent)` : 'transparent',
-              transform: `translateZ(${50 * glowIntensity}px)`,
-            }}
-          />
-          
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/95 z-10" />
-          <img
-            src={quest.image}
-            alt={quest.title}
-            className="w-full h-full object-cover"
-          />
-          
-          <div className="absolute top-6 left-6 right-6 z-20 flex gap-3">
-            <Badge variant="outline" className="bg-background/90 backdrop-blur-md text-base px-4 py-2 shadow-lg" style={{
-              transform: 'translateZ(30px)',
+          {/* Quest Image Section */}
+          <div className="h-[50vh] relative">
+            {/* Left side red glow when swiping left - 3D enhanced */}
+            <div 
+              className="absolute top-0 bottom-0 left-0 w-4 pointer-events-none z-[15] transition-all"
+              style={{
+                opacity: offset < 0 ? glowIntensity : 0,
+                boxShadow: offset < 0 ? `
+                  0 0 ${50 * glowIntensity}px ${25 * glowIntensity}px hsl(0 84% 60%),
+                  inset 0 0 ${30 * glowIntensity}px ${10 * glowIntensity}px hsl(0 84% 60%)
+                ` : 'none',
+                background: offset < 0 ? `linear-gradient(to right, hsl(0 84% 60%), transparent)` : 'transparent',
+                transform: `translateZ(${50 * glowIntensity}px)`,
+              }}
+            />
+            
+            {/* Right side green glow when swiping right - 3D enhanced */}
+            <div 
+              className="absolute top-0 bottom-0 right-0 w-4 pointer-events-none z-[15] transition-all"
+              style={{
+                opacity: offset > 0 ? glowIntensity : 0,
+                boxShadow: offset > 0 ? `
+                  0 0 ${50 * glowIntensity}px ${25 * glowIntensity}px hsl(142 76% 45%),
+                  inset 0 0 ${30 * glowIntensity}px ${10 * glowIntensity}px hsl(142 76% 45%)
+                ` : 'none',
+                background: offset > 0 ? `linear-gradient(to left, hsl(142 76% 45%), transparent)` : 'transparent',
+                transform: `translateZ(${50 * glowIntensity}px)`,
+              }}
+            />
+            
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/95 z-10" />
+            <img
+              src={quest.image}
+              alt={quest.title}
+              className="w-full h-full object-cover"
+            />
+            
+            <div className="absolute top-6 left-6 right-6 z-20 flex gap-3">
+              <Badge variant="outline" className="bg-background/90 backdrop-blur-md text-base px-4 py-2 shadow-lg" style={{
+                transform: 'translateZ(30px)',
+              }}>
+                {quest.type}
+              </Badge>
+              <Badge className="bg-accent/90 backdrop-blur-md ml-auto text-base px-4 py-2 shadow-lg" style={{
+                transform: 'translateZ(30px)',
+              }}>
+                <Trophy className="w-5 h-5 mr-2" />
+                {quest.reward} miles
+              </Badge>
+            </div>
+
+            <div className="absolute bottom-0 left-0 right-0 p-6 z-20 space-y-4" style={{
+              transform: 'translateZ(40px)',
             }}>
-              {quest.type}
-            </Badge>
-            <Badge className="bg-accent/90 backdrop-blur-md ml-auto text-base px-4 py-2 shadow-lg" style={{
-              transform: 'translateZ(30px)',
-            }}>
-              <Trophy className="w-5 h-5 mr-2" />
-              {quest.reward} miles
-            </Badge>
+              <div className="space-y-3">
+                <h2 className="text-4xl font-bold text-foreground drop-shadow-lg">{quest.title}</h2>
+                <p className="text-base text-muted-foreground leading-relaxed drop-shadow-md">{quest.description}</p>
+              </div>
+
+              <div className="flex items-center gap-6 text-base text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-5 h-5" />
+                  <span className="font-medium">{quest.timeLeft}</span>
+                </div>
+                {quest.location && (
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-5 h-5" />
+                    <span className="font-medium">{quest.location}</span>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
-          <div className="absolute bottom-0 left-0 right-0 p-6 z-20 space-y-4" style={{
-            transform: 'translateZ(40px)',
-          }}>
-            <div className="space-y-3">
-              <h2 className="text-4xl font-bold text-foreground drop-shadow-lg">{quest.title}</h2>
-              <p className="text-base text-muted-foreground leading-relaxed drop-shadow-md">{quest.description}</p>
-            </div>
-
-            <div className="flex items-center gap-6 text-base text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <Clock className="w-5 h-5" />
-                <span className="font-medium">{quest.timeLeft}</span>
+          {/* Quest Details Section */}
+          <div className="p-6 space-y-4 bg-background">
+            {/* Quest Type Description */}
+            <div className="flex items-start gap-3 p-4 bg-card rounded-lg shadow-card">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                <AlertCircle className="w-4 h-4 text-primary" />
               </div>
-              {quest.location && (
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-5 h-5" />
-                  <span className="font-medium">{quest.location}</span>
-                </div>
-              )}
+              <div className="flex-1">
+                <h3 className="font-bold text-foreground mb-1">{details.title}</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  {details.description}
+                </p>
+              </div>
             </div>
 
-            <div className="flex gap-6 pt-4">
+            {/* Requirements */}
+            <div className="p-4 bg-card rounded-lg shadow-card">
+              <div className="flex items-center gap-2 mb-3">
+                <CheckCircle2 className="w-4 h-4 text-accent" />
+                <h4 className="font-semibold text-sm text-foreground">Requirements</h4>
+              </div>
+              <ul className="space-y-2">
+                {details.requirements.map((req, index) => (
+                  <li key={index} className="flex items-start gap-2 text-xs text-muted-foreground">
+                    <span className="text-accent mt-0.5">•</span>
+                    <span>{req}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Verification Method */}
+            <div className="p-4 bg-card rounded-lg shadow-card">
+              <div className="flex items-center gap-2 mb-2">
+                <Shield className="w-4 h-4 text-primary" />
+                <h4 className="font-semibold text-sm text-foreground">Verification Method</h4>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {details.verificationMethod}
+              </p>
+              <Badge variant="outline" className="mt-3 text-xs bg-primary/5 text-primary border-primary/20">
+                Fraud-Protected
+              </Badge>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-4 pt-4">
               <Button
                 variant="outline"
                 size="lg"
                 className="flex-1 h-16 rounded-full text-lg shadow-elevated"
-                style={{
-                  transform: 'translateZ(10px)',
-                }}
                 onClick={onReject}
               >
                 <X className="w-7 h-7" />
@@ -230,9 +327,6 @@ export const SwipeableQuest = ({ quest, onAccept, onReject }: SwipeableQuestProp
                 variant="default"
                 size="lg"
                 className="flex-1 h-16 rounded-full bg-accent hover:bg-accent/90 text-lg shadow-elevated"
-                style={{
-                  transform: 'translateZ(10px)',
-                }}
                 onClick={onAccept}
               >
                 <Heart className="w-7 h-7 mr-2" />
@@ -240,8 +334,7 @@ export const SwipeableQuest = ({ quest, onAccept, onReject }: SwipeableQuestProp
               </Button>
             </div>
           </div>
-        </div>
-      </Card>
+        </Card>
 
         {/* Accept indicator - 3D enhanced */}
         {offset > 30 && (

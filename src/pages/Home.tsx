@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { SwipeableQuest } from "@/components/SwipeableQuest";
-import { QuestDescription } from "@/components/QuestDescription";
 import { BottomNav } from "@/components/BottomNav";
 import { Card } from "@/components/ui/card";
 import { Plane, MapPin } from "lucide-react";
@@ -110,14 +109,12 @@ const Home = () => {
         </Card>
       </header>
 
-      <div className="pt-6 space-y-4">
+      <div className="pt-6">
         <SwipeableQuest
           quest={sampleQuests[currentIndex]}
           onAccept={handleAccept}
           onReject={handleReject}
         />
-        
-        <QuestDescription questType={sampleQuests[currentIndex].type} />
       </div>
 
       <BottomNav />
