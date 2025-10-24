@@ -81,10 +81,10 @@ export const SwipeableQuest = ({ quest, onAccept, onReject }: SwipeableQuestProp
             </Badge>
           </div>
 
-          <div className="absolute bottom-0 left-0 right-0 p-6 z-20 space-y-4">
+          <div className="absolute bottom-0 left-0 right-0 p-6 z-20 space-y-3">
             <div className="space-y-2">
               <h2 className="text-2xl font-bold text-foreground">{quest.title}</h2>
-              <p className="text-muted-foreground">{quest.description}</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{quest.description}</p>
             </div>
 
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -100,7 +100,7 @@ export const SwipeableQuest = ({ quest, onAccept, onReject }: SwipeableQuestProp
               )}
             </div>
 
-            <div className="flex gap-4 pt-4">
+            <div className="flex gap-4 pt-2">
               <Button
                 variant="outline"
                 size="lg"
