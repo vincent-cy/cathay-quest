@@ -54,15 +54,11 @@ const Home = () => {
   };
 
   return (
-    <div className={`min-h-screen pb-20 transition-colors duration-500 ${
-      isInFlight 
-        ? "bg-gradient-to-b from-primary/5 via-primary/10 to-background" 
-        : "bg-background"
-    }`}>
+    <div className={`min-h-screen pb-20 transition-colors duration-500 bg-background`}>
       <header className={`p-6 border-b space-y-4 shadow-lg transition-all ${
         isInFlight 
-          ? "bg-primary/10 border-primary/30 backdrop-blur-md" 
-          : "bg-background border-border"
+          ? "bg-primary/20 border-accent/50 backdrop-blur-md" 
+          : "bg-primary/10 border-border"
       }`}>
         <div className="flex items-center justify-between">
           <div>
