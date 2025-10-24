@@ -92,8 +92,8 @@ const Home = () => {
           <div className="flex items-center gap-4">
             {isInFlight ? (
               <>
-                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-white/20 flex items-center justify-center shadow-lg">
-                  <Plane className="w-6 h-6 text-white animate-pulse" />
+                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-white/20 flex items-center justify-center shadow-lg">
+                  <Plane className="w-10 h-10 text-white animate-pulse" />
                 </div>
                 <div className="flex-1">
                   <p className="font-bold text-white text-base">In-Flight Mode Active</p>
