@@ -1,7 +1,10 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { BottomNav } from "@/components/BottomNav";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, Crown, Award } from "lucide-react";
+import { useFlightMode } from "@/contexts/FlightModeContext";
 
 const topUsers = [
   { rank: 1, name: "Sarah Chen", miles: 2450, streak: 47, region: "Hong Kong" },
@@ -14,6 +17,15 @@ const topUsers = [
 ];
 
 const LeaderboardPage = () => {
+  const { isInFlight } = useFlightMode();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isInFlight) {
+      navigate("/");
+    }
+  }, [isInFlight, navigate]);
+
   return (
     <div className="min-h-screen bg-background pb-20">
       <header className="p-4 border-b border-border">

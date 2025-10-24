@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SwipeableQuest } from "@/components/SwipeableQuest";
 import { QuestDescription } from "@/components/QuestDescription";
 import { BottomNav } from "@/components/BottomNav";
 import { Card } from "@/components/ui/card";
 import { Plane, MapPin } from "lucide-react";
+import { useFlightMode } from "@/contexts/FlightModeContext";
 import heroFlight from "@/assets/hero-flight.jpg";
 
 const sampleQuests = [
@@ -41,7 +42,7 @@ const sampleQuests = [
 const Home = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [acceptedQuests, setAcceptedQuests] = useState<string[]>([]);
-  const [isInFlight, setIsInFlight] = useState(false); // Toggle for demo purposes
+  const { isInFlight, setIsInFlight } = useFlightMode();
 
   const handleAccept = () => {
     setAcceptedQuests([...acceptedQuests, sampleQuests[currentIndex].id]);
@@ -53,8 +54,16 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <header className="p-6 border-b border-border space-y-4 shadow-lg">
+    <div className={`min-h-screen pb-20 transition-colors duration-500 ${
+      isInFlight 
+        ? "bg-gradient-to-b from-primary/5 via-primary/10 to-background" 
+        : "bg-background"
+    }`}>
+      <header className={`p-6 border-b space-y-4 shadow-lg transition-all ${
+        isInFlight 
+          ? "bg-primary/10 border-primary/30 backdrop-blur-md" 
+          : "bg-background border-border"
+      }`}>
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-foreground drop-shadow-md">Discover Quests</h1>
