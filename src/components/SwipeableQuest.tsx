@@ -367,19 +367,6 @@ export const SwipeableQuest = ({ quest, onAccept, onReject }: SwipeableQuestProp
             <p className="text-center mt-3 text-destructive font-bold text-2xl drop-shadow-lg">SKIP</p>
           </div>
         )}
-      
-        {/* Swipe instruction hint - 3D enhanced */}
-        {offset === 0 && !isDragging && !isExiting && (
-          <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 z-30 animate-pulse" style={{
-            transform: 'translateX(-50%) translateZ(50px)',
-          }}>
-            <div className="flex items-center gap-3 bg-background/90 backdrop-blur-md px-6 py-3 rounded-full shadow-elevated">
-              <span className="text-3xl">←</span>
-              <span className="text-base font-semibold text-foreground">Swipe to choose</span>
-              <span className="text-3xl">→</span>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
