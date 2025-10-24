@@ -29,47 +29,47 @@ export const Hero = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 text-center space-y-8 animate-slide-up">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-foreground/10 backdrop-blur-sm border border-primary-foreground/20">
-          <Sparkles className="w-4 h-4 text-accent" />
-          <span className="text-sm font-medium text-primary-foreground">
+      <div className="relative z-10 container mx-auto px-4 text-center space-y-6 md:space-y-8 animate-slide-up">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full bg-primary-foreground/10 backdrop-blur-sm border border-primary-foreground/20">
+          <Sparkles className="w-3 h-3 md:w-4 md:h-4 text-accent" />
+          <span className="text-xs md:text-sm font-medium text-primary-foreground">
             Powered by Cathay Pacific Asia Miles
           </span>
         </div>
 
-        <h1 className="text-5xl md:text-7xl font-bold text-primary-foreground tracking-tight">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-primary-foreground tracking-tight px-2">
           Earn Asia Miles
           <br />
           <span className="text-accent">by doing, not just buying</span>
         </h1>
 
-        <p className="text-xl md:text-2xl text-primary-foreground/90 max-w-3xl mx-auto leading-relaxed">
+        <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-primary-foreground/90 max-w-3xl mx-auto leading-relaxed px-4">
           Turn everyday actions into verified miles. Complete quests on-ground and in-flight
           with instant, auditable rewards.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-          <Button size="lg" variant="hero" className="text-lg px-8 py-6 shadow-glow">
+        <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-stretch sm:items-center pt-2 md:pt-4 px-4">
+          <Button size="lg" variant="hero" className="text-base md:text-lg px-6 md:px-8 py-5 md:py-6 shadow-glow w-full sm:w-auto">
             Start Your First Quest
           </Button>
-          <Button size="lg" variant="outline" className="text-lg px-8 py-6 bg-primary-foreground/10 backdrop-blur-sm border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/20">
+          <Button size="lg" variant="outline" className="text-base md:text-lg px-6 md:px-8 py-5 md:py-6 bg-primary-foreground/10 backdrop-blur-sm border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/20 w-full sm:w-auto">
             Learn More
           </Button>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto pt-12">
-          <div className="space-y-2">
-            <div className="text-3xl md:text-4xl font-bold text-accent">2M+</div>
-            <div className="text-sm text-primary-foreground/80">Quests Completed</div>
+        <div className="grid grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-2xl mx-auto pt-8 md:pt-12 px-2">
+          <div className="space-y-1 md:space-y-2">
+            <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-accent">2M+</div>
+            <div className="text-xs sm:text-sm text-primary-foreground/80">Quests Completed</div>
           </div>
-          <div className="space-y-2">
-            <div className="text-3xl md:text-4xl font-bold text-accent">500K+</div>
-            <div className="text-sm text-primary-foreground/80">Active Users</div>
+          <div className="space-y-1 md:space-y-2">
+            <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-accent">500K+</div>
+            <div className="text-xs sm:text-sm text-primary-foreground/80">Active Users</div>
           </div>
-          <div className="space-y-2">
-            <div className="text-3xl md:text-4xl font-bold text-accent">50M+</div>
-            <div className="text-sm text-primary-foreground/80">Miles Earned</div>
+          <div className="space-y-1 md:space-y-2">
+            <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-accent">50M+</div>
+            <div className="text-xs sm:text-sm text-primary-foreground/80">Miles Earned</div>
           </div>
         </div>
       </div>

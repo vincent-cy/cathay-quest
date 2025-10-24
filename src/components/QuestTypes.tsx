@@ -41,18 +41,18 @@ const questTypes = [
 
 export const QuestTypes = () => {
   return (
-    <section className="py-24 px-4 bg-muted/30">
+    <section className="py-16 md:py-24 px-4 bg-muted/30">
       <div className="container mx-auto">
-        <div className="text-center space-y-4 mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground">
+        <div className="text-center space-y-3 md:space-y-4 mb-12 md:mb-16 px-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground">
             Multiple Ways to <span className="text-primary">Earn</span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
             From daily habits to seasonal challenges, there's always a quest waiting for you.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {questTypes.map((quest, index) => {
             const Icon = quest.icon;
             return (

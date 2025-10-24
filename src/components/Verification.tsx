@@ -35,24 +35,24 @@ const verificationMethods = [
 
 export const Verification = () => {
   return (
-    <section className="py-24 px-4">
+    <section className="py-16 md:py-24 px-4">
       <div className="container mx-auto">
-        <div className="text-center space-y-4 mb-16">
-          <div className="flex justify-center mb-4">
+        <div className="text-center space-y-3 md:space-y-4 mb-12 md:mb-16 px-4">
+          <div className="flex justify-center mb-3 md:mb-4">
             <div className="relative">
-              <img src={ecoIcon} alt="Eco Icon" className="w-16 h-16" />
+              <img src={ecoIcon} alt="Eco Icon" className="w-12 h-12 md:w-16 md:h-16" />
               <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full" />
             </div>
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground">
             Verified <span className="text-primary">& Secure</span>
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
             Every quest is verified through multiple security layers to ensure fair play and prevent fraud.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+        <div className="grid sm:grid-cols-2 gap-4 md:gap-6 max-w-4xl mx-auto">
           {verificationMethods.map((method, index) => {
             const Icon = method.icon;
             return (
@@ -79,11 +79,11 @@ export const Verification = () => {
           })}
         </div>
 
-        <div className="mt-12 p-6 rounded-lg bg-card shadow-card max-w-2xl mx-auto">
-          <div className="flex items-start gap-4">
-            <ShieldCheck className="w-8 h-8 text-primary flex-shrink-0" />
+        <div className="mt-8 md:mt-12 p-4 md:p-6 rounded-lg bg-card shadow-card max-w-2xl mx-auto">
+          <div className="flex items-start gap-3 md:gap-4">
+            <ShieldCheck className="w-6 h-6 md:w-8 md:h-8 text-primary flex-shrink-0" />
             <div className="space-y-2">
-              <h3 className="text-lg font-bold text-foreground">Fraud Prevention</h3>
+              <h3 className="text-base md:text-lg font-bold text-foreground">Fraud Prevention</h3>
               <p className="text-sm text-muted-foreground">
                 Our system employs device attestation, replay protection, anomaly scoring, and liveness
                 checks to maintain a fair environment. Suspicious activity is flagged for review, and
