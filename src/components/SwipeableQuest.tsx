@@ -26,6 +26,7 @@ export const SwipeableQuest = ({ quest, onAccept, onReject }: SwipeableQuestProp
   const [offset, setOffset] = useState(0);
   const [startX, setStartX] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
+  const [exitDirection, setExitDirection] = useState<'left' | 'right' | null>(null);
 
   const handleStart = (clientX: number) => {
     if (isExiting) return;
@@ -40,26 +41,30 @@ export const SwipeableQuest = ({ quest, onAccept, onReject }: SwipeableQuestProp
 
   const handleEnd = () => {
     setIsDragging(false);
-    const threshold = 80; // Lower threshold for easier swiping
+    const threshold = 80;
     
     if (offset > threshold) {
       // Swipe right - Accept
       setIsExiting(true);
-      setOffset(400);
+      setExitDirection('right');
+      setOffset(window.innerWidth);
       setTimeout(() => {
         onAccept();
         setIsExiting(false);
+        setExitDirection(null);
         setOffset(0);
-      }, 300);
+      }, 400);
     } else if (offset < -threshold) {
       // Swipe left - Reject
       setIsExiting(true);
-      setOffset(-400);
+      setExitDirection('left');
+      setOffset(-window.innerWidth);
       setTimeout(() => {
         onReject();
         setIsExiting(false);
+        setExitDirection(null);
         setOffset(0);
-      }, 300);
+      }, 400);
     } else {
       setOffset(0);
     }
@@ -97,17 +102,21 @@ export const SwipeableQuest = ({ quest, onAccept, onReject }: SwipeableQuestProp
     }
   };
 
-  const rotation = offset / 15;
+  const rotation = isExiting ? offset / 20 : offset / 15;
   const scale = isDragging ? 0.95 : 1;
-  const acceptOpacity = Math.min(offset / 100, 1);
-  const rejectOpacity = Math.min(Math.abs(offset) / 100, 1);
+  const acceptOpacity = Math.min(Math.max(offset / 100, 0), 1);
+  const rejectOpacity = Math.min(Math.max(Math.abs(offset) / 100, 0), 1);
+  
+  // Glow intensity based on swipe distance
+  const glowIntensity = Math.min(Math.abs(offset) / 150, 1);
 
   return (
     <div
       className="touch-none select-none cursor-grab active:cursor-grabbing relative"
       style={{
         transform: `translateX(${offset}px) rotate(${rotation}deg) scale(${scale})`,
-        transition: isDragging ? "none" : "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        transition: isDragging ? "none" : isExiting ? "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)" : "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        opacity: isExiting ? 0 : 1,
       }}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
@@ -119,14 +128,24 @@ export const SwipeableQuest = ({ quest, onAccept, onReject }: SwipeableQuestProp
     >
       <Card className="relative overflow-hidden shadow-elevated mx-4">
         <div className="h-[60vh] relative">
-          {/* Color overlays for swipe direction */}
+          {/* Left side red glow when swiping left */}
           <div 
-            className="absolute inset-0 bg-primary z-[5] transition-opacity pointer-events-none"
-            style={{ opacity: offset > 0 ? acceptOpacity * 0.3 : 0 }}
+            className="absolute top-0 bottom-0 left-0 w-2 pointer-events-none z-[15] transition-all"
+            style={{
+              opacity: offset < 0 ? glowIntensity : 0,
+              boxShadow: offset < 0 ? `0 0 ${30 * glowIntensity}px ${15 * glowIntensity}px hsl(0 84% 60%)` : 'none',
+              background: offset < 0 ? 'hsl(0 84% 60%)' : 'transparent',
+            }}
           />
+          
+          {/* Right side green glow when swiping right */}
           <div 
-            className="absolute inset-0 bg-destructive z-[5] transition-opacity pointer-events-none"
-            style={{ opacity: offset < 0 ? rejectOpacity * 0.3 : 0 }}
+            className="absolute top-0 bottom-0 right-0 w-2 pointer-events-none z-[15] transition-all"
+            style={{
+              opacity: offset > 0 ? glowIntensity : 0,
+              boxShadow: offset > 0 ? `0 0 ${30 * glowIntensity}px ${15 * glowIntensity}px hsl(164 76% 45%)` : 'none',
+              background: offset > 0 ? 'hsl(164 76% 45%)' : 'transparent',
+            }}
           />
           
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/95 z-10" />
