@@ -121,7 +121,7 @@ const Home = () => {
         </Card>
       </header>
 
-      <div className="pt-6">
+      <div className={isInFlight ? "pt-8 px-2" : "pt-6"}>
         <SwipeableQuest
           quest={sampleQuests[currentIndex]}
           onAccept={handleAccept}

@@ -189,11 +189,15 @@ export const SwipeableQuest = ({ quest, onAccept, onReject, isInFlight = false }
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseLeave}
       >
-        <Card className="relative overflow-hidden mx-4" style={{
-          boxShadow: `
-            0 ${20 + Math.abs(offset) / 10}px ${40 + Math.abs(offset) / 5}px -10px rgba(0, 0, 0, 0.3),
-            0 ${10 + Math.abs(offset) / 20}px ${20 + Math.abs(offset) / 10}px -5px rgba(0, 0, 0, 0.2)
-          `,
+        <Card className={`relative overflow-hidden mx-4 ${
+          isInFlight ? 'border-4 border-white/30' : ''
+        }`} style={{
+          boxShadow: isInFlight 
+            ? `0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1)`
+            : `
+              0 ${20 + Math.abs(offset) / 10}px ${40 + Math.abs(offset) / 5}px -10px rgba(0, 0, 0, 0.3),
+              0 ${10 + Math.abs(offset) / 20}px ${20 + Math.abs(offset) / 10}px -5px rgba(0, 0, 0, 0.2)
+            `,
         }}>
           {/* Quest Image Section */}
           <div className="h-[50vh] relative">
