@@ -110,41 +110,65 @@ export const SwipeableQuest = ({ quest, onAccept, onReject }: SwipeableQuestProp
   // Glow intensity based on swipe distance
   const glowIntensity = Math.min(Math.abs(offset) / 150, 1);
 
+  // 3D perspective effect based on drag
+  const perspective = 1000;
+  const rotateY = offset / 10;
+  const rotateX = isDragging ? -5 : 0;
+
   return (
     <div
       className="touch-none select-none cursor-grab active:cursor-grabbing relative"
       style={{
-        transform: `translateX(${offset}px) rotate(${rotation}deg) scale(${scale})`,
-        transition: isDragging ? "none" : isExiting ? "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)" : "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-        opacity: isExiting ? 0 : 1,
+        perspective: `${perspective}px`,
       }}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseLeave}
     >
-      <Card className="relative overflow-hidden shadow-elevated mx-4">
-        <div className="h-[60vh] relative">
-          {/* Left side red glow when swiping left */}
+      <div
+        style={{
+          transform: `translateX(${offset}px) rotateY(${rotateY}deg) rotateX(${rotateX}deg) scale(${scale})`,
+          transformStyle: "preserve-3d",
+          transition: isDragging ? "none" : isExiting ? "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)" : "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+          opacity: isExiting ? 0 : 1,
+        }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
+      >
+        <Card className="relative overflow-hidden mx-4" style={{
+          boxShadow: `
+            0 ${20 + Math.abs(offset) / 10}px ${40 + Math.abs(offset) / 5}px -10px rgba(0, 0, 0, 0.3),
+            0 ${10 + Math.abs(offset) / 20}px ${20 + Math.abs(offset) / 10}px -5px rgba(0, 0, 0, 0.2)
+          `,
+        }}>
+          <div className="h-[70vh] relative">
+          {/* Left side red glow when swiping left - 3D enhanced */}
           <div 
-            className="absolute top-0 bottom-0 left-0 w-2 pointer-events-none z-[15] transition-all"
+            className="absolute top-0 bottom-0 left-0 w-4 pointer-events-none z-[15] transition-all"
             style={{
               opacity: offset < 0 ? glowIntensity : 0,
-              boxShadow: offset < 0 ? `0 0 ${30 * glowIntensity}px ${15 * glowIntensity}px hsl(0 84% 60%)` : 'none',
-              background: offset < 0 ? 'hsl(0 84% 60%)' : 'transparent',
+              boxShadow: offset < 0 ? `
+                0 0 ${50 * glowIntensity}px ${25 * glowIntensity}px hsl(0 84% 60%),
+                inset 0 0 ${30 * glowIntensity}px ${10 * glowIntensity}px hsl(0 84% 60%)
+              ` : 'none',
+              background: offset < 0 ? `linear-gradient(to right, hsl(0 84% 60%), transparent)` : 'transparent',
+              transform: `translateZ(${50 * glowIntensity}px)`,
             }}
           />
           
-          {/* Right side green glow when swiping right */}
+          {/* Right side green glow when swiping right - 3D enhanced */}
           <div 
-            className="absolute top-0 bottom-0 right-0 w-2 pointer-events-none z-[15] transition-all"
+            className="absolute top-0 bottom-0 right-0 w-4 pointer-events-none z-[15] transition-all"
             style={{
               opacity: offset > 0 ? glowIntensity : 0,
-              boxShadow: offset > 0 ? `0 0 ${30 * glowIntensity}px ${15 * glowIntensity}px hsl(164 76% 45%)` : 'none',
-              background: offset > 0 ? 'hsl(164 76% 45%)' : 'transparent',
+              boxShadow: offset > 0 ? `
+                0 0 ${50 * glowIntensity}px ${25 * glowIntensity}px hsl(164 76% 45%),
+                inset 0 0 ${30 * glowIntensity}px ${10 * glowIntensity}px hsl(164 76% 45%)
+              ` : 'none',
+              background: offset > 0 ? `linear-gradient(to left, hsl(164 76% 45%), transparent)` : 'transparent',
+              transform: `translateZ(${50 * glowIntensity}px)`,
             }}
           />
           
@@ -155,51 +179,63 @@ export const SwipeableQuest = ({ quest, onAccept, onReject }: SwipeableQuestProp
             className="w-full h-full object-cover"
           />
           
-          <div className="absolute top-4 left-4 right-4 z-20 flex gap-2">
-            <Badge variant="outline" className="bg-background/80 backdrop-blur-sm">
+          <div className="absolute top-6 left-6 right-6 z-20 flex gap-3">
+            <Badge variant="outline" className="bg-background/90 backdrop-blur-md text-base px-4 py-2 shadow-lg" style={{
+              transform: 'translateZ(30px)',
+            }}>
               {quest.type}
             </Badge>
-            <Badge className="bg-accent/80 backdrop-blur-sm ml-auto">
-              <Trophy className="w-3 h-3 mr-1" />
+            <Badge className="bg-accent/90 backdrop-blur-md ml-auto text-base px-4 py-2 shadow-lg" style={{
+              transform: 'translateZ(30px)',
+            }}>
+              <Trophy className="w-5 h-5 mr-2" />
               {quest.reward} miles
             </Badge>
           </div>
 
-          <div className="absolute bottom-0 left-0 right-0 p-6 z-20 space-y-3">
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-foreground">{quest.title}</h2>
-              <p className="text-sm text-muted-foreground leading-relaxed">{quest.description}</p>
+          <div className="absolute bottom-0 left-0 right-0 p-6 z-20 space-y-4" style={{
+            transform: 'translateZ(40px)',
+          }}>
+            <div className="space-y-3">
+              <h2 className="text-4xl font-bold text-foreground drop-shadow-lg">{quest.title}</h2>
+              <p className="text-base text-muted-foreground leading-relaxed drop-shadow-md">{quest.description}</p>
             </div>
 
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <Clock className="w-4 h-4" />
-                {quest.timeLeft}
+            <div className="flex items-center gap-6 text-base text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <Clock className="w-5 h-5" />
+                <span className="font-medium">{quest.timeLeft}</span>
               </div>
               {quest.location && (
-                <div className="flex items-center gap-1">
-                  <MapPin className="w-4 h-4" />
-                  {quest.location}
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-5 h-5" />
+                  <span className="font-medium">{quest.location}</span>
                 </div>
               )}
             </div>
 
-            <div className="flex gap-4 pt-2">
+            <div className="flex gap-6 pt-4">
               <Button
                 variant="outline"
                 size="lg"
-                className="flex-1 h-14 rounded-full"
+                className="flex-1 h-16 rounded-full text-lg shadow-elevated"
+                style={{
+                  transform: 'translateZ(10px)',
+                }}
                 onClick={onReject}
               >
-                <X className="w-6 h-6" />
+                <X className="w-7 h-7" />
               </Button>
               <Button
                 variant="default"
                 size="lg"
-                className="flex-1 h-14 rounded-full bg-accent hover:bg-accent/90"
+                className="flex-1 h-16 rounded-full bg-accent hover:bg-accent/90 text-lg shadow-elevated"
+                style={{
+                  transform: 'translateZ(10px)',
+                }}
                 onClick={onAccept}
               >
-                <Heart className="w-6 h-6 mr-2" />
+                <Heart className="w-7 h-7 mr-2" />
                 Accept Quest
               </Button>
             </div>
@@ -207,42 +243,51 @@ export const SwipeableQuest = ({ quest, onAccept, onReject }: SwipeableQuestProp
         </div>
       </Card>
 
-      {/* Accept indicator */}
-      {offset > 30 && (
-        <div 
-          className="absolute top-1/3 right-6 transform -translate-y-1/2"
-          style={{ opacity: acceptOpacity }}
-        >
-          <div className="bg-primary rounded-full p-4 shadow-glow">
-            <Heart className="w-12 h-12 text-white fill-white" />
+        {/* Accept indicator - 3D enhanced */}
+        {offset > 30 && (
+          <div 
+            className="absolute top-1/3 right-8 transform -translate-y-1/2 z-30"
+            style={{ 
+              opacity: acceptOpacity,
+              transform: `translateY(-50%) translateZ(${60 * acceptOpacity}px) scale(${1 + acceptOpacity * 0.2})`,
+            }}
+          >
+            <div className="bg-primary rounded-full p-6 shadow-glow animate-pulse">
+              <Heart className="w-16 h-16 text-white fill-white drop-shadow-2xl" />
+            </div>
+            <p className="text-center mt-3 text-primary font-bold text-2xl drop-shadow-lg">ACCEPT</p>
           </div>
-          <p className="text-center mt-2 text-primary font-bold text-xl">ACCEPT</p>
-        </div>
-      )}
+        )}
+        
+        {/* Reject indicator - 3D enhanced */}
+        {offset < -30 && (
+          <div 
+            className="absolute top-1/3 left-8 transform -translate-y-1/2 z-30"
+            style={{ 
+              opacity: rejectOpacity,
+              transform: `translateY(-50%) translateZ(${60 * rejectOpacity}px) scale(${1 + rejectOpacity * 0.2})`,
+            }}
+          >
+            <div className="bg-destructive rounded-full p-6 shadow-elevated animate-pulse">
+              <X className="w-16 h-16 text-white drop-shadow-2xl" />
+            </div>
+            <p className="text-center mt-3 text-destructive font-bold text-2xl drop-shadow-lg">SKIP</p>
+          </div>
+        )}
       
-      {/* Reject indicator */}
-      {offset < -30 && (
-        <div 
-          className="absolute top-1/3 left-6 transform -translate-y-1/2"
-          style={{ opacity: rejectOpacity }}
-        >
-          <div className="bg-destructive rounded-full p-4 shadow-elevated">
-            <X className="w-12 h-12 text-white" />
+        {/* Swipe instruction hint - 3D enhanced */}
+        {offset === 0 && !isDragging && !isExiting && (
+          <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 z-30 animate-pulse" style={{
+            transform: 'translateX(-50%) translateZ(50px)',
+          }}>
+            <div className="flex items-center gap-3 bg-background/90 backdrop-blur-md px-6 py-3 rounded-full shadow-elevated">
+              <span className="text-3xl">←</span>
+              <span className="text-base font-semibold text-foreground">Swipe to choose</span>
+              <span className="text-3xl">→</span>
+            </div>
           </div>
-          <p className="text-center mt-2 text-destructive font-bold text-xl">SKIP</p>
-        </div>
-      )}
-      
-      {/* Swipe instruction hint */}
-      {offset === 0 && !isDragging && !isExiting && (
-        <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 z-30 animate-pulse">
-          <div className="flex items-center gap-2 bg-background/80 backdrop-blur-sm px-4 py-2 rounded-full">
-            <span className="text-2xl">←</span>
-            <span className="text-xs font-medium text-muted-foreground">Swipe to choose</span>
-            <span className="text-2xl">→</span>
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

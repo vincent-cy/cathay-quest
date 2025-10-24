@@ -54,52 +54,55 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <header className="p-4 border-b border-border space-y-3">
+      <header className="p-6 border-b border-border space-y-4 shadow-lg">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Discover Quests</h1>
-            <p className="text-sm text-muted-foreground">Swipe to explore missions</p>
+            <h1 className="text-3xl font-bold text-foreground drop-shadow-md">Discover Quests</h1>
+            <p className="text-base text-muted-foreground">Swipe to explore missions</p>
           </div>
           <div className="text-right">
-            <p className="text-sm text-muted-foreground">Accepted</p>
-            <p className="text-xl font-bold text-accent">{acceptedQuests.length}</p>
+            <p className="text-base text-muted-foreground">Accepted</p>
+            <p className="text-3xl font-bold text-accent drop-shadow-md">{acceptedQuests.length}</p>
           </div>
         </div>
         
-        {/* Flight Mode Indicator */}
+        {/* Flight Mode Indicator - 3D enhanced */}
         <Card 
-          className={`p-3 cursor-pointer transition-all ${
+          className={`p-4 cursor-pointer transition-all shadow-card hover:shadow-elevated ${
             isInFlight 
               ? "bg-primary/10 border-primary/30" 
               : "bg-muted/50 border-border"
           }`}
+          style={{
+            transform: isInFlight ? 'scale(1.02)' : 'scale(1)',
+          }}
           onClick={() => setIsInFlight(!isInFlight)}
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             {isInFlight ? (
               <>
-                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                  <Plane className="w-5 h-5 text-primary animate-pulse" />
+                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center shadow-lg">
+                  <Plane className="w-6 h-6 text-primary animate-pulse" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-semibold text-foreground text-sm">In-Flight Mode Active</p>
-                  <p className="text-xs text-muted-foreground">Flight CX888 • HKG → SIN</p>
+                  <p className="font-bold text-foreground text-base">In-Flight Mode Active</p>
+                  <p className="text-sm text-muted-foreground">Flight CX888 • HKG → SIN</p>
                 </div>
-                <div className="px-3 py-1 rounded-full bg-primary/20">
-                  <span className="text-xs font-medium text-primary">Active</span>
+                <div className="px-4 py-2 rounded-full bg-primary/20 shadow-md">
+                  <span className="text-sm font-bold text-primary">Active</span>
                 </div>
               </>
             ) : (
               <>
-                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-muted flex items-center justify-center">
-                  <MapPin className="w-5 h-5 text-muted-foreground" />
+                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-muted flex items-center justify-center shadow-md">
+                  <MapPin className="w-6 h-6 text-muted-foreground" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-semibold text-foreground text-sm">On-Ground Mode</p>
-                  <p className="text-xs text-muted-foreground">No active flight detected</p>
+                  <p className="font-bold text-foreground text-base">On-Ground Mode</p>
+                  <p className="text-sm text-muted-foreground">No active flight detected</p>
                 </div>
-                <div className="px-3 py-1 rounded-full bg-muted">
-                  <span className="text-xs font-medium text-muted-foreground">Offline</span>
+                <div className="px-4 py-2 rounded-full bg-muted shadow-sm">
+                  <span className="text-sm font-semibold text-muted-foreground">Offline</span>
                 </div>
               </>
             )}
