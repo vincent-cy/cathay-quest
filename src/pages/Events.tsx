@@ -1,10 +1,7 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { BottomNav } from "@/components/BottomNav";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, Calendar } from "lucide-react";
-import { useFlightMode } from "@/contexts/FlightModeContext";
 
 const events = [
   {
@@ -24,15 +21,6 @@ const events = [
 ];
 
 const Events = () => {
-  const { isInFlight } = useFlightMode();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (isInFlight) {
-      navigate("/");
-    }
-  }, [isInFlight, navigate]);
-
   return (
     <div className="min-h-screen bg-background pb-20">
       <header className="p-4 border-b border-border">
