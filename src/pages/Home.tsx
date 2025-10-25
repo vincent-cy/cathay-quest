@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 const Home = () => {
   const [showCalendar, setShowCalendar] = useState(true);
   const [checkedDays, setCheckedDays] = useState<number[]>([1, 2, 3, 4]);
+  const [cathayPoints, setCathayPoints] = useState(1850);
   
   // Calculate next slot to claim (additive system)
   const nextSlotToClaim = checkedDays.length + 1;
@@ -27,7 +28,9 @@ const Home = () => {
 
   const handleClaimReward = () => {
     if (nextSlotToClaim <= 31) {
+      const rewardAmount = dailyRewards[nextSlotToClaim - 1].reward;
       setCheckedDays([...checkedDays, nextSlotToClaim]);
+      setCathayPoints(cathayPoints + rewardAmount);
     }
   };
 
@@ -103,7 +106,7 @@ const Home = () => {
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center p-3 rounded-lg bg-muted/50">
               <Trophy className="w-6 h-6 text-accent mx-auto mb-2" />
-              <p className="text-2xl font-bold text-foreground">1,850</p>
+              <p className="text-2xl font-bold text-foreground">{cathayPoints.toLocaleString()}</p>
               <p className="text-xs text-muted-foreground">Cathay Points</p>
             </div>
             <div className="text-center p-3 rounded-lg bg-muted/50">

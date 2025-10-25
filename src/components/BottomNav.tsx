@@ -34,9 +34,9 @@ export const BottomNav = () => {
                 </div>
               ) : (
                 <>
-                  <Icon className={`w-7 h-7 mb-1 transition-all ${
-                    isActive ? "text-primary scale-110" : "text-muted-foreground hover:text-foreground"
-                  }`} strokeWidth={2.5} />
+                  <Icon className={`mb-1 transition-all ${
+                    isActive ? "w-7 h-7 text-primary scale-110" : "w-6 h-6 text-muted-foreground hover:text-foreground"
+                  }`} strokeWidth={isActive ? 2.5 : 2} />
                   <span className={`text-xs transition-all ${
                     isActive ? "text-primary font-bold" : "text-muted-foreground"
                   }`}>
