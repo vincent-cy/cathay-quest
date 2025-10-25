@@ -149,17 +149,32 @@ const Quests = () => {
   const [isInFlight, setIsInFlight] = useState(false);
   const [swipesLeft, setSwipesLeft] = useState(3);
   const [daysUntilRefresh] = useState(4);
-  const [removedQuests, setRemovedQuests] = useState<string[]>([]);
+  const [weeklyIndex, setWeeklyIndex] = useState(0);
+  const [oneTimeIndex, setOneTimeIndex] = useState(0);
+  const [inFlightIndex, setInFlightIndex] = useState(0);
 
-  // Filter quests based on flight mode
-  const weeklyQuests = allQuests.filter(quest => quest.type === "Weekly" && !removedQuests.includes(quest.id));
-  const oneTimeQuests = allQuests.filter(quest => quest.type === "One-Time" && !removedQuests.includes(quest.id));
-  const inFlightQuests = allQuests.filter(quest => quest.type === "In-Flight" && !removedQuests.includes(quest.id));
+  // Get all quests by type
+  const allWeeklyQuests = allQuests.filter(quest => quest.type === "Weekly");
+  const allOneTimeQuests = allQuests.filter(quest => quest.type === "One-Time");
+  const allInFlightQuests = allQuests.filter(quest => quest.type === "In-Flight");
 
-  const handleSwipeLeft = (questId: string) => {
+  // Show only 3 quests at a time
+  const weeklyQuests = allWeeklyQuests.slice(weeklyIndex, weeklyIndex + 3);
+  const oneTimeQuests = allOneTimeQuests.slice(oneTimeIndex, oneTimeIndex + 3);
+  const inFlightQuests = allInFlightQuests.slice(inFlightIndex, inFlightIndex + 3);
+
+  const handleSwipeLeft = (questId: string, type: string) => {
     if (swipesLeft > 0) {
       setSwipesLeft(prev => prev - 1);
-      setRemovedQuests(prev => [...prev, questId]);
+      
+      // Advance to next quest in the list
+      if (type === "Weekly") {
+        setWeeklyIndex(prev => Math.min(prev + 1, allWeeklyQuests.length - 3));
+      } else if (type === "One-Time") {
+        setOneTimeIndex(prev => Math.min(prev + 1, allOneTimeQuests.length - 3));
+      } else if (type === "In-Flight") {
+        setInFlightIndex(prev => Math.min(prev + 1, allInFlightQuests.length - 3));
+      }
     }
   };
 
@@ -280,7 +295,7 @@ const Quests = () => {
                       <CompactQuestCard
                         quest={quest}
                         isInFlight={isInFlight}
-                        onSwipeLeft={() => handleSwipeLeft(quest.id)}
+                        onSwipeLeft={() => handleSwipeLeft(quest.id, "In-Flight")}
                         swipesLeft={swipesLeft}
                       />
                     </div>
@@ -322,7 +337,7 @@ const Quests = () => {
                         <CompactQuestCard
                           quest={quest}
                           isInFlight={isInFlight}
-                          onSwipeLeft={() => handleSwipeLeft(quest.id)}
+                          onSwipeLeft={() => handleSwipeLeft(quest.id, "Weekly")}
                           swipesLeft={swipesLeft}
                         />
                       </div>
@@ -360,7 +375,7 @@ const Quests = () => {
                         <CompactQuestCard
                           quest={quest}
                           isInFlight={isInFlight}
-                          onSwipeLeft={() => handleSwipeLeft(quest.id)}
+                          onSwipeLeft={() => handleSwipeLeft(quest.id, "One-Time")}
                           swipesLeft={swipesLeft}
                         />
                       </div>
