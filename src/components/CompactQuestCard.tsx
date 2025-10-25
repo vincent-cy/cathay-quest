@@ -18,6 +18,7 @@ interface CompactQuestCardProps {
   quest: Quest;
   isInFlight: boolean;
   onSwipeLeft?: () => void;
+  swipesLeft: number;
 }
 
 const getQuestIcon = (title: string) => {
@@ -73,13 +74,14 @@ const getQuestDetails = (title: string) => {
   };
 };
 
-export const CompactQuestCard = ({ quest, isInFlight, onSwipeLeft }: CompactQuestCardProps) => {
+export const CompactQuestCard = ({ quest, isInFlight, onSwipeLeft, swipesLeft }: CompactQuestCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [dragX, setDragX] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [hasMoved, setHasMoved] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
+  const [isWiggling, setIsWiggling] = useState(false);
   const SWIPE_THRESHOLD = 30;
 
   const QuestIcon = getQuestIcon(quest.title);
@@ -109,13 +111,38 @@ export const CompactQuestCard = ({ quest, isInFlight, onSwipeLeft }: CompactQues
     setIsDragging(false);
     
     if (swiped) {
-      setIsRemoving(true);
-      // Animate out to the left
-      setDragX(-400);
-      setTimeout(() => {
-        onSwipeLeft?.();
-        setIsRemoving(false);
-      }, 250);
+      if (swipesLeft > 0) {
+        setIsRemoving(true);
+        // Animate out to the left
+        setDragX(-400);
+        setTimeout(() => {
+          onSwipeLeft?.();
+          setIsRemoving(false);
+        }, 250);
+      } else {
+        // Wiggle animation when limit reached
+        setIsWiggling(true);
+        setDragX(20); // Bounce right slightly
+        setTimeout(() => {
+          setDragX(-10);
+          setTimeout(() => {
+            setDragX(5);
+            setTimeout(() => {
+              setDragX(0);
+              setIsWiggling(false);
+            }, 100);
+          }, 100);
+        }, 100);
+        
+        // Show toast message
+        import("@/hooks/use-toast").then(({ toast }) => {
+          toast({
+            title: "Daily Swipe Limit Reached",
+            description: "You've used all 3 swipes for today. Come back tomorrow!",
+            variant: "destructive",
+          });
+        });
+      }
     } else {
       setDragX(0);
     }
@@ -130,7 +157,7 @@ export const CompactQuestCard = ({ quest, isInFlight, onSwipeLeft }: CompactQues
   return (
     <Card
       className={`overflow-hidden select-none touch-pan-y ${
-        isRemoving ? "transition-all duration-300 ease-out" : "transition-transform duration-200"
+        isRemoving ? "transition-all duration-300 ease-out" : isWiggling ? "transition-all duration-100" : "transition-transform duration-200"
       } ${
         isInFlight
           ? "bg-white/10 border-white/30 backdrop-blur-sm hover:bg-white/15"
@@ -138,7 +165,7 @@ export const CompactQuestCard = ({ quest, isInFlight, onSwipeLeft }: CompactQues
       }`}
       style={{
         transform: `translateX(${dragX}px) rotate(${dragX * 0.05}deg)`,
-        opacity: isRemoving ? 0 : dragX < -SWIPE_THRESHOLD ? 0.7 : 1,
+        opacity: isRemoving ? 0 : dragX < -SWIPE_THRESHOLD && swipesLeft > 0 ? 0.7 : 1,
         userSelect: "none",
         willChange: "transform, opacity",
       }}

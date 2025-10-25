@@ -4,6 +4,7 @@ import { CompactQuestCard } from "@/components/CompactQuestCard";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plane, MapPin, RefreshCw } from "lucide-react";
+import { Toaster } from "@/components/ui/toaster";
 import heroFlight from "@/assets/hero-flight.jpg";
 
 const allQuests = [
@@ -257,22 +258,32 @@ const Quests = () => {
           <div className="space-y-3">
             <h2 className="text-xl font-bold text-white px-2">In-Flight Quests</h2>
             {inFlightQuests.length > 0 ? (
-              <div className="relative h-[280px]" style={{ perspective: "1000px" }}>
-                {inFlightQuests.slice(0, 3).map((quest, index) => (
-                  <div
-                    key={quest.id}
-                    className="absolute w-full transition-all duration-300"
-                    style={{
-                      zIndex: inFlightQuests.length - index,
-                      transform: `translateY(${index * 12}px) scale(${1 - index * 0.03})`,
-                      opacity: index === 0 ? 1 : 0.6,
-                    }}
-                  >
-                    <CompactQuestCard
-                      quest={quest}
-                      isInFlight={isInFlight}
-                      onSwipeLeft={() => handleSwipeLeft(quest.id)}
-                    />
+              <div className="space-y-6">
+                {inFlightQuests.map((quest, index) => (
+                  <div key={quest.id} className="relative" style={{ perspective: "1000px" }}>
+                    {/* Next card background preview */}
+                    {inFlightQuests[index + 1] && (
+                      <div 
+                        className="absolute inset-0 pointer-events-none"
+                        style={{
+                          transform: "translateY(8px) scale(0.97)",
+                          zIndex: 0,
+                          opacity: 0.4,
+                        }}
+                      >
+                        <div className={`rounded-lg border h-[140px] ${
+                          isInFlight ? "bg-white/10 border-white/30" : "bg-card border-border"
+                        }`} />
+                      </div>
+                    )}
+                    <div className="relative z-10">
+                      <CompactQuestCard
+                        quest={quest}
+                        isInFlight={isInFlight}
+                        onSwipeLeft={() => handleSwipeLeft(quest.id)}
+                        swipesLeft={swipesLeft}
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -289,22 +300,32 @@ const Quests = () => {
             <div className="space-y-3">
               <h2 className="text-xl font-bold text-foreground px-2">Weekly Quests</h2>
               {weeklyQuests.length > 0 ? (
-                <div className="relative h-[280px]" style={{ perspective: "1000px" }}>
-                  {weeklyQuests.slice(0, 3).map((quest, index) => (
-                    <div
-                      key={quest.id}
-                      className="absolute w-full transition-all duration-300"
-                      style={{
-                        zIndex: weeklyQuests.length - index,
-                        transform: `translateY(${index * 12}px) scale(${1 - index * 0.03})`,
-                        opacity: index === 0 ? 1 : 0.6,
-                      }}
-                    >
-                      <CompactQuestCard
-                        quest={quest}
-                        isInFlight={isInFlight}
-                        onSwipeLeft={() => handleSwipeLeft(quest.id)}
-                      />
+                <div className="space-y-6">
+                  {weeklyQuests.map((quest, index) => (
+                    <div key={quest.id} className="relative" style={{ perspective: "1000px" }}>
+                      {/* Next card background preview */}
+                      {weeklyQuests[index + 1] && (
+                        <div 
+                          className="absolute inset-0 pointer-events-none"
+                          style={{
+                            transform: "translateY(8px) scale(0.97)",
+                            zIndex: 0,
+                            opacity: 0.4,
+                          }}
+                        >
+                          <div className={`rounded-lg border h-[140px] ${
+                            isInFlight ? "bg-white/10 border-white/30" : "bg-card border-border"
+                          }`} />
+                        </div>
+                      )}
+                      <div className="relative z-10">
+                        <CompactQuestCard
+                          quest={quest}
+                          isInFlight={isInFlight}
+                          onSwipeLeft={() => handleSwipeLeft(quest.id)}
+                          swipesLeft={swipesLeft}
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -317,22 +338,32 @@ const Quests = () => {
             <div className="space-y-3">
               <h2 className="text-xl font-bold text-foreground px-2">One-Time Quests</h2>
               {oneTimeQuests.length > 0 ? (
-                <div className="relative h-[280px]" style={{ perspective: "1000px" }}>
-                  {oneTimeQuests.slice(0, 3).map((quest, index) => (
-                    <div
-                      key={quest.id}
-                      className="absolute w-full transition-all duration-300"
-                      style={{
-                        zIndex: oneTimeQuests.length - index,
-                        transform: `translateY(${index * 12}px) scale(${1 - index * 0.03})`,
-                        opacity: index === 0 ? 1 : 0.6,
-                      }}
-                    >
-                      <CompactQuestCard
-                        quest={quest}
-                        isInFlight={isInFlight}
-                        onSwipeLeft={() => handleSwipeLeft(quest.id)}
-                      />
+                <div className="space-y-6">
+                  {oneTimeQuests.map((quest, index) => (
+                    <div key={quest.id} className="relative" style={{ perspective: "1000px" }}>
+                      {/* Next card background preview */}
+                      {oneTimeQuests[index + 1] && (
+                        <div 
+                          className="absolute inset-0 pointer-events-none"
+                          style={{
+                            transform: "translateY(8px) scale(0.97)",
+                            zIndex: 0,
+                            opacity: 0.4,
+                          }}
+                        >
+                          <div className={`rounded-lg border h-[140px] ${
+                            isInFlight ? "bg-white/10 border-white/30" : "bg-card border-border"
+                          }`} />
+                        </div>
+                      )}
+                      <div className="relative z-10">
+                        <CompactQuestCard
+                          quest={quest}
+                          isInFlight={isInFlight}
+                          onSwipeLeft={() => handleSwipeLeft(quest.id)}
+                          swipesLeft={swipesLeft}
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -344,6 +375,7 @@ const Quests = () => {
         )}
       </div>
 
+      <Toaster />
       <BottomNav />
     </div>
   );
