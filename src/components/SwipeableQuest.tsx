@@ -327,7 +327,11 @@ export const SwipeableQuest = ({ quest, onAccept, onReject, isInFlight = false }
               <Button
                 variant="default"
                 size="lg"
-                className="flex-1 h-16 rounded-full text-lg font-bold bg-accent hover:bg-accent/90 shadow-elevated"
+                className={`flex-1 h-16 rounded-full text-lg font-bold shadow-elevated ${
+                  isInFlight 
+                    ? 'bg-secondary hover:bg-secondary/90 text-white' 
+                    : 'bg-accent hover:bg-accent/90'
+                }`}
                 onClick={onAccept}
               >
                 <Heart className="w-7 h-7 mr-2" />
