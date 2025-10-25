@@ -2,9 +2,9 @@ import { Home, Calendar, Trophy, Users } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 const navItems = [
-  { icon: Calendar, label: "Quests", path: "/" },
+  { icon: Calendar, label: "Quests", path: "/", isCenter: true },
   { icon: Trophy, label: "Events", path: "/events" },
-  { icon: Home, label: "Home", path: "/home", isCenter: true },
+  { icon: Home, label: "Home", path: "/home" },
   { icon: Users, label: "Leaderboard", path: "/leaderboard" },
 ];
 
