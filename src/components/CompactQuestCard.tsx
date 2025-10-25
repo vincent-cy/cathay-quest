@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, MapPin, Plane, Recycle, Bus, Brain, Film, Activity, ChevronDown, ChevronUp } from "lucide-react";
-import TinderCard from "react-tinder-card";
 
 interface Quest {
   id: string;
@@ -76,116 +75,152 @@ const getQuestDetails = (title: string) => {
 
 export const CompactQuestCard = ({ quest, isInFlight, onSwipeLeft }: CompactQuestCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [dragX, setDragX] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [hasMoved, setHasMoved] = useState(false);
+  const SWIPE_THRESHOLD = 60;
 
   const QuestIcon = getQuestIcon(quest.title);
   const questDetails = getQuestDetails(quest.title);
 
+  const onPointerDown = (e: any) => {
+    setIsDragging(true);
+    setStartX(e.clientX ?? 0);
+    setHasMoved(false);
+    try { (e.target as HTMLElement)?.setPointerCapture?.(e.pointerId); } catch {}
+  };
+
+  const onPointerMove = (e: any) => {
+    if (!isDragging) return;
+    const diff = (e.clientX ?? 0) - startX;
+    if (Math.abs(diff) > 4) setHasMoved(true);
+    if (diff < -4) {
+      setIsExpanded(false);
+      setDragX(Math.max(diff, -300));
+    } else {
+      setDragX(0);
+    }
+  };
+
+  const onPointerUp = () => {
+    const swiped = dragX <= -SWIPE_THRESHOLD;
+    setIsDragging(false);
+    if (swiped) onSwipeLeft?.();
+    setDragX(0);
+    setTimeout(() => setHasMoved(false), 50);
+  };
+
+  const handleHeaderClick = () => {
+    if (!isDragging && !hasMoved) setIsExpanded((v) => !v);
+  };
+
   return (
-    <TinderCard
-      preventSwipe={["up", "down", "right"]}
-      onSwipe={(dir) => {
-        if (dir === "left") {
-          setIsExpanded(false);
-          onSwipeLeft?.();
-        }
+    <Card
+      className={`overflow-hidden transition-transform duration-200 select-none touch-pan-y ${
+        isInFlight
+          ? "bg-white/10 border-white/30 backdrop-blur-sm hover:bg-white/15"
+          : "bg-card border-border hover:shadow-md"
+      }`}
+      style={{
+        transform: `translateX(${dragX}px)`,
+        userSelect: "none",
+        willChange: "transform",
       }}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
+      role="button"
     >
-      <Card
-        className={`overflow-hidden transition-all duration-300 select-none ${
-          isInFlight
-            ? "bg-white/10 border-white/30 backdrop-blur-sm hover:bg-white/15"
-            : "bg-card border-border hover:shadow-md"
-        }`}
-      >
-        {/* Collapsed View */}
-        <div className="flex gap-4 p-4" onClick={() => setIsExpanded((v) => !v)}>
-          {/* Quest Icon */}
-          <div className={`${
-            isInFlight ? "bg-white/20 border border-white/30" : "bg-muted"
-          } w-16 h-16 flex-shrink-0 rounded-lg flex items-center justify-center`}>
-            <QuestIcon className={`w-8 h-8 ${isInFlight ? "text-white" : "text-muted-foreground"}`} />
-          </div>
-
-          {/* Quest Info */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-2 mb-2">
-              <h3 className={`font-bold text-base ${isInFlight ? "text-white" : "text-foreground"}`}>
-                {quest.title}
-              </h3>
-              <Badge className={`${
-                isInFlight ? "bg-secondary text-white border-secondary/20" : "bg-accent text-accent-foreground"
-              } flex-shrink-0`}>
-                +{quest.reward}
-              </Badge>
-            </div>
-
-            <p className={`text-sm ${isExpanded ? "" : "line-clamp-2"} mb-3 ${
-              isInFlight ? "text-white/80" : "text-muted-foreground"
-            }`}>
-              {quest.description}
-            </p>
-
-            {!isExpanded && (
-              <div className="flex items-center gap-4 text-xs">
-                <div className="flex items-center gap-1">
-                  <Clock className={`w-3 h-3 ${isInFlight ? "text-white/70" : "text-muted-foreground"}`} />
-                  <span className={isInFlight ? "text-white/70" : "text-muted-foreground"}>{quest.timeLeft}</span>
-                </div>
-                {quest.location && (
-                  <div className="flex items-center gap-1">
-                    <MapPin className={`w-3 h-3 ${isInFlight ? "text-white/70" : "text-muted-foreground"}`} />
-                    <span className={`line-clamp-1 ${isInFlight ? "text-white/70" : "text-muted-foreground"}`}>{quest.location}</span>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Expand Icon */}
-          <div className="flex items-center">
-            {isExpanded ? (
-              <ChevronUp className={`w-5 h-5 ${isInFlight ? "text-white/70" : "text-muted-foreground"}`} />
-            ) : (
-              <ChevronDown className={`w-5 h-5 ${isInFlight ? "text-white/70" : "text-muted-foreground"}`} />
-            )}
-          </div>
+      {/* Collapsed View */}
+      <div className="flex gap-4 p-4" onClick={handleHeaderClick}>
+        {/* Quest Icon */}
+        <div className={`${
+          isInFlight ? "bg-white/20 border border-white/30" : "bg-muted"
+        } w-16 h-16 flex-shrink-0 rounded-lg flex items-center justify-center`}>
+          <QuestIcon className={`w-8 h-8 ${isInFlight ? "text-white" : "text-muted-foreground"}`} />
         </div>
 
-        {/* Expanded Details */}
-        {isExpanded && (
-          <div className={`px-4 pb-4 space-y-4 border-t ${isInFlight ? "border-white/20" : "border-border"}`}>
-            {/* Time and Location */}
-            <div className="flex items-center gap-4 text-sm pt-4">
+        {/* Quest Info */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2 mb-2">
+            <h3 className={`font-bold text-base ${isInFlight ? "text-white" : "text-foreground"}`}>
+              {quest.title}
+            </h3>
+            <Badge className={`${
+              isInFlight ? "bg-secondary text-white border-secondary/20" : "bg-accent text-accent-foreground"
+            } flex-shrink-0`}>
+              +{quest.reward}
+            </Badge>
+          </div>
+
+          <p className={`text-sm ${isExpanded ? "" : "line-clamp-2"} mb-3 ${
+            isInFlight ? "text-white/80" : "text-muted-foreground"
+          }`}>
+            {quest.description}
+          </p>
+
+          {!isExpanded && (
+            <div className="flex items-center gap-4 text-xs">
               <div className="flex items-center gap-1">
-                <Clock className={`w-4 h-4 ${isInFlight ? "text-white/70" : "text-muted-foreground"}`} />
-                <span className={isInFlight ? "text-white/80" : "text-muted-foreground"}>{quest.timeLeft}</span>
+                <Clock className={`w-3 h-3 ${isInFlight ? "text-white/70" : "text-muted-foreground"}`} />
+                <span className={isInFlight ? "text-white/70" : "text-muted-foreground"}>{quest.timeLeft}</span>
               </div>
               {quest.location && (
                 <div className="flex items-center gap-1">
-                  <MapPin className={`w-4 h-4 ${isInFlight ? "text-white/70" : "text-muted-foreground"}`} />
-                  <span className={isInFlight ? "text-white/80" : "text-muted-foreground"}>{quest.location}</span>
+                  <MapPin className={`w-3 h-3 ${isInFlight ? "text-white/70" : "text-muted-foreground"}`} />
+                  <span className={`line-clamp-1 ${isInFlight ? "text-white/70" : "text-muted-foreground"}`}>{quest.location}</span>
                 </div>
               )}
             </div>
+          )}
+        </div>
 
-            {/* Requirements */}
-            <div>
-              <h4 className={`font-semibold text-sm mb-2 ${isInFlight ? "text-white" : "text-foreground"}`}>Requirements</h4>
-              <ul className={`text-sm space-y-1 ${isInFlight ? "text-white/80" : "text-muted-foreground"}`}>
-                {questDetails.requirements.map((req, idx) => (
-                  <li key={idx}>• {req}</li>
-                ))}
-              </ul>
-            </div>
+        {/* Expand Icon */}
+        <div className="flex items-center">
+          {isExpanded ? (
+            <ChevronUp className={`w-5 h-5 ${isInFlight ? "text-white/70" : "text-muted-foreground"}`} />
+          ) : (
+            <ChevronDown className={`w-5 h-5 ${isInFlight ? "text-white/70" : "text-muted-foreground"}`} />
+          )}
+        </div>
+      </div>
 
-            {/* Verification */}
-            <div>
-              <h4 className={`font-semibold text-sm mb-2 ${isInFlight ? "text-white" : "text-foreground"}`}>Verification Method</h4>
-              <p className={`text-sm ${isInFlight ? "text-white/80" : "text-muted-foreground"}`}>{questDetails.verification}</p>
+      {/* Expanded Details */}
+      {isExpanded && (
+        <div className={`px-4 pb-4 space-y-4 border-t ${isInFlight ? "border-white/20" : "border-border"}`}>
+          {/* Time and Location */}
+          <div className="flex items-center gap-4 text-sm pt-4">
+            <div className="flex items-center gap-1">
+              <Clock className={`w-4 h-4 ${isInFlight ? "text-white/70" : "text-muted-foreground"}`} />
+              <span className={isInFlight ? "text-white/80" : "text-muted-foreground"}>{quest.timeLeft}</span>
             </div>
+            {quest.location && (
+              <div className="flex items-center gap-1">
+                <MapPin className={`w-4 h-4 ${isInFlight ? "text-white/70" : "text-muted-foreground"}`} />
+                <span className={isInFlight ? "text-white/80" : "text-muted-foreground"}>{quest.location}</span>
+              </div>
+            )}
           </div>
-        )}
-      </Card>
-    </TinderCard>
+
+          {/* Requirements */}
+          <div>
+            <h4 className={`font-semibold text-sm mb-2 ${isInFlight ? "text-white" : "text-foreground"}`}>Requirements</h4>
+            <ul className={`text-sm space-y-1 ${isInFlight ? "text-white/80" : "text-muted-foreground"}`}>
+              {questDetails.requirements.map((req, idx) => (
+                <li key={idx}>• {req}</li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Verification */}
+          <div>
+            <h4 className={`font-semibold text-sm mb-2 ${isInFlight ? "text-white" : "text-foreground"}`}>Verification Method</h4>
+            <p className={`text-sm ${isInFlight ? "text-white/80" : "text-muted-foreground"}`}>{questDetails.verification}</p>
+          </div>
+        </div>
+      )}
+    </Card>
   );
 };
