@@ -55,7 +55,7 @@ const LeaderboardPage = () => {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <h4 className="font-bold text-sm text-foreground truncate">{user.name}</h4>
-                  <Badge variant="outline" className="text-xs bg-background/50">
+                  <Badge variant="outline" className="text-xs bg-background/50 whitespace-nowrap">
                     {user.region}
                   </Badge>
                 </div>
