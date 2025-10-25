@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode } from "react";
 
 interface Quest {
   id: string;
@@ -19,14 +19,8 @@ interface QuestContextType {
 const QuestContext = createContext<QuestContextType | undefined>(undefined);
 
 export const QuestProvider = ({ children }: { children: ReactNode }) => {
-  const [acceptedQuests, setAcceptedQuests] = useState<Quest[]>(() => {
-    const stored = localStorage.getItem("acceptedQuests");
-    return stored ? JSON.parse(stored) : [];
-  });
+  const [acceptedQuests, setAcceptedQuests] = useState<Quest[]>([]);
 
-  useEffect(() => {
-    localStorage.setItem("acceptedQuests", JSON.stringify(acceptedQuests));
-  }, [acceptedQuests]);
 
   const addAcceptedQuest = (quest: Quest) => {
     setAcceptedQuests((prev) => {
