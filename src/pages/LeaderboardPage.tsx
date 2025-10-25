@@ -79,7 +79,7 @@ const LeaderboardPage = () => {
                 >
                   {user.miles.toLocaleString()}
                 </div>
-                <div className="text-xs text-muted-foreground">Cathay points</div>
+                <div className="text-xs text-muted-foreground">Cathay Points</div>
               </div>
             </div>
           </Card>
