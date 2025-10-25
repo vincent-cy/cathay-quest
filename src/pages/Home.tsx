@@ -131,13 +131,40 @@ const Home = () => {
         </Card>
       </header>
 
-      <div className={`transition-all duration-500 ${isInFlight ? "pt-8 px-2" : "pt-6"}`}>
-        <SwipeableQuest
-          quest={sampleQuests[currentIndex]}
-          onAccept={handleAccept}
-          onReject={handleReject}
-          isInFlight={isInFlight}
-        />
+      <div className={`relative transition-all duration-500 ${isInFlight ? "pt-8 px-2" : "pt-6"}`}>
+        {/* Quest Card Stack - Tinder Style */}
+        <div className="relative" style={{ perspective: "1000px" }}>
+          {/* Next Quest Card - Background */}
+          {sampleQuests[(currentIndex + 1) % sampleQuests.length] && (
+            <div 
+              className="absolute inset-0 transition-all duration-300"
+              style={{
+                transform: "scale(0.95) translateY(10px)",
+                opacity: 0.5,
+                zIndex: 0,
+              }}
+            >
+              <SwipeableQuest
+                quest={sampleQuests[(currentIndex + 1) % sampleQuests.length]}
+                onAccept={() => {}}
+                onReject={() => {}}
+                isInFlight={isInFlight}
+                isBackground={true}
+              />
+            </div>
+          )}
+          
+          {/* Current Quest Card - Foreground */}
+          <div className="relative z-10">
+            <SwipeableQuest
+              quest={sampleQuests[currentIndex]}
+              onAccept={handleAccept}
+              onReject={handleReject}
+              isInFlight={isInFlight}
+              isBackground={false}
+            />
+          </div>
+        </div>
       </div>
 
       <BottomNav />

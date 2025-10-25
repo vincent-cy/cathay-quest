@@ -20,6 +20,7 @@ interface SwipeableQuestProps {
   onAccept: () => void;
   onReject: () => void;
   isInFlight?: boolean;
+  isBackground?: boolean;
 }
 
 const getQuestDetails = (questType: string) => {
@@ -71,7 +72,7 @@ const getQuestDetails = (questType: string) => {
   }
 };
 
-export const SwipeableQuest = ({ quest, onAccept, onReject, isInFlight = false }: SwipeableQuestProps) => {
+export const SwipeableQuest = ({ quest, onAccept, onReject, isInFlight = false, isBackground = false }: SwipeableQuestProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [offset, setOffset] = useState(0);
   const [startX, setStartX] = useState(0);
@@ -81,7 +82,7 @@ export const SwipeableQuest = ({ quest, onAccept, onReject, isInFlight = false }
   const details = getQuestDetails(quest.type);
 
   const handleStart = (clientX: number) => {
-    if (isExiting) return;
+    if (isExiting || isBackground) return;
     setIsDragging(true);
     setStartX(clientX);
   };
@@ -169,25 +170,29 @@ export const SwipeableQuest = ({ quest, onAccept, onReject, isInFlight = false }
 
   return (
     <div
-      className="touch-none select-none cursor-grab active:cursor-grabbing relative"
+      className={`${isBackground ? 'pointer-events-none' : 'touch-none select-none cursor-grab active:cursor-grabbing'} relative`}
       style={{
         perspective: `${perspective}px`,
       }}
     >
       <div
         style={{
-          transform: `translateX(${offset}px) rotateY(${rotateY}deg) rotateX(${rotateX}deg) scale(${scale})`,
+          transform: isBackground 
+            ? "translateX(0px) rotateY(0deg) rotateX(0deg) scale(1)" 
+            : `translateX(${offset}px) rotateY(${rotateY}deg) rotateX(${rotateX}deg) scale(${scale})`,
           transformStyle: "preserve-3d",
-          transition: isDragging ? "none" : isExiting ? "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)" : "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-          opacity: isExiting ? 0 : 1,
+          transition: isBackground 
+            ? "none" 
+            : isDragging ? "none" : isExiting ? "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)" : "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+          opacity: isBackground ? 1 : isExiting ? 0 : 1,
         }}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseLeave}
+        onTouchStart={isBackground ? undefined : handleTouchStart}
+        onTouchMove={isBackground ? undefined : handleTouchMove}
+        onTouchEnd={isBackground ? undefined : handleTouchEnd}
+        onMouseDown={isBackground ? undefined : handleMouseDown}
+        onMouseMove={isBackground ? undefined : handleMouseMove}
+        onMouseUp={isBackground ? undefined : handleMouseUp}
+        onMouseLeave={isBackground ? undefined : handleMouseLeave}
       >
         <Card className="relative overflow-hidden mx-4" style={{
           boxShadow: `
