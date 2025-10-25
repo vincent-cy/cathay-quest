@@ -384,6 +384,7 @@ const Quests = () => {
                         isInFlight={isInFlight}
                         onSwipeLeft={() => handleSwipeLeft(quest.id, "One-Time", slotIndex)}
                         swipesLeft={swipesLeft}
+                        disableSwipe={true}
                       />
                     );
                   })}

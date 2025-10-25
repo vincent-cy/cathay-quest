@@ -20,6 +20,7 @@ interface CompactQuestCardProps {
   isInFlight: boolean;
   onSwipeLeft?: () => void;
   swipesLeft: number;
+  disableSwipe?: boolean;
 }
 
 const getQuestIcon = (title: string) => {
@@ -75,7 +76,7 @@ const getQuestDetails = (title: string) => {
   };
 };
 
-export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, swipesLeft }: CompactQuestCardProps) => {
+export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, swipesLeft, disableSwipe = false }: CompactQuestCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [dragX, setDragX] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -87,7 +88,7 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
   // NEW: controls the unblur/fade-in of the next card
   const [promoteNext, setPromoteNext] = useState(false);
 
-  const SWIPE_THRESHOLD = 30;
+  const SWIPE_THRESHOLD = 15;
 
   const QuestIcon = getQuestIcon(quest.title);
   const NextQuestIcon = nextQuest ? getQuestIcon(nextQuest.title) : null;
@@ -109,12 +110,13 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
   };
 
   const onPointerDown = (e: React.PointerEvent) => {
+    if (disableSwipe) return;
     setStartX(e.clientX);
     setIsDragging(true);
   };
 
   const onPointerMove = (e: React.PointerEvent) => {
-    if (!isDragging) return;
+    if (!isDragging || disableSwipe) return;
     const newDragX = e.clientX - startX;
     if (Math.abs(newDragX) > 5) setHasMoved(true);
     setDragX(Math.min(0, newDragX));
@@ -213,8 +215,8 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
             : "bg-card border-border hover:shadow-md"
         }`}
         style={{
-          transform: `translateX(${dragX}px) rotate(${dragX * 0.05}deg)`,
-          opacity: dragX < -SWIPE_THRESHOLD && swipesLeft > 0 ? 0.7 : 1,
+          transform: `translateX(${dragX}px) rotate(${dragX * 0.02}deg)`,
+          opacity: dragX < -SWIPE_THRESHOLD && swipesLeft > 0 && !disableSwipe ? 0.7 : 1,
           userSelect: "none",
           willChange: "transform, opacity",
           position: "relative",
