@@ -79,7 +79,8 @@ export const CompactQuestCard = ({ quest, isInFlight, onSwipeLeft }: CompactQues
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [hasMoved, setHasMoved] = useState(false);
-  const SWIPE_THRESHOLD = 30; // Easier swipe - reduced from 60
+  const [isRemoving, setIsRemoving] = useState(false);
+  const SWIPE_THRESHOLD = 30;
 
   const QuestIcon = getQuestIcon(quest.title);
   const questDetails = getQuestDetails(quest.title);
@@ -106,8 +107,19 @@ export const CompactQuestCard = ({ quest, isInFlight, onSwipeLeft }: CompactQues
   const onPointerUp = () => {
     const swiped = dragX <= -SWIPE_THRESHOLD;
     setIsDragging(false);
-    if (swiped) onSwipeLeft?.();
-    setDragX(0);
+    
+    if (swiped) {
+      setIsRemoving(true);
+      // Animate out to the left
+      setDragX(-400);
+      setTimeout(() => {
+        onSwipeLeft?.();
+        setIsRemoving(false);
+      }, 250);
+    } else {
+      setDragX(0);
+    }
+    
     setTimeout(() => setHasMoved(false), 50);
   };
 
@@ -117,15 +129,18 @@ export const CompactQuestCard = ({ quest, isInFlight, onSwipeLeft }: CompactQues
 
   return (
     <Card
-      className={`overflow-hidden transition-transform duration-200 select-none touch-pan-y ${
+      className={`overflow-hidden select-none touch-pan-y ${
+        isRemoving ? "transition-all duration-300 ease-out" : "transition-transform duration-200"
+      } ${
         isInFlight
           ? "bg-white/10 border-white/30 backdrop-blur-sm hover:bg-white/15"
           : "bg-card border-border hover:shadow-md"
       }`}
       style={{
-        transform: `translateX(${dragX}px)`,
+        transform: `translateX(${dragX}px) rotate(${dragX * 0.05}deg)`,
+        opacity: isRemoving ? 0 : dragX < -SWIPE_THRESHOLD ? 0.7 : 1,
         userSelect: "none",
-        willChange: "transform",
+        willChange: "transform, opacity",
       }}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
