@@ -149,32 +149,46 @@ const Quests = () => {
   const [isInFlight, setIsInFlight] = useState(false);
   const [swipesLeft, setSwipesLeft] = useState(3);
   const [daysUntilRefresh] = useState(4);
-  const [weeklyIndex, setWeeklyIndex] = useState(0);
-  const [oneTimeIndex, setOneTimeIndex] = useState(0);
-  const [inFlightIndex, setInFlightIndex] = useState(0);
+  const [weeklyStartIndex, setWeeklyStartIndex] = useState(0);
+  const [oneTimeStartIndex, setOneTimeStartIndex] = useState(0);
+  const [inFlightStartIndex, setInFlightStartIndex] = useState(0);
+  const [swipingQuestId, setSwipingQuestId] = useState<string | null>(null);
 
   // Get all quests by type
   const allWeeklyQuests = allQuests.filter(quest => quest.type === "Weekly");
   const allOneTimeQuests = allQuests.filter(quest => quest.type === "One-Time");
   const allInFlightQuests = allQuests.filter(quest => quest.type === "In-Flight");
 
-  // Show only 3 quests at a time
-  const weeklyQuests = allWeeklyQuests.slice(weeklyIndex, weeklyIndex + 3);
-  const oneTimeQuests = allOneTimeQuests.slice(oneTimeIndex, oneTimeIndex + 3);
-  const inFlightQuests = allInFlightQuests.slice(inFlightIndex, inFlightIndex + 3);
+  // Show 3 quests at a time, cycling through the list
+  const getVisibleQuests = (allQuestsOfType: typeof allQuests, startIndex: number) => {
+    const visible = [];
+    for (let i = 0; i < 3; i++) {
+      const index = (startIndex + i) % allQuestsOfType.length;
+      if (allQuestsOfType[index]) visible.push(allQuestsOfType[index]);
+    }
+    return visible;
+  };
+
+  const weeklyQuests = getVisibleQuests(allWeeklyQuests, weeklyStartIndex);
+  const oneTimeQuests = getVisibleQuests(allOneTimeQuests, oneTimeStartIndex);
+  const inFlightQuests = getVisibleQuests(allInFlightQuests, inFlightStartIndex);
 
   const handleSwipeLeft = (questId: string, type: string) => {
     if (swipesLeft > 0) {
+      setSwipingQuestId(questId);
       setSwipesLeft(prev => prev - 1);
       
-      // Advance to next quest in the list
-      if (type === "Weekly") {
-        setWeeklyIndex(prev => Math.min(prev + 1, allWeeklyQuests.length - 3));
-      } else if (type === "One-Time") {
-        setOneTimeIndex(prev => Math.min(prev + 1, allOneTimeQuests.length - 3));
-      } else if (type === "In-Flight") {
-        setInFlightIndex(prev => Math.min(prev + 1, allInFlightQuests.length - 3));
-      }
+      // After animation, advance to next quest
+      setTimeout(() => {
+        if (type === "Weekly") {
+          setWeeklyStartIndex(prev => (prev + 1) % allWeeklyQuests.length);
+        } else if (type === "One-Time") {
+          setOneTimeStartIndex(prev => (prev + 1) % allOneTimeQuests.length);
+        } else if (type === "In-Flight") {
+          setInFlightStartIndex(prev => (prev + 1) % allInFlightQuests.length);
+        }
+        setSwipingQuestId(null);
+      }, 300);
     }
   };
 
@@ -275,30 +289,28 @@ const Quests = () => {
             {inFlightQuests.length > 0 ? (
               <div className="space-y-6">
                 {inFlightQuests.map((quest, index) => (
-                  <div key={quest.id} className="relative" style={{ perspective: "1000px" }}>
-                    {/* Next card background preview */}
-                    {inFlightQuests[index + 1] && (
-                      <div 
-                        className="absolute inset-0 pointer-events-none"
+                  <div key={`${quest.id}-${index}`} className="relative h-[180px]" style={{ perspective: "1000px" }}>
+                    {/* Stack of cards with blur effect */}
+                    {inFlightQuests.slice(index).map((q, i) => (
+                      <div
+                        key={`${q.id}-${i}`}
+                        className="absolute inset-0 w-full transition-all duration-300"
                         style={{
-                          transform: "translateY(8px) scale(0.97)",
-                          zIndex: 0,
-                          opacity: 0.4,
+                          zIndex: 10 - i,
+                          transform: `translateY(${i * 8}px) scale(${1 - i * 0.03})`,
+                          opacity: i === 0 ? 1 : 0.5,
+                          filter: i > 0 ? 'blur(2px)' : 'none',
+                          pointerEvents: i === 0 ? 'auto' : 'none',
                         }}
                       >
-                        <div className={`rounded-lg border h-[140px] ${
-                          isInFlight ? "bg-white/10 border-white/30" : "bg-card border-border"
-                        }`} />
+                        <CompactQuestCard
+                          quest={q}
+                          isInFlight={isInFlight}
+                          onSwipeLeft={() => handleSwipeLeft(q.id, "In-Flight")}
+                          swipesLeft={swipesLeft}
+                        />
                       </div>
-                    )}
-                    <div className="relative z-10">
-                      <CompactQuestCard
-                        quest={quest}
-                        isInFlight={isInFlight}
-                        onSwipeLeft={() => handleSwipeLeft(quest.id, "In-Flight")}
-                        swipesLeft={swipesLeft}
-                      />
-                    </div>
+                    ))}
                   </div>
                 ))}
               </div>
@@ -317,30 +329,28 @@ const Quests = () => {
               {weeklyQuests.length > 0 ? (
                 <div className="space-y-6">
                   {weeklyQuests.map((quest, index) => (
-                    <div key={quest.id} className="relative" style={{ perspective: "1000px" }}>
-                      {/* Next card background preview */}
-                      {weeklyQuests[index + 1] && (
-                        <div 
-                          className="absolute inset-0 pointer-events-none"
+                    <div key={`${quest.id}-${index}`} className="relative h-[180px]" style={{ perspective: "1000px" }}>
+                      {/* Stack of cards with blur effect */}
+                      {weeklyQuests.slice(index).map((q, i) => (
+                        <div
+                          key={`${q.id}-${i}`}
+                          className="absolute inset-0 w-full transition-all duration-300"
                           style={{
-                            transform: "translateY(8px) scale(0.97)",
-                            zIndex: 0,
-                            opacity: 0.4,
+                            zIndex: 10 - i,
+                            transform: `translateY(${i * 8}px) scale(${1 - i * 0.03})`,
+                            opacity: i === 0 ? 1 : 0.5,
+                            filter: i > 0 ? 'blur(2px)' : 'none',
+                            pointerEvents: i === 0 ? 'auto' : 'none',
                           }}
                         >
-                          <div className={`rounded-lg border h-[140px] ${
-                            isInFlight ? "bg-white/10 border-white/30" : "bg-card border-border"
-                          }`} />
+                          <CompactQuestCard
+                            quest={q}
+                            isInFlight={isInFlight}
+                            onSwipeLeft={() => handleSwipeLeft(q.id, "Weekly")}
+                            swipesLeft={swipesLeft}
+                          />
                         </div>
-                      )}
-                      <div className="relative z-10">
-                        <CompactQuestCard
-                          quest={quest}
-                          isInFlight={isInFlight}
-                          onSwipeLeft={() => handleSwipeLeft(quest.id, "Weekly")}
-                          swipesLeft={swipesLeft}
-                        />
-                      </div>
+                      ))}
                     </div>
                   ))}
                 </div>
@@ -355,30 +365,28 @@ const Quests = () => {
               {oneTimeQuests.length > 0 ? (
                 <div className="space-y-6">
                   {oneTimeQuests.map((quest, index) => (
-                    <div key={quest.id} className="relative" style={{ perspective: "1000px" }}>
-                      {/* Next card background preview */}
-                      {oneTimeQuests[index + 1] && (
-                        <div 
-                          className="absolute inset-0 pointer-events-none"
+                    <div key={`${quest.id}-${index}`} className="relative h-[180px]" style={{ perspective: "1000px" }}>
+                      {/* Stack of cards with blur effect */}
+                      {oneTimeQuests.slice(index).map((q, i) => (
+                        <div
+                          key={`${q.id}-${i}`}
+                          className="absolute inset-0 w-full transition-all duration-300"
                           style={{
-                            transform: "translateY(8px) scale(0.97)",
-                            zIndex: 0,
-                            opacity: 0.4,
+                            zIndex: 10 - i,
+                            transform: `translateY(${i * 8}px) scale(${1 - i * 0.03})`,
+                            opacity: i === 0 ? 1 : 0.5,
+                            filter: i > 0 ? 'blur(2px)' : 'none',
+                            pointerEvents: i === 0 ? 'auto' : 'none',
                           }}
                         >
-                          <div className={`rounded-lg border h-[140px] ${
-                            isInFlight ? "bg-white/10 border-white/30" : "bg-card border-border"
-                          }`} />
+                          <CompactQuestCard
+                            quest={q}
+                            isInFlight={isInFlight}
+                            onSwipeLeft={() => handleSwipeLeft(q.id, "One-Time")}
+                            swipesLeft={swipesLeft}
+                          />
                         </div>
-                      )}
-                      <div className="relative z-10">
-                        <CompactQuestCard
-                          quest={quest}
-                          isInFlight={isInFlight}
-                          onSwipeLeft={() => handleSwipeLeft(quest.id, "One-Time")}
-                          swipesLeft={swipesLeft}
-                        />
-                      </div>
+                      ))}
                     </div>
                   ))}
                 </div>
