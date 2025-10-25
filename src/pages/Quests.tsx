@@ -289,10 +289,12 @@ const Quests = () => {
               <div className="space-y-3">
                 {inFlightSlots.map((questIndex, slotIndex) => {
                   const quest = allInFlightQuests[questIndex % allInFlightQuests.length];
+                  const nextQuest = allInFlightQuests[inFlightNextIndex % allInFlightQuests.length];
                   return (
                     <CompactQuestCard
-                      key={`inflight-${slotIndex}-${questIndex}`}
+                      key={`inflight-slot-${slotIndex}`}
                       quest={quest}
+                      nextQuest={nextQuest}
                       isInFlight={isInFlight}
                       onSwipeLeft={() => handleSwipeLeft(quest.id, "In-Flight", slotIndex)}
                       swipesLeft={swipesLeft}
@@ -316,10 +318,12 @@ const Quests = () => {
                 <div className="space-y-3">
                   {weeklySlots.map((questIndex, slotIndex) => {
                     const quest = allWeeklyQuests[questIndex % allWeeklyQuests.length];
+                    const nextQuest = allWeeklyQuests[weeklyNextIndex % allWeeklyQuests.length];
                     return (
                       <CompactQuestCard
-                        key={`weekly-${slotIndex}-${questIndex}`}
+                        key={`weekly-slot-${slotIndex}`}
                         quest={quest}
+                        nextQuest={nextQuest}
                         isInFlight={isInFlight}
                         onSwipeLeft={() => handleSwipeLeft(quest.id, "Weekly", slotIndex)}
                         swipesLeft={swipesLeft}
@@ -339,10 +343,12 @@ const Quests = () => {
                 <div className="space-y-3">
                   {oneTimeSlots.map((questIndex, slotIndex) => {
                     const quest = allOneTimeQuests[questIndex % allOneTimeQuests.length];
+                    const nextQuest = allOneTimeQuests[oneTimeNextIndex % allOneTimeQuests.length];
                     return (
                       <CompactQuestCard
-                        key={`onetime-${slotIndex}-${questIndex}`}
+                        key={`onetime-slot-${slotIndex}`}
                         quest={quest}
+                        nextQuest={nextQuest}
                         isInFlight={isInFlight}
                         onSwipeLeft={() => handleSwipeLeft(quest.id, "One-Time", slotIndex)}
                         swipesLeft={swipesLeft}

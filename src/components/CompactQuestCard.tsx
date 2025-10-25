@@ -16,6 +16,7 @@ interface Quest {
 
 interface CompactQuestCardProps {
   quest: Quest;
+  nextQuest?: Quest; // used to render blurred preview behind during swipe
   isInFlight: boolean;
   onSwipeLeft?: () => void;
   swipesLeft: number;
@@ -74,7 +75,7 @@ const getQuestDetails = (title: string) => {
   };
 };
 
-export const CompactQuestCard = ({ quest, isInFlight, onSwipeLeft, swipesLeft }: CompactQuestCardProps) => {
+export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, swipesLeft }: CompactQuestCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [dragX, setDragX] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -86,6 +87,7 @@ export const CompactQuestCard = ({ quest, isInFlight, onSwipeLeft, swipesLeft }:
 
   const QuestIcon = getQuestIcon(quest.title);
   const questDetails = getQuestDetails(quest.title);
+  const NextQuestIcon = nextQuest ? getQuestIcon(nextQuest.title) : null;
 
   const onPointerDown = (e: any) => {
     setIsDragging(true);
@@ -155,26 +157,59 @@ export const CompactQuestCard = ({ quest, isInFlight, onSwipeLeft, swipesLeft }:
   };
 
   return (
-    <Card
-      className={`overflow-hidden select-none touch-pan-y ${
-        isRemoving ? "transition-all duration-300 ease-out" : isWiggling ? "transition-all duration-100" : "transition-transform duration-200"
-      } ${
-        isInFlight
-          ? "bg-white/10 border-white/30 backdrop-blur-sm hover:bg-white/15"
-          : "bg-card border-border hover:shadow-md"
-      }`}
-      style={{
-        transform: `translateX(${dragX}px) rotate(${dragX * 0.05}deg)`,
-        opacity: isRemoving ? 0 : dragX < -SWIPE_THRESHOLD && swipesLeft > 0 ? 0.7 : 1,
-        userSelect: "none",
-        willChange: "transform, opacity",
-      }}
-      onPointerDown={onPointerDown}
-      onPointerMove={onPointerMove}
-      onPointerUp={onPointerUp}
-      onPointerCancel={onPointerUp}
-      role="button"
-    >
+    <div className="relative">
+      {nextQuest && isDragging && dragX < 0 && (
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <Card
+            className={`${isInFlight ? "bg-white/10 border-white/30 backdrop-blur-sm" : "bg-card border-border"} overflow-hidden`}
+            style={{
+              filter: "blur(6px)",
+              opacity: 0.7,
+              transform: "translateX(10px) scale(0.98)",
+              transition: "transform 0.2s ease, opacity 0.2s ease",
+            }}
+          >
+            <div className="flex gap-4 p-4">
+              <div className={`${isInFlight ? "bg-white/20 border border-white/30" : "bg-muted"} w-16 h-16 flex-shrink-0 rounded-lg flex items-center justify-center`}>
+                {NextQuestIcon ? <NextQuestIcon className={`w-8 h-8 ${isInFlight ? "text-white/80" : "text-muted-foreground"}`} /> : null}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <h3 className={`font-bold text-base ${isInFlight ? "text-white/80" : "text-foreground"}`}>
+                    {nextQuest?.title}
+                  </h3>
+                  <Badge className={`${isInFlight ? "bg-secondary/80 text-white border-secondary/20" : "bg-accent text-accent-foreground"} flex-shrink-0`}>
+                    +{nextQuest?.reward}
+                  </Badge>
+                </div>
+                <p className={`text-sm line-clamp-2 ${isInFlight ? "text-white/70" : "text-muted-foreground"}`}>{nextQuest?.description}</p>
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
+      <Card
+        className={`overflow-hidden select-none touch-pan-y ${
+          isRemoving ? "transition-all duration-300 ease-out" : isWiggling ? "transition-all duration-100" : "transition-transform duration-200"
+        } ${
+          isInFlight
+            ? "bg-white/10 border-white/30 backdrop-blur-sm hover:bg-white/15"
+            : "bg-card border-border hover:shadow-md"
+        }`}
+        style={{
+          transform: `translateX(${dragX}px) rotate(${dragX * 0.05}deg)`,
+          opacity: isRemoving ? 0 : dragX < -SWIPE_THRESHOLD && swipesLeft > 0 ? 0.7 : 1,
+          userSelect: "none",
+          willChange: "transform, opacity",
+          position: "relative",
+          zIndex: 1,
+        }}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
+        role="button"
+      >
       {/* Collapsed View */}
       <div className="flex gap-4 p-4" onClick={handleHeaderClick}>
         {/* Quest Icon */}
@@ -264,5 +299,6 @@ export const CompactQuestCard = ({ quest, isInFlight, onSwipeLeft, swipesLeft }:
         </div>
       )}
     </Card>
+    </div>
   );
 };
