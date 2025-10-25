@@ -449,7 +449,7 @@ const Quests = () => {
               className="bg-secondary/20 border-secondary/40 text-white"
             >
               <Clock className="w-3 h-3 mr-1" />
-              {flightTimeLeft.hours}h {flightTimeLeft.minutes}m left
+              Flight: {flightTimeLeft.hours}h {flightTimeLeft.minutes}m left
             </Badge>
           )}
         </div>
