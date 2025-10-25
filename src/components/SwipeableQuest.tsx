@@ -189,19 +189,11 @@ export const SwipeableQuest = ({ quest, onAccept, onReject, isInFlight = false }
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseLeave}
       >
-        <Card className={`relative overflow-hidden mx-4 transition-all duration-500 ${
-          isInFlight ? 'border-[3px] border-white/40 backdrop-blur-sm' : ''
-        }`} style={{
-          boxShadow: isInFlight 
-            ? `
-              0 25px 50px -12px rgba(0, 0, 0, 0.5), 
-              0 0 60px rgba(0, 100, 90, 0.4),
-              inset 0 0 0 1px rgba(255, 255, 255, 0.15)
-            `
-            : `
-              0 ${20 + Math.abs(offset) / 10}px ${40 + Math.abs(offset) / 5}px -10px rgba(0, 0, 0, 0.3),
-              0 ${10 + Math.abs(offset) / 20}px ${20 + Math.abs(offset) / 10}px -5px rgba(0, 0, 0, 0.2)
-            `,
+        <Card className="relative overflow-hidden mx-4" style={{
+          boxShadow: `
+            0 ${20 + Math.abs(offset) / 10}px ${40 + Math.abs(offset) / 5}px -10px rgba(0, 0, 0, 0.3),
+            0 ${10 + Math.abs(offset) / 20}px ${20 + Math.abs(offset) / 10}px -5px rgba(0, 0, 0, 0.2)
+          `,
         }}>
           {/* Quest Image Section */}
           <div className="h-[50vh] relative">
@@ -233,11 +225,7 @@ export const SwipeableQuest = ({ quest, onAccept, onReject, isInFlight = false }
               }}
             />
             
-            <div className={`absolute inset-0 z-10 transition-all duration-700 ${
-              isInFlight 
-                ? 'bg-gradient-to-b from-primary-glow/50 via-primary/70 to-primary'
-                : 'bg-gradient-to-b from-transparent via-transparent to-background/95'
-            }`} />
+            <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent via-transparent to-background/95" />
             <img
               src={quest.image}
               alt={quest.title}
@@ -245,16 +233,12 @@ export const SwipeableQuest = ({ quest, onAccept, onReject, isInFlight = false }
             />
             
             <div className="absolute top-6 left-6 right-6 z-20 flex gap-3">
-              <Badge variant="outline" className={`backdrop-blur-md text-base px-4 py-2 shadow-lg border-2 transition-all duration-500 ${
-                isInFlight ? 'bg-white/95 text-primary border-white/60 font-bold' : 'bg-background/90'
-              }`} style={{
+              <Badge variant="outline" className="backdrop-blur-md text-base px-4 py-2 shadow-lg border-2 bg-background/90" style={{
                 transform: 'translateZ(30px)',
               }}>
                 {quest.type}
               </Badge>
-              <Badge className={`backdrop-blur-md ml-auto text-base px-4 py-2 shadow-lg transition-all duration-500 ${
-                isInFlight ? 'bg-secondary text-white hover:bg-secondary/90 font-bold' : 'bg-accent/90'
-              }`} style={{
+              <Badge className="backdrop-blur-md ml-auto text-base px-4 py-2 shadow-lg bg-accent/90" style={{
                 transform: 'translateZ(30px)',
               }}>
                 <Trophy className="w-5 h-5 mr-2" />
@@ -266,17 +250,11 @@ export const SwipeableQuest = ({ quest, onAccept, onReject, isInFlight = false }
               transform: 'translateZ(40px)',
             }}>
               <div className="space-y-3">
-                <h2 className={`text-4xl font-bold drop-shadow-lg ${
-                  isInFlight ? 'text-white' : 'text-foreground'
-                }`}>{quest.title}</h2>
-                <p className={`text-base leading-relaxed drop-shadow-md ${
-                  isInFlight ? 'text-white/90' : 'text-muted-foreground'
-                }`}>{quest.description}</p>
+                <h2 className="text-4xl font-bold drop-shadow-lg text-foreground">{quest.title}</h2>
+                <p className="text-base leading-relaxed drop-shadow-md text-muted-foreground">{quest.description}</p>
               </div>
 
-              <div className={`flex items-center gap-6 text-base ${
-                isInFlight ? 'text-white/90' : 'text-muted-foreground'
-              }`}>
+              <div className="flex items-center gap-6 text-base text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <Clock className="w-5 h-5" />
                   <span className="font-medium">{quest.timeLeft}</span>
@@ -292,50 +270,30 @@ export const SwipeableQuest = ({ quest, onAccept, onReject, isInFlight = false }
           </div>
 
           {/* Quest Details Section */}
-          <div className={`p-6 space-y-4 transition-all duration-700 ${
-            isInFlight ? 'bg-gradient-to-b from-primary to-primary/95' : 'bg-background'
-          }`}>
+          <div className="p-6 space-y-4 bg-background">
             {/* Quest Type Description */}
-            <div className={`flex items-start gap-3 p-4 rounded-lg transition-all duration-500 ${
-              isInFlight ? 'bg-white/10 backdrop-blur-sm border border-white/20 shadow-[0_4px_16px_rgba(0,0,0,0.2)]' : 'bg-card shadow-card'
-            }`}>
-              <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-500 ${
-                isInFlight ? 'bg-secondary shadow-[0_0_12px_rgba(227,9,38,0.4)]' : 'bg-primary/10'
-              }`}>
-                <AlertCircle className={`w-4 h-4 ${
-                  isInFlight ? 'text-white' : 'text-primary'
-                }`} />
+            <div className="flex items-start gap-3 p-4 rounded-lg bg-card shadow-card">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-primary/10">
+                <AlertCircle className="w-4 h-4 text-primary" />
               </div>
               <div className="flex-1">
-                <h3 className={`font-bold mb-1 transition-all duration-500 ${
-                  isInFlight ? 'text-white' : 'text-foreground'
-                }`}>{details.title}</h3>
-                <p className={`text-xs leading-relaxed transition-all duration-500 ${
-                  isInFlight ? 'text-white/90' : 'text-muted-foreground'
-                }`}>
+                <h3 className="font-bold mb-1 text-foreground">{details.title}</h3>
+                <p className="text-xs leading-relaxed text-muted-foreground">
                   {details.description}
                 </p>
               </div>
             </div>
 
             {/* Requirements */}
-            <div className={`p-4 rounded-lg transition-all duration-500 ${
-              isInFlight ? 'bg-white/10 backdrop-blur-sm border border-white/20 shadow-[0_4px_16px_rgba(0,0,0,0.2)]' : 'bg-card shadow-card'
-            }`}>
+            <div className="p-4 rounded-lg bg-card shadow-card">
               <div className="flex items-center gap-2 mb-3">
-                <CheckCircle2 className={`w-4 h-4 transition-all duration-500 ${
-                  isInFlight ? 'text-secondary' : 'text-accent'
-                }`} />
-                <h4 className={`font-semibold text-sm transition-all duration-500 ${
-                  isInFlight ? 'text-white' : 'text-foreground'
-                }`}>Requirements</h4>
+                <CheckCircle2 className="w-4 h-4 text-accent" />
+                <h4 className="font-semibold text-sm text-foreground">Requirements</h4>
               </div>
               <ul className="space-y-2">
                 {details.requirements.map((req, index) => (
-                  <li key={index} className={`flex items-start gap-2 text-xs transition-all duration-500 ${
-                    isInFlight ? 'text-white/90' : 'text-muted-foreground'
-                  }`}>
-                    <span className={`transition-all duration-500 ${isInFlight ? 'text-secondary' : 'text-accent'}`}>•</span>
+                  <li key={index} className="flex items-start gap-2 text-xs text-muted-foreground">
+                    <span className="text-accent">•</span>
                     <span>{req}</span>
                   </li>
                 ))}
@@ -343,27 +301,15 @@ export const SwipeableQuest = ({ quest, onAccept, onReject, isInFlight = false }
             </div>
 
             {/* Verification Method */}
-            <div className={`p-4 rounded-lg transition-all duration-500 ${
-              isInFlight ? 'bg-white/10 backdrop-blur-sm border border-white/20 shadow-[0_4px_16px_rgba(0,0,0,0.2)]' : 'bg-card shadow-card'
-            }`}>
+            <div className="p-4 rounded-lg bg-card shadow-card">
               <div className="flex items-center gap-2 mb-2">
-                <Shield className={`w-4 h-4 transition-all duration-500 ${
-                  isInFlight ? 'text-secondary' : 'text-primary'
-                }`} />
-                <h4 className={`font-semibold text-sm transition-all duration-500 ${
-                  isInFlight ? 'text-white' : 'text-foreground'
-                }`}>Verification Method</h4>
+                <Shield className="w-4 h-4 text-primary" />
+                <h4 className="font-semibold text-sm text-foreground">Verification Method</h4>
               </div>
-              <p className={`text-xs transition-all duration-500 ${
-                isInFlight ? 'text-white/90' : 'text-muted-foreground'
-              }`}>
+              <p className="text-xs text-muted-foreground">
                 {details.verificationMethod}
               </p>
-              <Badge variant="outline" className={`mt-3 text-xs transition-all duration-500 ${
-                isInFlight 
-                  ? 'bg-secondary/20 text-white border-white/40 font-semibold'
-                  : 'bg-primary/5 text-primary border-primary/20'
-              }`}>
+              <Badge variant="outline" className="mt-3 text-xs bg-primary/5 text-primary border-primary/20">
                 Fraud-Protected
               </Badge>
             </div>
@@ -373,11 +319,7 @@ export const SwipeableQuest = ({ quest, onAccept, onReject, isInFlight = false }
               <Button
                 variant="outline"
                 size="lg"
-                className={`flex-1 h-16 rounded-full text-lg transition-all duration-500 ${
-                  isInFlight 
-                    ? 'bg-white/15 border-2 border-white/40 text-white hover:bg-white/25 backdrop-blur-sm shadow-[0_4px_16px_rgba(0,0,0,0.2)] hover:scale-105' 
-                    : 'shadow-elevated'
-                }`}
+                className="flex-1 h-16 rounded-full text-lg shadow-elevated"
                 onClick={onReject}
               >
                 <X className="w-7 h-7" />
@@ -385,11 +327,7 @@ export const SwipeableQuest = ({ quest, onAccept, onReject, isInFlight = false }
               <Button
                 variant="default"
                 size="lg"
-                className={`flex-1 h-16 rounded-full text-lg font-bold transition-all duration-500 ${
-                  isInFlight 
-                    ? 'bg-secondary hover:bg-secondary/90 text-white shadow-[0_4px_20px_rgba(227,9,38,0.5)] hover:shadow-[0_6px_24px_rgba(227,9,38,0.6)] hover:scale-105'
-                    : 'bg-accent hover:bg-accent/90 shadow-elevated'
-                }`}
+                className="flex-1 h-16 rounded-full text-lg font-bold bg-accent hover:bg-accent/90 shadow-elevated"
                 onClick={onAccept}
               >
                 <Heart className="w-7 h-7 mr-2" />

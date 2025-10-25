@@ -92,33 +92,40 @@ const Home = () => {
           onClick={() => setIsInFlight(!isInFlight)}
         >
           <div className="flex items-center gap-4">
-            {isInFlight ? (
-              <>
-                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center shadow-[0_4px_16px_rgba(0,0,0,0.2)] border border-white/30">
-                  <Plane className="w-10 h-10 text-white animate-pulse drop-shadow-lg" />
-                </div>
-                <div className="flex-1">
-                  <p className="font-bold text-white text-lg drop-shadow-md">In-Flight Mode Active</p>
-                  <p className="text-sm text-white/90 drop-shadow-sm">Flight CX888 • HKG → SIN</p>
-                </div>
-                <div className="px-5 py-2.5 rounded-full bg-secondary shadow-[0_4px_12px_rgba(227,9,38,0.4)] border border-secondary/20">
-                  <span className="text-sm font-bold text-white">Active</span>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-muted flex items-center justify-center shadow-md">
-                  <MapPin className="w-6 h-6 text-muted-foreground" />
-                </div>
-                <div className="flex-1">
-                  <p className="font-bold text-foreground text-base">On-Ground Mode</p>
-                  <p className="text-sm text-muted-foreground">No active flight detected</p>
-                </div>
-                <div className="px-4 py-2 rounded-full bg-muted shadow-sm">
-                  <span className="text-sm font-semibold text-muted-foreground">Offline</span>
-                </div>
-              </>
-            )}
+            <div className={`flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center shadow-md transition-all duration-700 ${
+              isInFlight 
+                ? 'bg-white/20 backdrop-blur-md border border-white/30' 
+                : 'bg-muted'
+            }`}>
+              {isInFlight ? (
+                <Plane className="w-10 h-10 text-white animate-pulse drop-shadow-lg" />
+              ) : (
+                <MapPin className="w-6 h-6 text-muted-foreground" />
+              )}
+            </div>
+            <div className="flex-1">
+              <p className={`font-bold text-base transition-all duration-500 ${
+                isInFlight ? 'text-white text-lg drop-shadow-md' : 'text-foreground'
+              }`}>
+                {isInFlight ? 'In-Flight Mode Active' : 'On-Ground Mode'}
+              </p>
+              <p className={`text-sm transition-all duration-500 ${
+                isInFlight ? 'text-white/90 drop-shadow-sm' : 'text-muted-foreground'
+              }`}>
+                {isInFlight ? 'Flight CX888 • HKG → SIN' : 'No active flight detected'}
+              </p>
+            </div>
+            <div className={`px-5 py-2.5 rounded-full shadow-sm transition-all duration-700 ${
+              isInFlight 
+                ? 'bg-secondary shadow-[0_4px_12px_rgba(227,9,38,0.4)] border border-secondary/20' 
+                : 'bg-muted'
+            }`}>
+              <span className={`text-sm font-bold transition-all duration-500 ${
+                isInFlight ? 'text-white' : 'text-muted-foreground font-semibold'
+              }`}>
+                {isInFlight ? 'Active' : 'Offline'}
+              </span>
+            </div>
           </div>
         </Card>
       </header>
