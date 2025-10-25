@@ -30,13 +30,13 @@ export const BottomNav = () => {
                 <div className={`w-14 h-14 rounded-full flex items-center justify-center shadow-elevated transition-all ${
                   isActive ? "bg-primary scale-110" : "bg-accent hover:scale-105"
                 }`}>
-                  <Icon className="w-6 h-6 text-white" />
+                  <Icon className="w-7 h-7 text-white" strokeWidth={2.5} />
                 </div>
               ) : (
                 <>
-                  <Icon className={`w-6 h-6 mb-1 transition-all ${
+                  <Icon className={`w-7 h-7 mb-1 transition-all ${
                     isActive ? "text-primary scale-110" : "text-muted-foreground hover:text-foreground"
-                  }`} />
+                  }`} strokeWidth={2.5} />
                   <span className={`text-xs transition-all ${
                     isActive ? "text-primary font-bold" : "text-muted-foreground"
                   }`}>

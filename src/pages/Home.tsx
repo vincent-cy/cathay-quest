@@ -10,7 +10,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 const Home = () => {
   const [showCalendar, setShowCalendar] = useState(true);
   const [checkedDays, setCheckedDays] = useState<number[]>([1, 2, 3, 4]);
-  const currentDay = 5; // This would be calculated based on actual date
+  
+  // Calculate next slot to claim (additive system)
+  const nextSlotToClaim = checkedDays.length + 1;
 
   const dailyRewards = [
     { day: 1, reward: 10 }, { day: 2, reward: 10 }, { day: 3, reward: 15 }, { day: 4, reward: 15 },
@@ -24,8 +26,8 @@ const Home = () => {
   ];
 
   const handleClaimReward = () => {
-    if (!checkedDays.includes(currentDay)) {
-      setCheckedDays([...checkedDays, currentDay]);
+    if (nextSlotToClaim <= 31) {
+      setCheckedDays([...checkedDays, nextSlotToClaim]);
     }
   };
 
@@ -47,17 +49,15 @@ const Home = () => {
                   className={`aspect-square rounded-lg flex flex-col items-center justify-center text-xs font-semibold transition-all ${
                     checkedDays.includes(item.day)
                       ? 'bg-accent text-white shadow-lg scale-105'
-                      : item.day === currentDay
+                      : item.day === nextSlotToClaim
                       ? 'bg-primary text-white animate-pulse ring-2 ring-primary'
-                      : item.day === 31
-                      ? 'bg-gradient-achievement text-white col-span-7'
                       : 'bg-muted text-muted-foreground'
                   }`}
                 >
-                  <div className={`${item.day === 31 ? 'text-base' : 'text-xs'} font-bold`}>{item.day}</div>
+                  <div className="text-xs font-bold">{item.day}</div>
                   <div className="flex items-center gap-1 mt-1">
-                    <Trophy className={`${item.day === 31 ? 'w-4 h-4' : 'w-3 h-3'}`} />
-                    <span className={item.day === 31 ? 'text-lg font-bold' : ''}>{item.reward}</span>
+                    <Trophy className="w-3 h-3" />
+                    <span className="text-xs">{item.reward}</span>
                   </div>
                 </div>
               ))}
@@ -66,12 +66,12 @@ const Home = () => {
           <div className="flex-shrink-0 p-4 pt-0">
             <Button
               onClick={handleClaimReward}
-              disabled={checkedDays.includes(currentDay)}
+              disabled={nextSlotToClaim > 31}
               className="w-full"
               size="lg"
             >
               <Gift className="w-5 h-5 mr-2" />
-              {checkedDays.includes(currentDay) ? 'Already Claimed Today' : 'Claim Today\'s Reward'}
+              {nextSlotToClaim > 31 ? 'All Rewards Claimed!' : `Claim Reward ${nextSlotToClaim}`}
             </Button>
           </div>
         </DialogContent>
