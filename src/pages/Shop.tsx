@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Coffee, Wifi, Luggage, Plane, Star, Award, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useQuests } from "@/contexts/QuestContext";
 
 interface ShopItem {
   id: string;
@@ -127,11 +128,23 @@ const shopItems: ShopItem[] = [
 
 const Shop = () => {
   const [selectedItem, setSelectedItem] = useState<ShopItem | null>(null);
-  const [userPoints] = useState(2750); // This would come from user context in real app
+  const { cathayPoints, deductCathayPoints, addVoucher } = useQuests();
   const { toast } = useToast();
 
   const handleRedeem = (item: ShopItem) => {
-    if (userPoints >= item.points) {
+    const success = deductCathayPoints(item.points);
+    
+    if (success) {
+      // Add voucher to inventory
+      addVoucher({
+        id: `${item.id}-${Date.now()}`,
+        name: item.name,
+        description: item.description,
+        availability: item.availability,
+        icon: item.icon.name,
+        redeemedAt: new Date()
+      });
+      
       toast({
         title: "Reward Redeemed!",
         description: `You've successfully redeemed ${item.name} for ${item.points} points.`,
@@ -140,7 +153,7 @@ const Shop = () => {
     } else {
       toast({
         title: "Insufficient Points",
-        description: `You need ${item.points - userPoints} more points to redeem this reward.`,
+        description: `You need ${item.points - cathayPoints} more points to redeem this reward.`,
         variant: "destructive",
       });
     }
@@ -156,7 +169,7 @@ const Shop = () => {
         <div className="flex items-center justify-between mb-2">
           <h1 className="text-2xl font-bold text-foreground">Rewards Shop</h1>
           <Badge className="bg-gradient-achievement text-white px-4 py-2 text-base">
-            {userPoints.toLocaleString()} Points
+            {cathayPoints.toLocaleString()} Points
           </Badge>
         </div>
         <p className="text-sm text-muted-foreground">Redeem your Cathay Points for exclusive rewards</p>
@@ -173,7 +186,7 @@ const Shop = () => {
         <TabsContent value="inflight" className="space-y-3">
           {getCategoryItems("inflight").map((item) => {
             const Icon = item.icon;
-            const canAfford = userPoints >= item.points;
+            const canAfford = cathayPoints >= item.points;
             
             return (
               <Card
@@ -209,7 +222,7 @@ const Shop = () => {
         <TabsContent value="travel" className="space-y-3">
           {getCategoryItems("travel").map((item) => {
             const Icon = item.icon;
-            const canAfford = userPoints >= item.points;
+            const canAfford = cathayPoints >= item.points;
             
             return (
               <Card
@@ -245,7 +258,7 @@ const Shop = () => {
         <TabsContent value="upgrades" className="space-y-3">
           {getCategoryItems("upgrades").map((item) => {
             const Icon = item.icon;
-            const canAfford = userPoints >= item.points;
+            const canAfford = cathayPoints >= item.points;
             
             return (
               <Card
@@ -294,13 +307,13 @@ const Shop = () => {
                 </div>
                 <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                   <span className="text-sm text-muted-foreground">Your Balance</span>
-                  <span className="font-bold text-lg">{userPoints} Points</span>
+                  <span className="font-bold text-lg">{cathayPoints} Points</span>
                 </div>
-                {userPoints >= selectedItem.points && (
+                {cathayPoints >= selectedItem.points && (
                   <div className="flex items-center justify-between p-3 bg-primary/10 rounded-lg border border-primary/20">
                     <span className="text-sm text-primary font-medium">After Redemption</span>
                     <span className="font-bold text-lg text-primary">
-                      {userPoints - selectedItem.points} Points
+                      {cathayPoints - selectedItem.points} Points
                     </span>
                   </div>
                 )}
@@ -319,7 +332,7 @@ const Shop = () => {
                 </Button>
                 <Button 
                   onClick={() => handleRedeem(selectedItem)}
-                  disabled={userPoints < selectedItem.points}
+                  disabled={cathayPoints < selectedItem.points}
                   className="bg-gradient-achievement"
                 >
                   Redeem Now

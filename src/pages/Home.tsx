@@ -4,14 +4,18 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Trophy, Flame, Star, Award, X, Gift } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Trophy, Flame, Star, Award, Gift, Coffee, Wifi, Luggage, Plane, Zap, Ticket } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { useQuests } from "@/contexts/QuestContext";
+import { useToast } from "@/hooks/use-toast";
 
 const Home = () => {
   const [showCalendar, setShowCalendar] = useState(false);
   const [checkedDays, setCheckedDays] = useState<number[]>([1, 2, 3, 4]);
-  const [cathayPoints, setCathayPoints] = useState(1850);
   const [hasClaimedToday, setHasClaimedToday] = useState(false);
+  const [selectedVoucher, setSelectedVoucher] = useState<any>(null);
+  const { cathayPoints, addCathayPoints, ownedVouchers, removeVoucher } = useQuests();
+  const { toast } = useToast();
   
   // Calculate next slot to claim (additive system)
   const nextSlotToClaim = checkedDays.length + 1;
@@ -31,9 +35,25 @@ const Home = () => {
     if (nextSlotToClaim <= 31 && !hasClaimedToday) {
       const rewardAmount = dailyRewards[nextSlotToClaim - 1].reward;
       setCheckedDays([...checkedDays, nextSlotToClaim]);
-      setCathayPoints(cathayPoints + rewardAmount);
+      addCathayPoints(rewardAmount);
       setHasClaimedToday(true);
     }
+  };
+
+  const handleUseVoucher = (voucher: any) => {
+    removeVoucher(voucher.id);
+    toast({
+      title: "Voucher Used!",
+      description: `${voucher.name} has been used and removed from your inventory.`,
+    });
+    setSelectedVoucher(null);
+  };
+
+  const getVoucherIcon = (iconName: string) => {
+    const icons: { [key: string]: any } = {
+      Coffee, Wifi, Luggage, Plane, Star, Award, Zap
+    };
+    return icons[iconName] || Ticket;
   };
 
   return (
@@ -149,7 +169,83 @@ const Home = () => {
             <Badge variant="outline" className="bg-muted/50">🏆 Quest Master</Badge>
           </div>
         </Card>
+
+        {/* Owned Vouchers Section */}
+        <Card className="p-4 shadow-card">
+          <h3 className="font-bold text-foreground mb-3">My Vouchers</h3>
+          {ownedVouchers.length === 0 ? (
+            <div className="text-center py-8">
+              <Ticket className="w-12 h-12 text-muted-foreground mx-auto mb-2 opacity-50" />
+              <p className="text-sm text-muted-foreground">No vouchers yet</p>
+              <p className="text-xs text-muted-foreground mt-1">Visit the Shop to redeem rewards</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {ownedVouchers.map((voucher) => {
+                const Icon = getVoucherIcon(voucher.icon);
+                return (
+                  <Card
+                    key={voucher.id}
+                    className="p-3 cursor-pointer transition-all hover:shadow-card bg-gradient-to-br from-primary/5 to-accent/5"
+                    onClick={() => setSelectedVoucher(voucher)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                        <Icon className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-bold text-sm text-foreground truncate">{voucher.name}</h4>
+                        <p className="text-xs text-muted-foreground truncate">{voucher.availability}</p>
+                      </div>
+                      <Badge variant="outline" className="shrink-0 text-xs">
+                        Use
+                      </Badge>
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+        </Card>
       </div>
+
+      {/* Voucher Use Dialog */}
+      <Dialog open={!!selectedVoucher} onOpenChange={() => setSelectedVoucher(null)}>
+        <DialogContent className="max-w-md">
+          {selectedVoucher && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-xl">{selectedVoucher.name}</DialogTitle>
+                <DialogDescription>{selectedVoucher.description}</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="p-4 bg-muted/50 rounded-lg">
+                  <p className="text-sm text-muted-foreground mb-2">
+                    <strong>Availability:</strong> {selectedVoucher.availability}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    <strong>Redeemed:</strong> {new Date(selectedVoucher.redeemedAt).toLocaleDateString()}
+                  </p>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Once you use this voucher, it will be removed from your inventory. Make sure you're ready to use it now.
+                </p>
+              </div>
+              <DialogFooter className="gap-2">
+                <Button variant="outline" onClick={() => setSelectedVoucher(null)}>
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={() => handleUseVoucher(selectedVoucher)}
+                  className="bg-gradient-achievement"
+                >
+                  Use Voucher
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <BottomNav />
     </div>

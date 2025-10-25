@@ -11,16 +11,33 @@ interface Quest {
   image: string;
 }
 
+interface Voucher {
+  id: string;
+  name: string;
+  description: string;
+  availability: string;
+  icon: string;
+  redeemedAt: Date;
+}
+
 interface QuestContextType {
   acceptedQuests: Quest[];
   addAcceptedQuest: (quest: Quest) => void;
+  cathayPoints: number;
+  setCathayPoints: (points: number) => void;
+  addCathayPoints: (points: number) => void;
+  deductCathayPoints: (points: number) => boolean;
+  ownedVouchers: Voucher[];
+  addVoucher: (voucher: Voucher) => void;
+  removeVoucher: (voucherId: string) => void;
 }
 
 const QuestContext = createContext<QuestContextType | undefined>(undefined);
 
 export const QuestProvider = ({ children }: { children: ReactNode }) => {
   const [acceptedQuests, setAcceptedQuests] = useState<Quest[]>([]);
-
+  const [cathayPoints, setCathayPoints] = useState(2750);
+  const [ownedVouchers, setOwnedVouchers] = useState<Voucher[]>([]);
 
   const addAcceptedQuest = (quest: Quest) => {
     setAcceptedQuests((prev) => {
@@ -32,8 +49,40 @@ export const QuestProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  const addCathayPoints = (points: number) => {
+    setCathayPoints((prev) => prev + points);
+  };
+
+  const deductCathayPoints = (points: number): boolean => {
+    if (cathayPoints >= points) {
+      setCathayPoints((prev) => prev - points);
+      return true;
+    }
+    return false;
+  };
+
+  const addVoucher = (voucher: Voucher) => {
+    setOwnedVouchers((prev) => [...prev, voucher]);
+  };
+
+  const removeVoucher = (voucherId: string) => {
+    setOwnedVouchers((prev) => prev.filter((v) => v.id !== voucherId));
+  };
+
   return (
-    <QuestContext.Provider value={{ acceptedQuests, addAcceptedQuest }}>
+    <QuestContext.Provider 
+      value={{ 
+        acceptedQuests, 
+        addAcceptedQuest,
+        cathayPoints,
+        setCathayPoints,
+        addCathayPoints,
+        deductCathayPoints,
+        ownedVouchers,
+        addVoucher,
+        removeVoucher
+      }}
+    >
       {children}
     </QuestContext.Provider>
   );
