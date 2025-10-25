@@ -298,7 +298,7 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
 
   return (
     <div className="relative">
-      {nextQuest && ((isDragging && dragX < -50) || isRemoving) && (
+      {nextQuest && isRemoving && promoteNext && (
         <div className="absolute inset-0 pointer-events-none z-0">
           <Card
             className={`${
@@ -307,8 +307,8 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
             } overflow-hidden`}
             style={{
               // Smoothly unblur & brighten as we promote the next card
-              filter: `blur(${promoteNext ? 0 : 20}px)`,
-              opacity: promoteNext ? 0.9 : 0.3,
+              filter: "blur(0px)",
+              opacity: 0.9,
               transform: "scale(0.98)",
               transition: "filter 220ms ease, opacity 220ms ease, transform 200ms ease",
             }}
