@@ -89,6 +89,10 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
 
   const SWIPE_THRESHOLD = 30;
 
+  const QuestIcon = getQuestIcon(quest.title);
+  const NextQuestIcon = nextQuest ? getQuestIcon(nextQuest.title) : null;
+  const questDetails = getQuestDetails(quest.title);
+
   // Reset transient state whenever the top card changes
   useEffect(() => {
     setDragX(0);
@@ -98,7 +102,23 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
     setPromoteNext(false);
   }, [quest?.id]);
 
-  // ...
+  const handleHeaderClick = (e: React.MouseEvent) => {
+    if (!hasMoved) {
+      setIsExpanded(!isExpanded);
+    }
+  };
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    setStartX(e.clientX);
+    setIsDragging(true);
+  };
+
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!isDragging) return;
+    const newDragX = e.clientX - startX;
+    if (Math.abs(newDragX) > 5) setHasMoved(true);
+    setDragX(Math.min(0, newDragX));
+  };
 
   const onPointerUp = () => {
     const swiped = dragX <= -SWIPE_THRESHOLD;
@@ -118,7 +138,9 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
           setPromoteNext(false); // safety reset
         }, 360);
       } else {
-        // ... (unchanged wiggle/limit code)
+        setIsWiggling(true);
+        setDragX(0);
+        setTimeout(() => setIsWiggling(false), 100);
       }
     } else {
       setDragX(0);
@@ -198,7 +220,10 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
           position: "relative",
           zIndex: 1,
         }}
-        // ...handlers unchanged
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
       >
         {/* Collapsed View */}
         <div className="flex gap-4 p-4" onClick={handleHeaderClick}>
