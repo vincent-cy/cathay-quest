@@ -8,6 +8,7 @@ import { QuestProvider } from "./contexts/QuestContext";
 import Home from "./pages/Home";
 import Quests from "./pages/Quests";
 import Events from "./pages/Events";
+import Shop from "./pages/Shop";
 import LeaderboardPage from "./pages/LeaderboardPage";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
@@ -24,6 +25,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Quests />} />
             <Route path="/events" element={<Events />} />
+            <Route path="/shop" element={<Shop />} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/home" element={<Home />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

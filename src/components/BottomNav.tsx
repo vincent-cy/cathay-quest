@@ -1,10 +1,11 @@
-import { Home, Target, Trophy, Users } from "lucide-react";
+import { Home, Target, Trophy, Users, ShoppingBag } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 const navItems = [
   { icon: Target, label: "Quests", path: "/", isCenter: true },
   { icon: Trophy, label: "Events", path: "/events" },
   { icon: Home, label: "Home", path: "/home" },
+  { icon: ShoppingBag, label: "Shop", path: "/shop" },
   { icon: Users, label: "Leaderboard", path: "/leaderboard" },
 ];
 
