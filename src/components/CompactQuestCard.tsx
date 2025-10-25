@@ -260,9 +260,7 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
     if (Math.abs(newDragX) > 2) setHasMoved(true);
     const clamped = Math.min(0, newDragX);
     setDragX(clamped);
-    // Start promoting next card as soon as the drag passes half the threshold
-    if (clamped < -SWIPE_THRESHOLD / 2) setPromoteNext(true);
-    else if (!isRemoving) setPromoteNext(false);
+    // Don't promote during drag - keep blurred
   };
 
   const onPointerUp = () => {
