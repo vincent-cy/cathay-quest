@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, MapPin, Plane, Recycle, Bus, Brain, Film, Activity, ChevronDown, ChevronUp } from "lucide-react";
@@ -20,7 +20,6 @@ interface CompactQuestCardProps {
   isInFlight: boolean;
   onSwipeLeft?: () => void;
   swipesLeft: number;
-  disableSwipe?: boolean;
 }
 
 const getQuestIcon = (title: string) => {
@@ -76,7 +75,7 @@ const getQuestDetails = (title: string) => {
   };
 };
 
-export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, swipesLeft, disableSwipe = false }: CompactQuestCardProps) => {
+export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, swipesLeft }: CompactQuestCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [dragX, setDragX] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -84,42 +83,32 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
   const [hasMoved, setHasMoved] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
   const [isWiggling, setIsWiggling] = useState(false);
-
-  // NEW: controls the unblur/fade-in of the next card
-  const [promoteNext, setPromoteNext] = useState(false);
-
-  const SWIPE_THRESHOLD = 15;
+  const SWIPE_THRESHOLD = 50;
 
   const QuestIcon = getQuestIcon(quest.title);
-  const NextQuestIcon = nextQuest ? getQuestIcon(nextQuest.title) : null;
   const questDetails = getQuestDetails(quest.title);
+  const NextQuestIcon = nextQuest ? getQuestIcon(nextQuest.title) : null;
 
-  // Reset transient state whenever the top card changes
-  useEffect(() => {
-    setDragX(0);
-    setIsExpanded(false);
-    setIsDragging(false);
-    setIsRemoving(false);
-    setPromoteNext(false);
-  }, [quest?.id]);
-
-  const handleHeaderClick = (e: React.MouseEvent) => {
-    if (!hasMoved) {
-      setIsExpanded(!isExpanded);
-    }
-  };
-
-  const onPointerDown = (e: React.PointerEvent) => {
-    if (disableSwipe) return;
-    setStartX(e.clientX);
+  const onPointerDown = (e: any) => {
     setIsDragging(true);
+    setStartX(e.clientX ?? 0);
+    setHasMoved(false);
+    try {
+      (e.target as HTMLElement)?.setPointerCapture?.(e.pointerId);
+    } catch {}
   };
 
-  const onPointerMove = (e: React.PointerEvent) => {
-    if (!isDragging || disableSwipe) return;
-    const newDragX = e.clientX - startX;
-    if (Math.abs(newDragX) > 5) setHasMoved(true);
-    setDragX(Math.min(0, newDragX));
+  const onPointerMove = (e: any) => {
+    if (!isDragging) return;
+    const diff = (e.clientX ?? 0) - startX;
+    if (Math.abs(diff) > 2) setHasMoved(true); // More sensitive - reduced from 4
+    if (diff < -2) {
+      // Start dragging sooner - reduced from -4
+      setIsExpanded(false);
+      setDragX(Math.max(diff, -300));
+    } else {
+      setDragX(0);
+    }
   };
 
   const onPointerUp = () => {
@@ -129,20 +118,35 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
     if (swiped) {
       if (swipesLeft > 0) {
         setIsRemoving(true);
-
-        // Make the preview become the "real" visible card while the current slides out
-        setPromoteNext(true);
-
+        // Animate out to the left
         setDragX(-400);
         setTimeout(() => {
-          onSwipeLeft?.(); // parent replaces quest with nextQuest
-          setIsRemoving(false); // overlay will hide via condition
-          setPromoteNext(false); // safety reset
+          onSwipeLeft?.();
+          setIsRemoving(false);
         }, 360);
       } else {
+        // Wiggle animation when limit reached
         setIsWiggling(true);
-        setDragX(0);
-        setTimeout(() => setIsWiggling(false), 100);
+        setDragX(20); // Bounce right slightly
+        setTimeout(() => {
+          setDragX(-10);
+          setTimeout(() => {
+            setDragX(5);
+            setTimeout(() => {
+              setDragX(0);
+              setIsWiggling(false);
+            }, 100);
+          }, 100);
+        }, 100);
+
+        // Show toast message
+        import("@/hooks/use-toast").then(({ toast }) => {
+          toast({
+            title: "Daily Swipe Limit Reached",
+            description: "You've used all 3 swipes for today. Come back tomorrow!",
+            variant: "destructive",
+          });
+        });
       }
     } else {
       setDragX(0);
@@ -151,29 +155,26 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
     setTimeout(() => setHasMoved(false), 50);
   };
 
+  const handleHeaderClick = () => {
+    if (!isDragging && !hasMoved) setIsExpanded((v) => !v);
+  };
+
   return (
     <div className="relative">
       {nextQuest && ((isDragging && dragX < 0) || isRemoving) && (
         <div className="absolute inset-0 pointer-events-none z-0">
           <Card
-            className={`${
-              // Use the SAME styling as a real card (not a washed-out ghost)
-              isInFlight ? "bg-white/10 border-white/30 backdrop-blur-sm" : "bg-card border-border"
-            } overflow-hidden`}
+            className={`${isInFlight ? "bg-white/10 border-white/30 backdrop-blur-sm" : "bg-card border-border"} overflow-hidden`}
             style={{
-              // Smoothly unblur & brighten as we promote the next card
-              filter: `blur(${promoteNext ? 0 : 6}px)`,
-              opacity: promoteNext ? 1 : 0.7,
+              filter: "blur(6px)",
+              opacity: 0.7,
               transform: "translateX(10px) scale(0.98)",
-              transition: "filter 220ms ease, opacity 220ms ease, transform 200ms ease",
+              transition: "transform 0.2s ease, opacity 0.2s ease",
             }}
           >
-            {/* duplicated next card content (unchanged) */}
             <div className="flex gap-4 p-4">
               <div
-                className={`${
-                  isInFlight ? "bg-white/20 border border-white/30" : "bg-muted"
-                } w-16 h-16 flex-shrink-0 rounded-lg flex items-center justify-center`}
+                className={`${isInFlight ? "bg-white/20 border border-white/30" : "bg-muted"} w-16 h-16 flex-shrink-0 rounded-lg flex items-center justify-center`}
               >
                 {NextQuestIcon ? (
                   <NextQuestIcon className={`w-8 h-8 ${isInFlight ? "text-white/80" : "text-muted-foreground"}`} />
@@ -185,9 +186,7 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
                     {nextQuest?.title}
                   </h3>
                   <Badge
-                    className={`${
-                      isInFlight ? "bg-secondary/80 text-white border-secondary/20" : "bg-accent text-accent-foreground"
-                    } flex-shrink-0`}
+                    className={`${isInFlight ? "bg-secondary/80 text-white border-secondary/20" : "bg-accent text-accent-foreground"} flex-shrink-0`}
                   >
                     +{nextQuest?.reward}
                   </Badge>
@@ -200,8 +199,6 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
           </Card>
         </div>
       )}
-
-      {/* FOREGROUND (current) CARD — unchanged except for transform/opacity */}
       <Card
         className={`overflow-hidden select-none touch-pan-y ${
           isRemoving
@@ -215,8 +212,8 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
             : "bg-card border-border hover:shadow-md"
         }`}
         style={{
-          transform: `translateX(${dragX}px) rotate(${dragX * 0.02}deg)`,
-          opacity: dragX < -SWIPE_THRESHOLD && swipesLeft > 0 && !disableSwipe ? 0.7 : 1,
+          transform: `translateX(${dragX}px) rotate(${dragX * 0.05}deg)`,
+          opacity: dragX < -SWIPE_THRESHOLD && swipesLeft > 0 ? 0.7 : 1,
           userSelect: "none",
           willChange: "transform, opacity",
           position: "relative",
@@ -226,6 +223,7 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
+        role="button"
       >
         {/* Collapsed View */}
         <div className="flex gap-4 p-4" onClick={handleHeaderClick}>
