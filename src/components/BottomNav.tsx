@@ -28,14 +28,14 @@ export const BottomNav = () => {
             >
               {item.isCenter ? (
                 <div className={`w-14 h-14 rounded-full flex items-center justify-center shadow-elevated transition-all duration-300 ease-in-out ${
-                  isActive ? "bg-primary scale-110" : "bg-accent hover:scale-105"
+                  isActive ? "bg-primary scale-110" : "bg-accent"
                 }`}>
                   <Icon className="w-7 h-7 text-white transition-all duration-300" strokeWidth={2.5} />
                 </div>
               ) : (
                 <>
                   <Icon className={`mb-1 transition-all duration-300 ease-in-out ${
-                    isActive ? "w-7 h-7 text-primary scale-110" : "w-6 h-6 text-muted-foreground hover:text-foreground"
+                    isActive ? "w-7 h-7 text-primary scale-110" : "w-6 h-6 text-muted-foreground"
                   }`} strokeWidth={isActive ? 2.5 : 2} />
                   <span className={`text-xs transition-all duration-300 ease-in-out ${
                     isActive ? "text-primary font-bold" : "text-muted-foreground"
