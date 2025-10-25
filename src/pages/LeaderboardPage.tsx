@@ -35,11 +35,11 @@ const LeaderboardPage = () => {
             <div className="flex items-center gap-3">
               <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center">
                 {user.rank === 1 ? (
-                  <Crown className="w-7 h-7 text-accent" />
+                  <Crown className="w-7 h-7" style={{ color: 'hsl(45 90% 50%)' }} />
                 ) : user.rank === 2 ? (
-                  <Trophy className="w-6 h-6 text-muted-foreground" />
+                  <Trophy className="w-6 h-6" style={{ color: 'hsl(0 0% 75%)' }} />
                 ) : user.rank === 3 ? (
-                  <Award className="w-5 h-5 text-muted-foreground" />
+                  <Award className="w-5 h-5" style={{ color: 'hsl(25 75% 47%)' }} />
                 ) : (
                   <span className="text-xl font-bold text-muted-foreground">#{user.rank}</span>
                 )}
