@@ -227,7 +227,7 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
   // NEW: controls the unblur/fade-in of the next card
   const [promoteNext, setPromoteNext] = useState(false);
 
-  const SWIPE_THRESHOLD = 3;
+  const SWIPE_THRESHOLD = 120;
 
   const QuestIcon = getQuestIcon(quest.title);
   const NextQuestIcon = nextQuest ? getQuestIcon(nextQuest.title) : null;
@@ -258,7 +258,7 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
     if (!isDragging || disableSwipe) return;
     const newDragX = e.clientX - startX;
     if (Math.abs(newDragX) > 2) setHasMoved(true);
-    const clamped = Math.min(0, newDragX * 1.8);
+    const clamped = Math.min(0, newDragX);
     setDragX(clamped);
     // Start promoting next card as soon as the drag passes half the threshold
     if (clamped < -SWIPE_THRESHOLD / 2) setPromoteNext(true);
@@ -298,7 +298,7 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
 
   return (
     <div className="relative">
-      {nextQuest && ((isDragging && dragX < 0) || isRemoving) && (
+      {nextQuest && ((isDragging && dragX < -50) || isRemoving) && (
         <div className="absolute inset-0 pointer-events-none z-0">
           <Card
             className={`${
@@ -307,9 +307,9 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
             } overflow-hidden`}
             style={{
               // Smoothly unblur & brighten as we promote the next card
-              filter: `blur(${promoteNext ? 0 : 6}px)`,
-              opacity: promoteNext ? 1 : 0.7,
-              transform: "translateX(10px) scale(0.98)",
+              filter: `blur(${promoteNext ? 0 : 4}px)`,
+              opacity: promoteNext ? 0.9 : 0.5,
+              transform: "scale(0.98)",
               transition: "filter 220ms ease, opacity 220ms ease, transform 200ms ease",
             }}
           >
