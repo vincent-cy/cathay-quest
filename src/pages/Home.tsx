@@ -45,11 +45,11 @@ const Home = () => {
             </DialogTitle>
           </DialogHeader>
           <div className="overflow-y-auto flex-1 px-4">
-            <div className="grid grid-cols-7 gap-2 py-4">
+            <div className="grid grid-cols-7 gap-3 py-4">
               {dailyRewards.map((item) => (
                 <div
                   key={item.day}
-                  className={`aspect-square rounded-lg flex flex-col items-center justify-center text-xs font-semibold transition-all ${
+                  className={`aspect-square rounded-xl flex flex-col items-center justify-center p-2 text-xs font-semibold transition-all ${
                     checkedDays.includes(item.day)
                       ? 'bg-accent text-white shadow-lg scale-105'
                       : item.day === nextSlotToClaim
@@ -57,10 +57,10 @@ const Home = () => {
                       : 'bg-muted text-muted-foreground'
                   }`}
                 >
-                  <div className="text-xs font-bold">{item.day}</div>
-                  <div className="flex items-center gap-1 mt-1">
-                    <Trophy className="w-3 h-3" />
-                    <span className="text-xs">{item.reward}</span>
+                  <div className="text-sm font-bold mb-0.5">{item.day}</div>
+                  <div className="flex items-center gap-1">
+                    <Trophy className="w-3.5 h-3.5" />
+                    <span className="text-xs font-semibold">{item.reward}</span>
                   </div>
                 </div>
               ))}
