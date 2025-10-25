@@ -1,8 +1,8 @@
-import { Home, Calendar, Trophy, Users } from "lucide-react";
+import { Home, Target, Trophy, Users } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 const navItems = [
-  { icon: Calendar, label: "Quests", path: "/", isCenter: true },
+  { icon: Target, label: "Quests", path: "/", isCenter: true },
   { icon: Trophy, label: "Events", path: "/events" },
   { icon: Home, label: "Home", path: "/home" },
   { icon: Users, label: "Leaderboard", path: "/leaderboard" },
@@ -27,15 +27,19 @@ export const BottomNav = () => {
               }`}
             >
               {item.isCenter ? (
-                <div className={`w-14 h-14 rounded-full flex items-center justify-center shadow-elevated ${
-                  isActive ? "bg-primary" : "bg-accent"
+                <div className={`w-14 h-14 rounded-full flex items-center justify-center shadow-elevated transition-all ${
+                  isActive ? "bg-primary scale-110" : "bg-accent hover:scale-105"
                 }`}>
                   <Icon className="w-6 h-6 text-white" />
                 </div>
               ) : (
                 <>
-                  <Icon className={`w-5 h-5 mb-1 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
-                  <span className={`text-xs ${isActive ? "text-primary font-medium" : "text-muted-foreground"}`}>
+                  <Icon className={`w-6 h-6 mb-1 transition-all ${
+                    isActive ? "text-primary scale-110" : "text-muted-foreground hover:text-foreground"
+                  }`} />
+                  <span className={`text-xs transition-all ${
+                    isActive ? "text-primary font-bold" : "text-muted-foreground"
+                  }`}>
                     {item.label}
                   </span>
                 </>

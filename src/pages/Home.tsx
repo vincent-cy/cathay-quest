@@ -33,43 +33,47 @@ const Home = () => {
     <div className="min-h-screen bg-background pb-20">
       {/* Daily Check-in Dialog */}
       <Dialog open={showCalendar} onOpenChange={setShowCalendar}>
-        <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
+        <DialogContent className="max-w-md flex flex-col max-h-[85vh]">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle className="text-2xl font-bold text-center">
               Daily Check-in Rewards
             </DialogTitle>
           </DialogHeader>
-          <div className="grid grid-cols-7 gap-2 p-4">
-            {dailyRewards.map((item) => (
-              <div
-                key={item.day}
-                className={`aspect-square rounded-lg flex flex-col items-center justify-center text-xs font-semibold transition-all ${
-                  checkedDays.includes(item.day)
-                    ? 'bg-accent text-white shadow-lg scale-105'
-                    : item.day === currentDay
-                    ? 'bg-primary text-white animate-pulse ring-2 ring-primary'
-                    : item.day === 31
-                    ? 'bg-gradient-achievement text-white col-span-7'
-                    : 'bg-muted text-muted-foreground'
-                }`}
-              >
-                <div className="text-xs opacity-70">Day {item.day}</div>
-                <div className="flex items-center gap-1 mt-1">
-                  <Trophy className="w-3 h-3" />
-                  <span>{item.reward}</span>
+          <div className="overflow-y-auto flex-1 px-4">
+            <div className="grid grid-cols-7 gap-2 py-4">
+              {dailyRewards.map((item) => (
+                <div
+                  key={item.day}
+                  className={`aspect-square rounded-lg flex flex-col items-center justify-center text-xs font-semibold transition-all ${
+                    checkedDays.includes(item.day)
+                      ? 'bg-accent text-white shadow-lg scale-105'
+                      : item.day === currentDay
+                      ? 'bg-primary text-white animate-pulse ring-2 ring-primary'
+                      : item.day === 31
+                      ? 'bg-gradient-achievement text-white col-span-7'
+                      : 'bg-muted text-muted-foreground'
+                  }`}
+                >
+                  <div className={`${item.day === 31 ? 'text-base' : 'text-xs'} font-bold`}>{item.day}</div>
+                  <div className="flex items-center gap-1 mt-1">
+                    <Trophy className={`${item.day === 31 ? 'w-4 h-4' : 'w-3 h-3'}`} />
+                    <span className={item.day === 31 ? 'text-lg font-bold' : ''}>{item.reward}</span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-          <Button
-            onClick={handleClaimReward}
-            disabled={checkedDays.includes(currentDay)}
-            className="w-full"
-            size="lg"
-          >
-            <Gift className="w-5 h-5 mr-2" />
-            {checkedDays.includes(currentDay) ? 'Already Claimed Today' : 'Claim Today\'s Reward'}
-          </Button>
+          <div className="flex-shrink-0 p-4 pt-0">
+            <Button
+              onClick={handleClaimReward}
+              disabled={checkedDays.includes(currentDay)}
+              className="w-full"
+              size="lg"
+            >
+              <Gift className="w-5 h-5 mr-2" />
+              {checkedDays.includes(currentDay) ? 'Already Claimed Today' : 'Claim Today\'s Reward'}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
 
