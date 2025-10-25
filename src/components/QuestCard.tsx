@@ -82,10 +82,14 @@ export const QuestCard = ({
 
         <div className="flex items-center justify-between pt-4 border-t border-border">
           <div className="flex items-center gap-2">
-            <span className="text-2xl font-bold text-accent">+{reward}</span>
+            <span className="text-2xl font-bold text-secondary">+{reward}</span>
             <span className="text-sm text-muted-foreground">Asia Miles</span>
           </div>
-          <Button size="sm" variant={featured ? "hero" : "default"} disabled={completed}>
+          <Button 
+            size="lg" 
+            className="bg-primary hover:bg-primary/90 text-white px-8 h-11 shadow-elevated" 
+            disabled={completed}
+          >
             {completed ? "Completed" : "Start Quest"}
           </Button>
         </div>

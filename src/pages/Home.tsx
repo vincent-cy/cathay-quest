@@ -3,6 +3,7 @@ import { SwipeableQuest } from "@/components/SwipeableQuest";
 import { BottomNav } from "@/components/BottomNav";
 import { Card } from "@/components/ui/card";
 import { Plane, MapPin } from "lucide-react";
+import { useQuests } from "@/contexts/QuestContext";
 import heroFlight from "@/assets/hero-flight.jpg";
 
 const sampleQuests = [
@@ -39,11 +40,11 @@ const sampleQuests = [
 
 const Home = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [acceptedQuests, setAcceptedQuests] = useState<string[]>([]);
-  const [isInFlight, setIsInFlight] = useState(false); // Toggle for demo purposes
+  const [isInFlight, setIsInFlight] = useState(false);
+  const { acceptedQuests, addAcceptedQuest } = useQuests();
 
   const handleAccept = () => {
-    setAcceptedQuests([...acceptedQuests, sampleQuests[currentIndex].id]);
+    addAcceptedQuest(sampleQuests[currentIndex]);
     setCurrentIndex((prev) => (prev + 1) % sampleQuests.length);
   };
 
