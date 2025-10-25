@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { BottomNav } from "@/components/BottomNav";
-import { SwipeableQuest } from "@/components/SwipeableQuest";
+import { CompactQuestCard } from "@/components/CompactQuestCard";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plane, MapPin, RefreshCw } from "lucide-react";
@@ -68,31 +68,19 @@ const allQuests = [
 
 const Quests = () => {
   const [isInFlight, setIsInFlight] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [swipesLeft, setSwipesLeft] = useState(3);
-  const [daysUntilRefresh] = useState(4); // This would be calculated based on actual date
+  const [daysUntilRefresh] = useState(4);
+  const [removedQuests, setRemovedQuests] = useState<string[]>([]);
 
   // Filter quests based on flight mode
-  const availableQuests = allQuests.filter(quest => {
-    if (isInFlight) {
-      return quest.type === "In-Flight";
-    } else {
-      return quest.type === "Weekly" || quest.type === "One-Time";
-    }
-  });
+  const weeklyQuests = allQuests.filter(quest => quest.type === "Weekly" && !removedQuests.includes(quest.id));
+  const oneTimeQuests = allQuests.filter(quest => quest.type === "One-Time" && !removedQuests.includes(quest.id));
+  const inFlightQuests = allQuests.filter(quest => quest.type === "In-Flight" && !removedQuests.includes(quest.id));
 
-  // Get 3 random quests
-  const displayedQuests = availableQuests.slice(0, 3);
-  const currentQuest = displayedQuests[currentIndex % displayedQuests.length];
-
-  const handleAccept = () => {
-    setCurrentIndex((prev) => (prev + 1) % displayedQuests.length);
-  };
-
-  const handleReject = () => {
+  const handleSwipeLeft = (questId: string) => {
     if (swipesLeft > 0) {
       setSwipesLeft(prev => prev - 1);
-      setCurrentIndex((prev) => (prev + 1) % displayedQuests.length);
+      setRemovedQuests(prev => [...prev, questId]);
     }
   };
 
@@ -185,40 +173,64 @@ const Quests = () => {
         </Card>
       </header>
 
-      <div className={`relative transition-all duration-500 ${isInFlight ? "pt-8 px-2" : "pt-6"}`}>
-        {/* Quest Card Stack - Tinder Style */}
-        <div className="relative" style={{ perspective: "1000px" }}>
-          {/* Next Quest Card - Background */}
-          {displayedQuests[(currentIndex + 1) % displayedQuests.length] && (
-            <div 
-              className="absolute inset-0 transition-all duration-300"
-              style={{
-                transform: "scale(0.95) translateY(10px)",
-                opacity: 0.5,
-                zIndex: 0,
-              }}
-            >
-              <SwipeableQuest
-                quest={displayedQuests[(currentIndex + 1) % displayedQuests.length]}
-                onAccept={() => {}}
-                onReject={() => {}}
-                isInFlight={isInFlight}
-                isBackground={true}
-              />
-            </div>
-          )}
-          
-          {/* Current Quest Card - Foreground */}
-          <div className="relative z-10">
-            <SwipeableQuest
-              quest={currentQuest}
-              onAccept={handleAccept}
-              onReject={handleReject}
-              isInFlight={isInFlight}
-              isBackground={false}
-            />
+      <div className="px-4 py-6 space-y-6">
+        {/* In-Flight Mode - Show In-Flight Quests */}
+        {isInFlight && (
+          <div className="space-y-3">
+            <h2 className="text-xl font-bold text-white px-2">In-Flight Quests</h2>
+            {inFlightQuests.length > 0 ? (
+              inFlightQuests.map(quest => (
+                <CompactQuestCard
+                  key={quest.id}
+                  quest={quest}
+                  isInFlight={isInFlight}
+                  onSwipeLeft={() => handleSwipeLeft(quest.id)}
+                />
+              ))
+            ) : (
+              <p className="text-white/70 text-center py-8">No in-flight quests available</p>
+            )}
           </div>
-        </div>
+        )}
+
+        {/* On-Ground Mode - Show Weekly and One-Time Quests */}
+        {!isInFlight && (
+          <>
+            {/* Weekly Quests */}
+            <div className="space-y-3">
+              <h2 className="text-xl font-bold text-foreground px-2">Weekly Quests</h2>
+              {weeklyQuests.length > 0 ? (
+                weeklyQuests.map(quest => (
+                  <CompactQuestCard
+                    key={quest.id}
+                    quest={quest}
+                    isInFlight={isInFlight}
+                    onSwipeLeft={() => handleSwipeLeft(quest.id)}
+                  />
+                ))
+              ) : (
+                <p className="text-muted-foreground text-center py-8">No weekly quests available</p>
+              )}
+            </div>
+
+            {/* One-Time Quests */}
+            <div className="space-y-3">
+              <h2 className="text-xl font-bold text-foreground px-2">One-Time Quests</h2>
+              {oneTimeQuests.length > 0 ? (
+                oneTimeQuests.map(quest => (
+                  <CompactQuestCard
+                    key={quest.id}
+                    quest={quest}
+                    isInFlight={isInFlight}
+                    onSwipeLeft={() => handleSwipeLeft(quest.id)}
+                  />
+                ))
+              ) : (
+                <p className="text-muted-foreground text-center py-8">No one-time quests available</p>
+              )}
+            </div>
+          </>
+        )}
       </div>
 
       <BottomNav />
