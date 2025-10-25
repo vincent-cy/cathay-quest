@@ -79,7 +79,7 @@ export const CompactQuestCard = ({ quest, isInFlight, onSwipeLeft }: CompactQues
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [hasMoved, setHasMoved] = useState(false);
-  const SWIPE_THRESHOLD = 60;
+  const SWIPE_THRESHOLD = 30; // Easier swipe - reduced from 60
 
   const QuestIcon = getQuestIcon(quest.title);
   const questDetails = getQuestDetails(quest.title);
@@ -94,8 +94,8 @@ export const CompactQuestCard = ({ quest, isInFlight, onSwipeLeft }: CompactQues
   const onPointerMove = (e: any) => {
     if (!isDragging) return;
     const diff = (e.clientX ?? 0) - startX;
-    if (Math.abs(diff) > 4) setHasMoved(true);
-    if (diff < -4) {
+    if (Math.abs(diff) > 2) setHasMoved(true); // More sensitive - reduced from 4
+    if (diff < -2) { // Start dragging sooner - reduced from -4
       setIsExpanded(false);
       setDragX(Math.max(diff, -300));
     } else {
