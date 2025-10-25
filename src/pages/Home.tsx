@@ -38,7 +38,7 @@ const Home = () => {
     <div className="min-h-screen bg-background pb-20">
       {/* Daily Check-in Dialog */}
       <Dialog open={showCalendar} onOpenChange={setShowCalendar}>
-        <DialogContent className="max-w-md flex flex-col max-h-[85vh]">
+        <DialogContent className="max-w-lg flex flex-col max-h-[85vh]">
           <DialogHeader className="flex-shrink-0">
             <DialogTitle className="text-2xl font-bold text-center">
               Daily Check-in Rewards
