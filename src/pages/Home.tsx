@@ -52,55 +52,57 @@ const Home = () => {
   };
 
   return (
-    <div className={`min-h-screen pb-20 transition-colors duration-500 ${
-      isInFlight ? 'bg-[hsl(164,76%,35%)]' : 'bg-background'
+    <div className={`min-h-screen pb-20 transition-all duration-700 ${
+      isInFlight ? 'bg-primary' : 'bg-background'
     }`}>
-      <header className={`p-6 border-b space-y-4 shadow-lg transition-colors duration-500 ${
-        isInFlight ? 'bg-[hsl(164,76%,40%)] border-[hsl(164,76%,50%)]' : 'border-border'
+      <header className={`p-6 border-b space-y-4 transition-all duration-700 ${
+        isInFlight 
+          ? 'bg-gradient-to-br from-primary via-primary-glow to-primary border-primary-glow/30 shadow-glow' 
+          : 'border-border shadow-card'
       }`}>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className={`text-3xl font-bold drop-shadow-md ${
-              isInFlight ? 'text-white' : 'text-foreground'
+            <h1 className={`text-3xl font-bold transition-all duration-500 ${
+              isInFlight ? 'text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.3)]' : 'text-foreground'
             }`}>Discover Quests</h1>
-            <p className={`text-base ${
-              isInFlight ? 'text-white/80' : 'text-muted-foreground'
+            <p className={`text-base transition-all duration-500 ${
+              isInFlight ? 'text-white/90' : 'text-muted-foreground'
             }`}>Swipe to explore missions</p>
           </div>
           <div className="text-right">
-            <p className={`text-base ${
-              isInFlight ? 'text-white/80' : 'text-muted-foreground'
+            <p className={`text-base transition-all duration-500 ${
+              isInFlight ? 'text-white/90' : 'text-muted-foreground'
             }`}>Accepted</p>
-            <p className={`text-3xl font-bold drop-shadow-md ${
-              isInFlight ? 'text-[hsl(45,100%,55%)]' : 'text-accent'
+            <p className={`text-3xl font-bold transition-all duration-500 ${
+              isInFlight ? 'text-secondary drop-shadow-[0_2px_10px_rgba(227,9,38,0.5)]' : 'text-accent'
             }`}>{acceptedQuests.length}</p>
           </div>
         </div>
         
-        {/* Flight Mode Indicator - 3D enhanced */}
+        {/* Flight Mode Indicator - Enhanced */}
         <Card 
-          className={`p-4 cursor-pointer transition-all shadow-card hover:shadow-elevated ${
+          className={`p-5 cursor-pointer transition-all duration-700 backdrop-blur-sm ${
             isInFlight 
-              ? "bg-[hsl(164,76%,45%)] border-[hsl(164,76%,55%)]" 
-              : "bg-muted/50 border-border"
+              ? "bg-white/10 border-2 border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.3)]" 
+              : "bg-muted/50 border-border shadow-card hover:shadow-elevated"
           }`}
           style={{
-            transform: isInFlight ? 'scale(1.02)' : 'scale(1)',
+            transform: isInFlight ? 'scale(1.02) translateY(-2px)' : 'scale(1)',
           }}
           onClick={() => setIsInFlight(!isInFlight)}
         >
           <div className="flex items-center gap-4">
             {isInFlight ? (
               <>
-                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-white/20 flex items-center justify-center shadow-lg">
-                  <Plane className="w-10 h-10 text-white animate-pulse" />
+                <div className="flex-shrink-0 w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center shadow-[0_4px_16px_rgba(0,0,0,0.2)] border border-white/30">
+                  <Plane className="w-10 h-10 text-white animate-pulse drop-shadow-lg" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-bold text-white text-base">In-Flight Mode Active</p>
-                  <p className="text-sm text-white/80">Flight CX888 • HKG → SIN</p>
+                  <p className="font-bold text-white text-lg drop-shadow-md">In-Flight Mode Active</p>
+                  <p className="text-sm text-white/90 drop-shadow-sm">Flight CX888 • HKG → SIN</p>
                 </div>
-                <div className="px-4 py-2 rounded-full bg-[hsl(45,100%,55%)] shadow-md">
-                  <span className="text-sm font-bold text-[hsl(164,76%,35%)]">Active</span>
+                <div className="px-5 py-2.5 rounded-full bg-secondary shadow-[0_4px_12px_rgba(227,9,38,0.4)] border border-secondary/20">
+                  <span className="text-sm font-bold text-white">Active</span>
                 </div>
               </>
             ) : (
@@ -121,7 +123,7 @@ const Home = () => {
         </Card>
       </header>
 
-      <div className={isInFlight ? "pt-8 px-2" : "pt-6"}>
+      <div className={`transition-all duration-500 ${isInFlight ? "pt-8 px-2" : "pt-6"}`}>
         <SwipeableQuest
           quest={sampleQuests[currentIndex]}
           onAccept={handleAccept}
