@@ -303,11 +303,11 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
               isInFlight ? "bg-white/10 border-white/30" : "bg-card border-border"
             } overflow-hidden`}
             style={{
-              // Scale up from behind while unblurring
-              filter: `blur(${promoteNext ? 0 : 30}px) brightness(0.9)`,
-              opacity: 1,
-              transform: `scale(${promoteNext ? 1 : 0.85})`,
-              transition: "filter 300ms ease-out, transform 300ms ease-out",
+              // Heavily blur until swipe is committed
+              filter: `blur(${promoteNext ? 0 : 5}px) brightness(0.9)`,
+              opacity: promoteNext ? 1 : 1,
+              transform: "scale(0.98)",
+              transition: "filter 250ms ease, opacity 250ms ease, transform 200ms ease",
             }}
           >
             {/* duplicated next card content (unchanged) */}
