@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plane, MapPin, RefreshCw } from "lucide-react";
 import { Toaster } from "@/components/ui/toaster";
+import { toast } from "@/hooks/use-toast";
 import heroFlight from "@/assets/hero-flight.jpg";
 
 const allQuests = [
@@ -167,7 +168,17 @@ const Quests = () => {
 
   const handleSwipeLeft = (questId: string, type: string, slotIndex: number) => {
     if (swipesLeft > 0) {
-      setSwipesLeft((prev) => prev - 1);
+      const newSwipesLeft = swipesLeft - 1;
+      setSwipesLeft(newSwipesLeft);
+
+      // Show notification when all swipes are used
+      if (newSwipesLeft === 0) {
+        toast({
+          title: "No Swipes Left!",
+          description: "You've used all 3 swipes. Come back tomorrow for more!",
+          variant: "destructive",
+        });
+      }
 
       // After animation, replace the swiped card at its position
       setTimeout(() => {
