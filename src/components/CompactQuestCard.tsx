@@ -88,7 +88,7 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
   // NEW: controls the unblur/fade-in of the next card
   const [promoteNext, setPromoteNext] = useState(false);
 
-  const SWIPE_THRESHOLD = 15;
+  const SWIPE_THRESHOLD = 8;
 
   const QuestIcon = getQuestIcon(quest.title);
   const NextQuestIcon = nextQuest ? getQuestIcon(nextQuest.title) : null;
@@ -118,8 +118,8 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
   const onPointerMove = (e: React.PointerEvent) => {
     if (!isDragging || disableSwipe) return;
     const newDragX = e.clientX - startX;
-    if (Math.abs(newDragX) > 5) setHasMoved(true);
-    setDragX(Math.min(0, newDragX));
+    if (Math.abs(newDragX) > 3) setHasMoved(true);
+    setDragX(Math.min(0, newDragX * 1.25));
   };
 
   const onPointerUp = () => {
@@ -215,7 +215,7 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
             : "bg-card border-border hover:shadow-md"
         }`}
         style={{
-          transform: `translateX(${dragX}px) rotate(${dragX * 0.02}deg)`,
+          transform: `translateX(${dragX}px) rotate(${dragX * 0.05}deg)`,
           opacity: dragX < -SWIPE_THRESHOLD && swipesLeft > 0 && !disableSwipe ? 0.7 : 1,
           userSelect: "none",
           willChange: "transform, opacity",
