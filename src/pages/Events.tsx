@@ -32,90 +32,90 @@ const seasonalEvents = [
 
 const communityMilestones = [
   {
-    goal: "$85,000",
-    goalNum: 85000,
-    title: "The Abyss",
-    description: "Massive new expansion",
+    goal: "50,000",
+    goalNum: 50000,
+    title: "Quest Master Legend",
+    description: "Unlock ultimate achievement",
     reward: "1000 Points + Exclusive Badge",
     status: "LOCKED",
     funded: false,
     position: "right"
   },
   {
-    goal: "$68,000",
-    goalNum: 68000,
-    title: "3rd Playable Character",
-    description: "Another hero joins",
-    reward: "500 Points",
+    goal: "40,000",
+    goalNum: 40000,
+    title: "Elite Explorer",
+    description: "Join the top tier",
+    reward: "800 Points + Special Badge",
     status: "LOCKED",
     funded: false,
     position: "left"
   },
   {
-    goal: "$62,000",
-    goalNum: 62000,
-    title: "Colosseum of Fools",
-    description: "Challenge arena + new bosses",
-    reward: "400 Points",
+    goal: "30,000",
+    goalNum: 30000,
+    title: "Adventure Champion",
+    description: "Major milestone unlocked",
+    reward: "600 Points",
     status: "IN PROGRESS",
     funded: false,
-    currentAmount: 58000,
+    currentAmount: 27500,
     position: "right"
   },
   {
-    goal: "$56,000",
-    goalNum: 56000,
-    title: "2nd Playable Character",
-    description: "New character unlock",
-    reward: "350 Points",
+    goal: "20,000",
+    goalNum: 20000,
+    title: "Journey Veteran",
+    description: "Proven dedication",
+    reward: "400 Points",
     status: "FUNDED",
     funded: true,
     position: "left"
   },
   {
-    goal: "$50,000",
-    goalNum: 50000,
-    title: "Wii U",
-    description: "Gaming rewards unlock",
+    goal: "15,000",
+    goalNum: 15000,
+    title: "Quest Enthusiast",
+    description: "Building momentum",
     reward: "300 Points",
     status: "FUNDED",
     funded: true,
     position: "right"
   },
   {
-    goal: "$44,000",
-    goalNum: 44000,
-    title: "4 Additional Quests",
-    description: "More missions for everyone",
-    reward: "250 Points",
+    goal: "10,000",
+    goalNum: 10000,
+    title: "Rising Adventurer",
+    description: "Community united",
+    reward: "200 Points",
     status: "FUNDED",
     funded: true,
     position: "left"
   },
   {
-    goal: "$39,000",
-    goalNum: 39000,
-    title: "The White Palace",
-    description: "Exclusive destination unlock",
-    reward: "200 Points",
+    goal: "5,000",
+    goalNum: 5000,
+    title: "First Steps",
+    description: "The journey begins",
+    reward: "100 Points",
     status: "FUNDED",
     funded: true,
     position: "right"
   },
   {
-    goal: "$35,000",
-    goalNum: 35000,
-    title: "Funding Goal",
-    description: "Unlock basic rewards",
-    reward: "100 Points",
+    goal: "1,000",
+    goalNum: 1000,
+    title: "Community Kickoff",
+    description: "Foundation milestone",
+    reward: "50 Points",
     status: "FUNDED",
     funded: true,
     position: "left"
   }
 ];
 
-const totalGoal = 85000;
-const currentProgress = 58000;
+const totalGoal = 50000;
+const currentProgress = 27500;
 
 const Events = () => {
   const [selectedEvent, setSelectedEvent] = useState<typeof seasonalEvents[0] | null>(null);
@@ -191,7 +191,7 @@ const Events = () => {
                 </span>
               </div>
               <p className="text-muted-foreground mt-4 text-sm">
-                Community Progress: ${(currentProgress / 1000).toFixed(1)}K / ${(totalGoal / 1000).toFixed(0)}K
+                Community Progress: {(currentProgress / 1000).toFixed(1)}K / {(totalGoal / 1000).toFixed(0)}K Quests
               </p>
             </div>
 
@@ -299,7 +299,7 @@ const Events = () => {
                             <div className="mt-2 space-y-1">
                               <div className="flex justify-between text-xs">
                                 <span className="text-primary font-bold">
-                                  ${(milestone.currentAmount / 1000).toFixed(1)}K
+                                  {(milestone.currentAmount / 1000).toFixed(1)}K
                                 </span>
                                 <span className="text-muted-foreground">{milestone.goal}</span>
                               </div>
