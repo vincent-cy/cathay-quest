@@ -202,16 +202,16 @@ export const SwipeableQuest = ({ quest, onAccept, onReject, isInFlight = false, 
         }}>
           {/* Quest Image Section */}
           <div className="h-[50vh] relative">
-            {/* Left side red glow when swiping left - 3D enhanced */}
+            {/* Left side gold glow when swiping left - 3D enhanced */}
             <div 
               className="absolute top-0 bottom-0 left-0 w-4 pointer-events-none z-[15] transition-all"
               style={{
                 opacity: offset < 0 ? glowIntensity : 0,
                 boxShadow: offset < 0 ? `
-                  0 0 ${50 * glowIntensity}px ${25 * glowIntensity}px hsl(0 84% 60%),
-                  inset 0 0 ${30 * glowIntensity}px ${10 * glowIntensity}px hsl(0 84% 60%)
+                  0 0 ${50 * glowIntensity}px ${25 * glowIntensity}px hsl(45 33% 71%),
+                  inset 0 0 ${30 * glowIntensity}px ${10 * glowIntensity}px hsl(45 33% 71%)
                 ` : 'none',
-                background: offset < 0 ? `linear-gradient(to right, hsl(0 84% 60%), transparent)` : 'transparent',
+                background: offset < 0 ? `linear-gradient(to right, hsl(45 33% 71%), transparent)` : 'transparent',
                 transform: `translateZ(${50 * glowIntensity}px)`,
               }}
             />
