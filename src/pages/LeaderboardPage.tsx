@@ -28,9 +28,16 @@ const LeaderboardPage = () => {
         {topUsers.map((user, index) => (
           <Card
             key={index}
-            className={`p-4 shadow-card ${
-              index < 3 ? "bg-gradient-card" : "bg-muted/50"
-            }`}
+            className="p-4 shadow-card"
+            style={{
+              background: user.rank === 1 
+                ? 'linear-gradient(135deg, hsl(45 90% 88%), hsl(45 90% 95%))' // Gold
+                : user.rank === 2 
+                ? 'linear-gradient(135deg, hsl(0 0% 88%), hsl(0 0% 95%))' // Silver
+                : user.rank === 3 
+                ? 'linear-gradient(135deg, hsl(25 75% 85%), hsl(25 75% 92%))' // Bronze
+                : 'hsl(var(--muted) / 0.5)'
+            }}
           >
             <div className="flex items-center gap-3">
               <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center">
