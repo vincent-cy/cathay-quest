@@ -93,7 +93,7 @@ export const CompactQuestCard = ({ quest, isInFlight, onSwipeLeft }: CompactQues
   const handleMove = (clientX: number) => {
     if (!isDragging) return;
     const diff = clientX - startX;
-    if (Math.abs(diff) > 5) {
+    if (Math.abs(diff) > 10) {
       setHasMoved(true);
     }
     if (diff < 0) { // Only allow left swipe
@@ -102,15 +102,21 @@ export const CompactQuestCard = ({ quest, isInFlight, onSwipeLeft }: CompactQues
   };
 
   const handleEnd = () => {
+    const wasSwiped = dragX < -100;
     setIsDragging(false);
-    if (dragX < -100 && onSwipeLeft) {
+    
+    if (wasSwiped && onSwipeLeft) {
       onSwipeLeft();
     }
+    
     setDragX(0);
+    
+    // Reset hasMoved after a short delay to allow click detection
+    setTimeout(() => setHasMoved(false), 100);
   };
 
-  const handleClick = () => {
-    if (!hasMoved) {
+  const handleClick = (e: React.MouseEvent) => {
+    if (!hasMoved && !isDragging) {
       setIsExpanded(!isExpanded);
     }
   };
@@ -269,20 +275,6 @@ export const CompactQuestCard = ({ quest, isInFlight, onSwipeLeft }: CompactQues
             </p>
           </div>
 
-          {/* Start Button */}
-          <Button 
-            className={`w-full ${
-              isInFlight 
-                ? "bg-secondary hover:bg-secondary/90 text-white" 
-                : ""
-            }`}
-            onClick={(e) => {
-              e.stopPropagation();
-              // Handle quest start
-            }}
-          >
-            Start Quest
-          </Button>
         </div>
       )}
     </Card>
