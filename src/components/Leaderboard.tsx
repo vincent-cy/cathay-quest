@@ -17,7 +17,11 @@ export const Leaderboard = () => {
       <div className="container mx-auto max-w-4xl">
         <div className="text-center space-y-3 md:space-y-4 mb-12 md:mb-16 px-4">
           <div className="flex justify-center mb-3 md:mb-4">
-            <img src={achievementBadge} alt="Achievement Badge" className="w-16 h-16 md:w-20 md:h-20 animate-pulse-glow" />
+            <img
+              src={achievementBadge}
+              alt="Achievement Badge"
+              className="w-16 h-16 md:w-20 md:h-20 animate-pulse-glow"
+            />
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground">
             Global <span className="text-accent">Leaderboard</span>
@@ -75,8 +79,10 @@ export const Leaderboard = () => {
 
                 {/* Cathay Points */}
                 <div className="text-right flex-shrink-0">
-                  <div className="text-lg sm:text-xl md:text-2xl font-bold text-accent">{user.miles.toLocaleString()}</div>
-                  <div className="text-xs text-muted-foreground hidden sm:block">Cathay points</div>
+                  <div className="text-lg sm:text-xl md:text-2xl font-bold text-accent">
+                    {user.miles.toLocaleString()}
+                  </div>
+                  <div className="text-xs text-muted-foreground hidden sm:block">Cathay Points</div>
                 </div>
               </div>
             ))}
