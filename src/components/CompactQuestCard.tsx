@@ -232,7 +232,7 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
             </Badge>
           </div>
 
-          <p className={`text-sm ${isExpanded ? "" : "line-clamp-2"} mb-3 ${
+          <p className={`text-sm ${isExpanded ? "" : "line-clamp-2"} mb-3 min-h-[2.5rem] ${
             isInFlight ? "text-white/80" : "text-muted-foreground"
           }`}>
             {quest.description}

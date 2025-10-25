@@ -318,7 +318,8 @@ const Quests = () => {
               <div className="space-y-3">
                 {inFlightSlots.map((questIndex, slotIndex) => {
                   const quest = allInFlightQuests[questIndex % allInFlightQuests.length];
-                  const nextQuest = allInFlightQuests[inFlightNextIndex % allInFlightQuests.length];
+                  const nextQuestIndex = (inFlightNextIndex + slotIndex) % allInFlightQuests.length;
+                  const nextQuest = allInFlightQuests[nextQuestIndex];
                   return (
                     <CompactQuestCard
                       key={`inflight-slot-${slotIndex}`}
@@ -347,7 +348,8 @@ const Quests = () => {
                 <div className="space-y-3">
                   {weeklySlots.map((questIndex, slotIndex) => {
                     const quest = allWeeklyQuests[questIndex % allWeeklyQuests.length];
-                    const nextQuest = allWeeklyQuests[weeklyNextIndex % allWeeklyQuests.length];
+                    const nextQuestIndex = (weeklyNextIndex + slotIndex) % allWeeklyQuests.length;
+                    const nextQuest = allWeeklyQuests[nextQuestIndex];
                     return (
                       <CompactQuestCard
                         key={`weekly-slot-${slotIndex}`}
@@ -372,7 +374,8 @@ const Quests = () => {
                 <div className="space-y-3">
                   {oneTimeSlots.map((questIndex, slotIndex) => {
                     const quest = allOneTimeQuests[questIndex % allOneTimeQuests.length];
-                    const nextQuest = allOneTimeQuests[oneTimeNextIndex % allOneTimeQuests.length];
+                    const nextQuestIndex = (oneTimeNextIndex + slotIndex) % allOneTimeQuests.length;
+                    const nextQuest = allOneTimeQuests[nextQuestIndex];
                     return (
                       <CompactQuestCard
                         key={`onetime-slot-${slotIndex}`}
