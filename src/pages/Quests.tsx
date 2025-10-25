@@ -251,20 +251,31 @@ const Quests = () => {
         </Card>
       </header>
 
-      <div className="px-4 py-6 space-y-6">
+      <div className="px-4 py-6 space-y-8">
         {/* In-Flight Mode - Show In-Flight Quests */}
         {isInFlight && (
           <div className="space-y-3">
             <h2 className="text-xl font-bold text-white px-2">In-Flight Quests</h2>
             {inFlightQuests.length > 0 ? (
-              inFlightQuests.map(quest => (
-                <CompactQuestCard
-                  key={quest.id}
-                  quest={quest}
-                  isInFlight={isInFlight}
-                  onSwipeLeft={() => handleSwipeLeft(quest.id)}
-                />
-              ))
+              <div className="relative h-[280px]" style={{ perspective: "1000px" }}>
+                {inFlightQuests.slice(0, 3).map((quest, index) => (
+                  <div
+                    key={quest.id}
+                    className="absolute w-full transition-all duration-300"
+                    style={{
+                      zIndex: inFlightQuests.length - index,
+                      transform: `translateY(${index * 12}px) scale(${1 - index * 0.03})`,
+                      opacity: index === 0 ? 1 : 0.6,
+                    }}
+                  >
+                    <CompactQuestCard
+                      quest={quest}
+                      isInFlight={isInFlight}
+                      onSwipeLeft={() => handleSwipeLeft(quest.id)}
+                    />
+                  </div>
+                ))}
+              </div>
             ) : (
               <p className="text-white/70 text-center py-8">No in-flight quests available</p>
             )}
@@ -278,14 +289,25 @@ const Quests = () => {
             <div className="space-y-3">
               <h2 className="text-xl font-bold text-foreground px-2">Weekly Quests</h2>
               {weeklyQuests.length > 0 ? (
-                weeklyQuests.map(quest => (
-                  <CompactQuestCard
-                    key={quest.id}
-                    quest={quest}
-                    isInFlight={isInFlight}
-                    onSwipeLeft={() => handleSwipeLeft(quest.id)}
-                  />
-                ))
+                <div className="relative h-[280px]" style={{ perspective: "1000px" }}>
+                  {weeklyQuests.slice(0, 3).map((quest, index) => (
+                    <div
+                      key={quest.id}
+                      className="absolute w-full transition-all duration-300"
+                      style={{
+                        zIndex: weeklyQuests.length - index,
+                        transform: `translateY(${index * 12}px) scale(${1 - index * 0.03})`,
+                        opacity: index === 0 ? 1 : 0.6,
+                      }}
+                    >
+                      <CompactQuestCard
+                        quest={quest}
+                        isInFlight={isInFlight}
+                        onSwipeLeft={() => handleSwipeLeft(quest.id)}
+                      />
+                    </div>
+                  ))}
+                </div>
               ) : (
                 <p className="text-muted-foreground text-center py-8">No weekly quests available</p>
               )}
@@ -295,14 +317,25 @@ const Quests = () => {
             <div className="space-y-3">
               <h2 className="text-xl font-bold text-foreground px-2">One-Time Quests</h2>
               {oneTimeQuests.length > 0 ? (
-                oneTimeQuests.map(quest => (
-                  <CompactQuestCard
-                    key={quest.id}
-                    quest={quest}
-                    isInFlight={isInFlight}
-                    onSwipeLeft={() => handleSwipeLeft(quest.id)}
-                  />
-                ))
+                <div className="relative h-[280px]" style={{ perspective: "1000px" }}>
+                  {oneTimeQuests.slice(0, 3).map((quest, index) => (
+                    <div
+                      key={quest.id}
+                      className="absolute w-full transition-all duration-300"
+                      style={{
+                        zIndex: oneTimeQuests.length - index,
+                        transform: `translateY(${index * 12}px) scale(${1 - index * 0.03})`,
+                        opacity: index === 0 ? 1 : 0.6,
+                      }}
+                    >
+                      <CompactQuestCard
+                        quest={quest}
+                        isInFlight={isInFlight}
+                        onSwipeLeft={() => handleSwipeLeft(quest.id)}
+                      />
+                    </div>
+                  ))}
+                </div>
               ) : (
                 <p className="text-muted-foreground text-center py-8">No one-time quests available</p>
               )}
