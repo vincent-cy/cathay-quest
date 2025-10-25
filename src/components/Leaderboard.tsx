@@ -73,10 +73,10 @@ export const Leaderboard = () => {
                   </div>
                 </div>
 
-                {/* Miles */}
+                {/* Cathay Points */}
                 <div className="text-right flex-shrink-0">
                   <div className="text-lg sm:text-xl md:text-2xl font-bold text-accent">{user.miles.toLocaleString()}</div>
-                  <div className="text-xs text-muted-foreground hidden sm:block">miles earned</div>
+                  <div className="text-xs text-muted-foreground hidden sm:block">Cathay points</div>
                 </div>
               </div>
             ))}

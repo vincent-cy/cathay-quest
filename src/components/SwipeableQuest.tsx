@@ -247,7 +247,7 @@ export const SwipeableQuest = ({ quest, onAccept, onReject, isInFlight = false, 
                 transform: 'translateZ(30px)',
               }}>
                 <Trophy className="w-5 h-5 mr-2" />
-                {quest.reward} miles
+                {quest.reward} pts
               </Badge>
             </div>
 

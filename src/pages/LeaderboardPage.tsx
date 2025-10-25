@@ -58,8 +58,21 @@ const LeaderboardPage = () => {
               </div>
 
               <div className="text-right flex-shrink-0">
-                <div className="text-xl font-bold text-accent">{user.miles.toLocaleString()}</div>
-                <div className="text-xs text-muted-foreground">miles</div>
+                <div 
+                  className="text-xl font-bold"
+                  style={{
+                    color: user.rank === 1 
+                      ? 'hsl(45 90% 50%)' // Gold
+                      : user.rank === 2 
+                      ? 'hsl(0 0% 75%)' // Silver
+                      : user.rank === 3 
+                      ? 'hsl(25 75% 47%)' // Bronze
+                      : 'hsl(var(--accent))'
+                  }}
+                >
+                  {user.miles.toLocaleString()}
+                </div>
+                <div className="text-xs text-muted-foreground">Cathay points</div>
               </div>
             </div>
           </Card>
