@@ -8,9 +8,10 @@ import { Trophy, Flame, Star, Award, X, Gift } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const Home = () => {
-  const [showCalendar, setShowCalendar] = useState(true);
+  const [showCalendar, setShowCalendar] = useState(false);
   const [checkedDays, setCheckedDays] = useState<number[]>([1, 2, 3, 4]);
   const [cathayPoints, setCathayPoints] = useState(1850);
+  const [hasClaimedToday, setHasClaimedToday] = useState(false);
   
   // Calculate next slot to claim (additive system)
   const nextSlotToClaim = checkedDays.length + 1;
@@ -27,10 +28,11 @@ const Home = () => {
   ];
 
   const handleClaimReward = () => {
-    if (nextSlotToClaim <= 31) {
+    if (nextSlotToClaim <= 31 && !hasClaimedToday) {
       const rewardAmount = dailyRewards[nextSlotToClaim - 1].reward;
       setCheckedDays([...checkedDays, nextSlotToClaim]);
       setCathayPoints(cathayPoints + rewardAmount);
+      setHasClaimedToday(true);
     }
   };
 
@@ -38,7 +40,7 @@ const Home = () => {
     <div className="min-h-screen bg-background pb-20">
       {/* Daily Check-in Dialog */}
       <Dialog open={showCalendar} onOpenChange={setShowCalendar}>
-        <DialogContent className="max-w-lg flex flex-col max-h-[85vh]">
+        <DialogContent className="max-w-2xl flex flex-col max-h-[85vh]">
           <DialogHeader className="flex-shrink-0">
             <DialogTitle className="text-2xl font-bold text-center">
               Daily Check-in Rewards
@@ -69,12 +71,12 @@ const Home = () => {
           <div className="flex-shrink-0 p-4 pt-0">
             <Button
               onClick={handleClaimReward}
-              disabled={nextSlotToClaim > 31}
+              disabled={nextSlotToClaim > 31 || hasClaimedToday}
               className="w-full"
               size="lg"
             >
               <Gift className="w-5 h-5 mr-2" />
-              {nextSlotToClaim > 31 ? 'All Rewards Claimed!' : `Claim Reward ${nextSlotToClaim}`}
+              {nextSlotToClaim > 31 ? 'All Rewards Claimed!' : hasClaimedToday ? 'Already Claimed Today' : `Claim Reward ${nextSlotToClaim}`}
             </Button>
           </div>
         </DialogContent>
@@ -92,6 +94,17 @@ const Home = () => {
 
       {/* Profile Content */}
       <div className="p-4 space-y-4">
+        {/* Daily Check-in Button */}
+        <Button 
+          onClick={() => setShowCalendar(true)}
+          className="w-full"
+          size="lg"
+          variant="default"
+        >
+          <Gift className="w-5 h-5 mr-2" />
+          Daily Check-in Rewards
+        </Button>
+
         <Card className="p-6 shadow-card text-center">
           <Avatar className="w-24 h-24 mx-auto mb-4">
             <AvatarFallback className="bg-primary text-white text-2xl">JD</AvatarFallback>
