@@ -3,7 +3,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { CompactQuestCard } from "@/components/CompactQuestCard";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plane, MapPin, RefreshCw } from "lucide-react";
+import { Plane, MapPin, RefreshCw, Clock } from "lucide-react";
 import { Toaster } from "@/components/ui/toaster";
 import { toast } from "@/hooks/use-toast";
 import heroFlight from "@/assets/hero-flight.jpg";
@@ -110,9 +110,9 @@ const allQuests = [
   },
   {
     id: "5",
-    title: "In-Flight Entertainment",
-    description: "Watch a sustainability documentary",
-    reward: 15,
+    title: "Movie Marathon",
+    description: "Watch a full-length film on the entertainment system",
+    reward: 30,
     type: "In-Flight",
     timeLeft: "During flight",
     image: heroFlight,
@@ -137,8 +137,8 @@ const allQuests = [
   },
   {
     id: "14",
-    title: "Meal Order",
-    description: "Order an in-flight meal",
+    title: "Premium Meal Order",
+    description: "Order a premium in-flight meal",
     reward: 35,
     type: "In-Flight",
     timeLeft: "During flight",
@@ -146,9 +146,180 @@ const allQuests = [
   },
   {
     id: "15",
-    title: "Drink Order",
-    description: "Order an in-flight drink",
+    title: "Specialty Drink",
+    description: "Order a specialty in-flight beverage",
     reward: 25,
+    type: "In-Flight",
+    timeLeft: "During flight",
+    image: heroFlight,
+  },
+  {
+    id: "16",
+    title: "Destination Explorer",
+    description: "Browse the interactive destination guide",
+    reward: 15,
+    type: "In-Flight",
+    timeLeft: "During flight",
+    image: heroFlight,
+  },
+  {
+    id: "17",
+    title: "Duty-Free Shopping",
+    description: "Browse duty-free catalog and save favorites",
+    reward: 20,
+    type: "In-Flight",
+    timeLeft: "During flight",
+    image: heroFlight,
+  },
+  {
+    id: "18",
+    title: "Language Learning",
+    description: "Complete a 10-minute language lesson module",
+    reward: 25,
+    type: "In-Flight",
+    timeLeft: "During flight",
+    image: heroFlight,
+  },
+  {
+    id: "19",
+    title: "Sleep Tracker",
+    description: "Use sleep mode for at least 2 hours",
+    reward: 20,
+    type: "In-Flight",
+    timeLeft: "During flight",
+    image: heroFlight,
+  },
+  {
+    id: "20",
+    title: "Culinary Adventure",
+    description: "Try a menu item you've never ordered before",
+    reward: 30,
+    type: "In-Flight",
+    timeLeft: "During flight",
+    image: heroFlight,
+  },
+  {
+    id: "21",
+    title: "Meditation Master",
+    description: "Complete a guided meditation session",
+    reward: 15,
+    type: "In-Flight",
+    timeLeft: "During flight",
+    image: heroFlight,
+  },
+  {
+    id: "22",
+    title: "Sky Photography",
+    description: "Capture and share a window view photo",
+    reward: 10,
+    type: "In-Flight",
+    timeLeft: "During flight",
+    image: heroFlight,
+  },
+  {
+    id: "23",
+    title: "Travel Planner",
+    description: "Create a destination itinerary using onboard tools",
+    reward: 25,
+    type: "In-Flight",
+    timeLeft: "During flight",
+    image: heroFlight,
+  },
+  {
+    id: "24",
+    title: "Podcast Listener",
+    description: "Listen to a complete travel podcast episode",
+    reward: 20,
+    type: "In-Flight",
+    timeLeft: "During flight",
+    image: heroFlight,
+  },
+  {
+    id: "25",
+    title: "Sustainability Documentary",
+    description: "Watch a documentary about environmental conservation",
+    reward: 15,
+    type: "In-Flight",
+    timeLeft: "During flight",
+    image: heroFlight,
+  },
+  {
+    id: "26",
+    title: "Inflight Magazine",
+    description: "Read the digital inflight magazine",
+    reward: 10,
+    type: "In-Flight",
+    timeLeft: "During flight",
+    image: heroFlight,
+  },
+  {
+    id: "27",
+    title: "Snack Order",
+    description: "Order a healthy snack from the menu",
+    reward: 15,
+    type: "In-Flight",
+    timeLeft: "During flight",
+    image: heroFlight,
+  },
+  {
+    id: "28",
+    title: "Coffee Connoisseur",
+    description: "Order a premium coffee or tea",
+    reward: 20,
+    type: "In-Flight",
+    timeLeft: "During flight",
+    image: heroFlight,
+  },
+  {
+    id: "29",
+    title: "Cultural Discovery",
+    description: "Complete a destination culture quiz",
+    reward: 15,
+    type: "In-Flight",
+    timeLeft: "During flight",
+    image: heroFlight,
+  },
+  {
+    id: "30",
+    title: "Music Therapy",
+    description: "Listen to a relaxing music playlist for 30 minutes",
+    reward: 10,
+    type: "In-Flight",
+    timeLeft: "During flight",
+    image: heroFlight,
+  },
+  {
+    id: "31",
+    title: "Wi-Fi Explorer",
+    description: "Connect to inflight Wi-Fi and browse travel tips",
+    reward: 15,
+    type: "In-Flight",
+    timeLeft: "During flight",
+    image: heroFlight,
+  },
+  {
+    id: "32",
+    title: "Flight Experience Rating",
+    description: "Rate your flight experience and provide feedback",
+    reward: 20,
+    type: "In-Flight",
+    timeLeft: "During flight",
+    image: heroFlight,
+  },
+  {
+    id: "33",
+    title: "Hydration Hero",
+    description: "Drink at least 3 glasses of water during the flight",
+    reward: 10,
+    type: "In-Flight",
+    timeLeft: "During flight",
+    image: heroFlight,
+  },
+  {
+    id: "34",
+    title: "Business Reading",
+    description: "Read business or travel articles on the entertainment system",
+    reward: 15,
     type: "In-Flight",
     timeLeft: "During flight",
     image: heroFlight,
@@ -159,6 +330,7 @@ const Quests = () => {
   const [isInFlight, setIsInFlight] = useState(false);
   const [swipesLeft, setSwipesLeft] = useState(3);
   const [daysUntilRefresh] = useState(4);
+  const [flightTimeLeft, setFlightTimeLeft] = useState({ hours: 2, minutes: 15 });
 
   // Get all quests by type
   const allWeeklyQuests = allQuests.filter((quest) => quest.type === "Weekly");
@@ -258,17 +430,29 @@ const Quests = () => {
           </div>
         </div>
 
-        {/* Weekly Refresh Countdown */}
-        <Badge
-          variant="outline"
-          className={`transition-all duration-500 ${
-            isInFlight
-              ? "bg-white/10 border-white/30 text-white"
-              : "bg-accent/10 text-accent-foreground border-accent/20"
-          }`}
-        >
-          Refreshes in {daysUntilRefresh} days
-        </Badge>
+        {/* Weekly Refresh Countdown & Flight Timer */}
+        <div className="flex items-center gap-3 flex-wrap">
+          <Badge
+            variant="outline"
+            className={`transition-all duration-500 ${
+              isInFlight
+                ? "bg-white/10 border-white/30 text-white"
+                : "bg-accent/10 text-accent-foreground border-accent/20"
+            }`}
+          >
+            Refreshes in {daysUntilRefresh} days
+          </Badge>
+          
+          {isInFlight && (
+            <Badge
+              variant="outline"
+              className="bg-secondary/20 border-secondary/40 text-white"
+            >
+              <Clock className="w-3 h-3 mr-1" />
+              {flightTimeLeft.hours}h {flightTimeLeft.minutes}m left
+            </Badge>
+          )}
+        </div>
 
         {/* Flight Mode Indicator */}
         <Card

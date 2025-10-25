@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, MapPin, Plane, Recycle, Bus, Brain, Film, Activity, ChevronDown, ChevronUp, Target, Award, Trophy } from "lucide-react";
+import { Clock, MapPin, Plane, Recycle, Bus, Brain, Film, Activity, ChevronDown, ChevronUp, Target, Award, Trophy, Coffee, Music, Book, Camera, Utensils, Moon, Languages, Wifi, Star, Droplet, Briefcase, ShoppingBag, Headphones, Newspaper } from "lucide-react";
 
 interface Quest {
   id: string;
@@ -27,13 +27,28 @@ const getQuestIcon = (title: string) => {
   if (title.includes("Check-in")) return Plane;
   if (title.includes("Recycle")) return Recycle;
   if (title.includes("Transport")) return Bus;
-  if (title.includes("Quiz")) return Brain;
-  if (title.includes("Entertainment")) return Film;
-  if (title.includes("Wellness")) return Activity;
-  if (title.includes("Complete") || title.includes("Quests")) return Target;
-  if (title.includes("Book") || title.includes("Flights")) return Plane;
+  if (title.includes("Quiz") || title.includes("Cultural")) return Brain;
+  if (title.includes("Movie") || title.includes("Film") || title.includes("Documentary")) return Film;
+  if (title.includes("Wellness") || title.includes("Stretching")) return Activity;
+  if (title.includes("Complete") && title.includes("Quests")) return Target;
+  if (title.includes("Book") && title.includes("Flights")) return Plane;
   if (title.includes("Eco Warrior")) return Award;
   if (title.includes("Frequent Flyer") || title.includes("miles")) return Trophy;
+  if (title.includes("Coffee") || title.includes("Drink") || title.includes("Beverage")) return Coffee;
+  if (title.includes("Music")) return Music;
+  if (title.includes("Magazine") || title.includes("Reading")) return Book;
+  if (title.includes("Photo") || title.includes("Sky")) return Camera;
+  if (title.includes("Meal") || title.includes("Culinary") || title.includes("Snack")) return Utensils;
+  if (title.includes("Sleep")) return Moon;
+  if (title.includes("Language")) return Languages;
+  if (title.includes("Wi-Fi") || title.includes("Wifi")) return Wifi;
+  if (title.includes("Rating") || title.includes("Feedback") || title.includes("Survey")) return Star;
+  if (title.includes("Hydration") || title.includes("Water")) return Droplet;
+  if (title.includes("Business") || title.includes("Planner")) return Briefcase;
+  if (title.includes("Shopping") || title.includes("Duty-Free")) return ShoppingBag;
+  if (title.includes("Podcast")) return Headphones;
+  if (title.includes("Destination") || title.includes("Explorer")) return MapPin;
+  if (title.includes("Meditation")) return Activity;
   return Plane;
 };
 
@@ -56,21 +71,21 @@ const getQuestDetails = (title: string) => {
       verification: "Upload transport ticket photo",
     };
   }
-  if (title.includes("Quiz")) {
+  if (title.includes("Quiz") || title.includes("Cultural")) {
     return {
       requirements: ["Complete in-flight entertainment system access"],
       verification: "Automatic upon quiz completion",
     };
   }
-  if (title.includes("Entertainment")) {
+  if (title.includes("Movie") || title.includes("Documentary")) {
     return {
       requirements: ["Access to in-flight entertainment"],
       verification: "Watch time tracked automatically",
     };
   }
-  if (title.includes("Wellness")) {
+  if (title.includes("Wellness") || title.includes("Stretching")) {
     return {
-      requirements: ["Follow the exercise guide"],
+      requirements: ["Follow the exercise guide on screen"],
       verification: "Self-reported completion",
     };
   }
@@ -96,6 +111,102 @@ const getQuestDetails = (title: string) => {
     return {
       requirements: ["Accumulate 100,000 total miles in your account"],
       verification: "Verified through your mileage balance",
+    };
+  }
+  if (title.includes("Meal") || title.includes("Culinary")) {
+    return {
+      requirements: ["Browse menu and place order through entertainment system"],
+      verification: "Order confirmation tracked automatically",
+    };
+  }
+  if (title.includes("Drink") || title.includes("Coffee") || title.includes("Beverage")) {
+    return {
+      requirements: ["Order through entertainment system or cabin crew"],
+      verification: "Order recorded in flight system",
+    };
+  }
+  if (title.includes("Destination") || title.includes("Explorer")) {
+    return {
+      requirements: ["Access destination guide on entertainment system"],
+      verification: "Time spent browsing tracked automatically",
+    };
+  }
+  if (title.includes("Shopping") || title.includes("Duty-Free")) {
+    return {
+      requirements: ["Browse catalog and save at least 3 items"],
+      verification: "Saved items tracked in your profile",
+    };
+  }
+  if (title.includes("Language")) {
+    return {
+      requirements: ["Complete language lesson module on entertainment system"],
+      verification: "Progress tracked automatically",
+    };
+  }
+  if (title.includes("Sleep")) {
+    return {
+      requirements: ["Enable sleep mode and rest for at least 2 hours"],
+      verification: "Sleep mode duration tracked",
+    };
+  }
+  if (title.includes("Meditation")) {
+    return {
+      requirements: ["Follow guided meditation audio on entertainment system"],
+      verification: "Session completion tracked",
+    };
+  }
+  if (title.includes("Photo") || title.includes("Sky")) {
+    return {
+      requirements: ["Take a window view photo and share via app"],
+      verification: "Photo upload confirmation",
+    };
+  }
+  if (title.includes("Planner")) {
+    return {
+      requirements: ["Use onboard planning tools to create itinerary"],
+      verification: "Saved itinerary in your account",
+    };
+  }
+  if (title.includes("Podcast")) {
+    return {
+      requirements: ["Listen to complete episode on entertainment system"],
+      verification: "Listening time tracked automatically",
+    };
+  }
+  if (title.includes("Magazine") || title.includes("Reading")) {
+    return {
+      requirements: ["Read digital magazine content"],
+      verification: "Reading time tracked automatically",
+    };
+  }
+  if (title.includes("Snack")) {
+    return {
+      requirements: ["Order healthy snack option from menu"],
+      verification: "Order confirmation in system",
+    };
+  }
+  if (title.includes("Music")) {
+    return {
+      requirements: ["Listen to playlist for at least 30 minutes"],
+      verification: "Listening duration tracked",
+    };
+  }
+  if (title.includes("Wi-Fi") || title.includes("Wifi")) {
+    return {
+      requirements: ["Connect to inflight Wi-Fi service"],
+      verification: "Connection logged automatically",
+    };
+  }
+  if (title.includes("Rating") || title.includes("Feedback") || title.includes("Survey")) {
+    return {
+      requirements: ["Complete feedback form on entertainment system"],
+      verification: "Survey submission confirmed",
+    };
+  }
+  if (title.includes("Hydration") || title.includes("Water")) {
+    return {
+      requirements: ["Request and drink at least 3 glasses of water"],
+      verification: "Self-reported with crew confirmation",
     };
   }
   return {
