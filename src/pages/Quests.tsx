@@ -168,17 +168,17 @@ const Quests = () => {
 
   const handleSwipeLeft = (questId: string, type: string, slotIndex: number) => {
     if (swipesLeft > 0) {
-      const newSwipesLeft = swipesLeft - 1;
-      setSwipesLeft(newSwipesLeft);
-
-      // Show notification when all swipes are used
-      if (newSwipesLeft === 0) {
-        toast({
-          title: "No Swipes Left!",
-          description: "You've used all 3 swipes. Come back tomorrow for more!",
-          variant: "destructive",
-        });
-      }
+      setSwipesLeft((prev) => {
+        const next = Math.max(prev - 1, 0);
+        if (next === 0) {
+          toast({
+            title: "No Swipes Left!",
+            description: "You've used all 3 swipes. Come back tomorrow for more!",
+            variant: "destructive",
+          });
+        }
+        return next;
+      });
 
       // After animation, replace the swiped card at its position
       setTimeout(() => {

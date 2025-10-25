@@ -119,7 +119,11 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
     if (!isDragging || disableSwipe) return;
     const newDragX = e.clientX - startX;
     if (Math.abs(newDragX) > 2) setHasMoved(true);
-    setDragX(Math.min(0, newDragX * 1.8));
+    const clamped = Math.min(0, newDragX * 1.8);
+    setDragX(clamped);
+    // Start promoting next card as soon as the drag passes half the threshold
+    if (clamped < -SWIPE_THRESHOLD / 2) setPromoteNext(true);
+    else if (!isRemoving) setPromoteNext(false);
   };
 
   const onPointerUp = () => {
@@ -127,18 +131,19 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
     setIsDragging(false);
 
     if (swiped) {
-      if (swipesLeft > 0) {
+      if (swipesLeft > 0 && !disableSwipe) {
         setIsRemoving(true);
-
-        // Make the preview become the "real" visible card while the current slides out
         setPromoteNext(true);
-
         setDragX(-400);
+
+        // Trigger parent immediately; parent handles a 300ms delay before swapping
+        onSwipeLeft?.();
+
+        // Reset local visuals shortly after the parent swap
         setTimeout(() => {
-          onSwipeLeft?.(); // parent replaces quest with nextQuest
-          setIsRemoving(false); // overlay will hide via condition
-          setPromoteNext(false); // safety reset
-        }, 360);
+          setIsRemoving(false);
+          setPromoteNext(false);
+        }, 340);
       } else {
         setIsWiggling(true);
         setDragX(0);
@@ -146,6 +151,7 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
       }
     } else {
       setDragX(0);
+      setPromoteNext(false);
     }
 
     setTimeout(() => setHasMoved(false), 50);
