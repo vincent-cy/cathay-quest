@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, MapPin, Plane, Recycle, Bus, Brain, Film, Activity, ChevronDown, ChevronUp } from "lucide-react";
+import { Clock, MapPin, Plane, Recycle, Bus, Brain, Film, Activity, ChevronDown, ChevronUp, Target, Award, Trophy } from "lucide-react";
 
 interface Quest {
   id: string;
@@ -30,6 +30,10 @@ const getQuestIcon = (title: string) => {
   if (title.includes("Quiz")) return Brain;
   if (title.includes("Entertainment")) return Film;
   if (title.includes("Wellness")) return Activity;
+  if (title.includes("Complete") || title.includes("Quests")) return Target;
+  if (title.includes("Book") || title.includes("Flights")) return Plane;
+  if (title.includes("Eco Warrior")) return Award;
+  if (title.includes("Frequent Flyer") || title.includes("miles")) return Trophy;
   return Plane;
 };
 
@@ -68,6 +72,30 @@ const getQuestDetails = (title: string) => {
     return {
       requirements: ["Follow the exercise guide"],
       verification: "Self-reported completion",
+    };
+  }
+  if (title.includes("Complete") && title.includes("Quests")) {
+    return {
+      requirements: ["Complete any 50 quests from weekly or in-flight categories"],
+      verification: "Automatically tracked through your quest history",
+    };
+  }
+  if (title.includes("Book") && title.includes("Flights")) {
+    return {
+      requirements: ["Book 15 flights through the Cathay Pacific mobile app"],
+      verification: "Automatically verified through booking system",
+    };
+  }
+  if (title.includes("Eco Warrior")) {
+    return {
+      requirements: ["Complete 25 eco-friendly or sustainability quests"],
+      verification: "Tracked automatically via quest completion data",
+    };
+  }
+  if (title.includes("Frequent Flyer")) {
+    return {
+      requirements: ["Accumulate 100,000 total miles in your account"],
+      verification: "Verified through your mileage balance",
     };
   }
   return {
