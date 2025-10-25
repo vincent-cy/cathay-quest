@@ -304,7 +304,7 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
             } overflow-hidden`}
             style={{
               // Heavily blur until swipe is committed
-              filter: `blur(${promoteNext ? 0 : 10}px) brightness(0.9)`,
+              filter: `blur(${promoteNext ? 0 : 5}px) brightness(0.9)`,
               opacity: promoteNext ? 1 : 1,
               transform: "scale(0.98)",
               transition: "filter 250ms ease, opacity 250ms ease, transform 200ms ease",
