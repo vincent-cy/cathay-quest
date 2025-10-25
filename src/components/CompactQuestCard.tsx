@@ -296,17 +296,16 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
 
   return (
     <div className="relative">
-      {nextQuest && ((isDragging && dragX < -50) || isRemoving) && (
+      {nextQuest && ((isDragging && dragX < -20) || isRemoving) && (
         <div className="absolute inset-0 pointer-events-none z-0">
           <Card
             className={`${
-              // Use the SAME styling as a real card (not a washed-out ghost)
-              isInFlight ? "bg-white/10 border-white/30 backdrop-blur-sm" : "bg-card border-border"
+              isInFlight ? "bg-white/10 border-white/30" : "bg-card border-border"
             } overflow-hidden`}
             style={{
               // Heavily blur until swipe is committed
-              filter: `blur(${promoteNext ? 0 : 25}px)`,
-              opacity: promoteNext ? 0.9 : 0.4,
+              filter: `blur(${promoteNext ? 0 : 30}px) brightness(0.9)`,
+              opacity: promoteNext ? 1 : 1,
               transform: "scale(0.98)",
               transition: "filter 250ms ease, opacity 250ms ease, transform 200ms ease",
             }}
