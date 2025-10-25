@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Clock, MapPin, Plane, Recycle, Bus, Brain, Film, Activity, ChevronDown, ChevronUp } from "lucide-react";
 
 interface Quest {
@@ -102,7 +101,7 @@ export const CompactQuestCard = ({ quest, isInFlight, onSwipeLeft }: CompactQues
   };
 
   const handleEnd = () => {
-    const wasSwiped = dragX < -100;
+    const wasSwiped = dragX < -60; // lowered threshold for easier swipe
     setIsDragging(false);
     
     if (wasSwiped && onSwipeLeft) {
@@ -131,6 +130,7 @@ export const CompactQuestCard = ({ quest, isInFlight, onSwipeLeft }: CompactQues
       style={{
         transform: `translateX(${dragX}px)`,
         opacity: dragX < -50 ? 0.5 : 1,
+        touchAction: "pan-y",
       }}
       onMouseDown={(e) => {
         handleStart(e.clientX);
