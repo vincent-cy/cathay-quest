@@ -92,16 +92,16 @@ export const CompactQuestCard = ({ quest, isInFlight, onSwipeLeft }: CompactQues
   const handleMove = (clientX: number) => {
     if (!isDragging) return;
     const diff = clientX - startX;
-    if (Math.abs(diff) > 10) {
+    if (Math.abs(diff) > 6) {
       setHasMoved(true);
     }
-    if (diff < 0) { // Only allow left swipe
+    if (diff < -6) { // Only allow left swipe and collapse if dragging
+      setIsExpanded(false);
       setDragX(diff);
     }
   };
-
   const handleEnd = () => {
-    const wasSwiped = dragX < -60; // lowered threshold for easier swipe
+    const wasSwiped = dragX < -40; // easier swipe threshold
     setIsDragging(false);
     
     if (wasSwiped && onSwipeLeft) {
@@ -122,15 +122,17 @@ export const CompactQuestCard = ({ quest, isInFlight, onSwipeLeft }: CompactQues
 
   return (
     <Card
-      className={`overflow-hidden transition-all duration-300 cursor-pointer ${
+      className={`overflow-hidden transition-all duration-300 cursor-pointer cursor-grab select-none ${
         isInFlight
           ? "bg-white/10 border-white/30 backdrop-blur-sm hover:bg-white/15"
           : "bg-card border-border hover:shadow-md"
       }`}
       style={{
         transform: `translateX(${dragX}px)`,
-        opacity: dragX < -50 ? 0.5 : 1,
+        opacity: dragX < -40 ? 0.5 : 1,
         touchAction: "pan-y",
+        userSelect: "none",
+        willChange: "transform",
       }}
       onMouseDown={(e) => {
         handleStart(e.clientX);
@@ -155,6 +157,7 @@ export const CompactQuestCard = ({ quest, isInFlight, onSwipeLeft }: CompactQues
         document.addEventListener("touchend", handleTouchEnd);
       }}
       onClick={handleClick}
+      onDragStart={(e) => e.preventDefault()}
     >
       {/* Collapsed View */}
       <div className="flex gap-4 p-4">
