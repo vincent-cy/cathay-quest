@@ -120,7 +120,7 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
         setTimeout(() => {
           onSwipeLeft?.();
           setIsRemoving(false);
-        }, 250);
+        }, 360);
       } else {
         // Wiggle animation when limit reached
         setIsWiggling(true);
@@ -158,7 +158,7 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
 
   return (
     <div className="relative">
-      {nextQuest && isDragging && dragX < 0 && (
+      {nextQuest && ((isDragging && dragX < 0) || isRemoving) && (
         <div className="absolute inset-0 pointer-events-none z-0">
           <Card
             className={`${isInFlight ? "bg-white/10 border-white/30 backdrop-blur-sm" : "bg-card border-border"} overflow-hidden`}
@@ -198,7 +198,7 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
         }`}
         style={{
           transform: `translateX(${dragX}px) rotate(${dragX * 0.05}deg)`,
-          opacity: isRemoving ? 0 : dragX < -SWIPE_THRESHOLD && swipesLeft > 0 ? 0.7 : 1,
+          opacity: dragX < -SWIPE_THRESHOLD && swipesLeft > 0 ? 0.7 : 1,
           userSelect: "none",
           willChange: "transform, opacity",
           position: "relative",
@@ -238,6 +238,18 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
             {quest.description}
           </p>
 
+          {!isExpanded && quest.description.length > 80 && (
+            <button
+              type="button"
+              className={`${isInFlight ? "text-white/80 hover:text-white" : "text-accent hover:text-accent"} text-xs font-medium underline`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsExpanded(true);
+              }}
+            >
+              Show more
+            </button>
+          )}
           {!isExpanded && (
             <div className="flex items-center gap-4 text-xs">
               <div className="flex items-center gap-1">

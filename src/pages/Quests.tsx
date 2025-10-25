@@ -173,17 +173,17 @@ const Quests = () => {
       setTimeout(() => {
         if (type === "Weekly") {
           const newSlots = [...weeklySlots];
-          newSlots[slotIndex] = weeklyNextIndex % allWeeklyQuests.length;
+          newSlots[slotIndex] = (weeklyNextIndex + slotIndex) % allWeeklyQuests.length;
           setWeeklySlots(newSlots);
           setWeeklyNextIndex((prev) => prev + 1);
         } else if (type === "One-Time") {
           const newSlots = [...oneTimeSlots];
-          newSlots[slotIndex] = oneTimeNextIndex % allOneTimeQuests.length;
+          newSlots[slotIndex] = (oneTimeNextIndex + slotIndex) % allOneTimeQuests.length;
           setOneTimeSlots(newSlots);
           setOneTimeNextIndex((prev) => prev + 1);
         } else if (type === "In-Flight") {
           const newSlots = [...inFlightSlots];
-          newSlots[slotIndex] = inFlightNextIndex % allInFlightQuests.length;
+          newSlots[slotIndex] = (inFlightNextIndex + slotIndex) % allInFlightQuests.length;
           setInFlightSlots(newSlots);
           setInFlightNextIndex((prev) => prev + 1);
         }
