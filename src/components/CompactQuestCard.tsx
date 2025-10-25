@@ -298,7 +298,7 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
 
   return (
     <div className="relative">
-      {nextQuest && isRemoving && promoteNext && (
+      {nextQuest && ((isDragging && dragX < -50) || isRemoving) && (
         <div className="absolute inset-0 pointer-events-none z-0">
           <Card
             className={`${
@@ -306,11 +306,11 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
               isInFlight ? "bg-white/10 border-white/30 backdrop-blur-sm" : "bg-card border-border"
             } overflow-hidden`}
             style={{
-              // Smoothly unblur & brighten as we promote the next card
-              filter: "blur(0px)",
-              opacity: 0.9,
+              // Heavily blur until swipe is committed
+              filter: `blur(${promoteNext ? 0 : 25}px)`,
+              opacity: promoteNext ? 0.9 : 0.4,
               transform: "scale(0.98)",
-              transition: "filter 220ms ease, opacity 220ms ease, transform 200ms ease",
+              transition: "filter 250ms ease, opacity 250ms ease, transform 200ms ease",
             }}
           >
             {/* duplicated next card content (unchanged) */}
