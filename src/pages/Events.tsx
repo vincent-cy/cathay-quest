@@ -202,8 +202,8 @@ const Events = () => {
         {/* Community Challenges Tab */}
         <TabsContent value="community" className="space-y-4">
           <Card className="p-6 shadow-card bg-gradient-to-br from-primary/5 via-background to-accent/5 overflow-hidden">
-            {/* Header with Final Reward */}
-            <div className="text-center mb-8">
+            {/* Header with Final Reward - Sticky */}
+            <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm text-center pb-6 pt-2 -mt-2 -mx-6 px-6 mb-2 border-b border-border/50">
               <h2 className="text-3xl font-bold text-foreground mb-2 tracking-wider">
                 COMMUNITY MILESTONES
               </h2>
