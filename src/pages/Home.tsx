@@ -28,7 +28,7 @@ const Home = () => {
     { day: 17, reward: 50 }, { day: 18, reward: 50 }, { day: 19, reward: 55 }, { day: 20, reward: 55 },
     { day: 21, reward: 60 }, { day: 22, reward: 60 }, { day: 23, reward: 65 }, { day: 24, reward: 65 },
     { day: 25, reward: 70 }, { day: 26, reward: 70 }, { day: 27, reward: 75 }, { day: 28, reward: 75 },
-    { day: 29, reward: 80 }, { day: 30, reward: 80 }, { day: 31, reward: 500 }
+    { day: 29, reward: 80 }, { day: 30, reward: 80 }, { day: 31, reward: 200 }
   ];
 
   const handleClaimReward = () => {
@@ -67,12 +67,18 @@ const Home = () => {
             </DialogTitle>
           </DialogHeader>
           <div className="overflow-y-auto flex-1 px-4">
-            <div className="grid grid-cols-7 gap-3 py-4">
+            <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-7 gap-2 sm:gap-3 py-4">
               {dailyRewards.map((item) => (
                 <div
                   key={item.day}
                   className={`aspect-square rounded-xl flex flex-col items-center justify-center p-2 text-xs font-semibold transition-all ${
-                    checkedDays.includes(item.day)
+                    item.day === 31
+                      ? checkedDays.includes(item.day)
+                        ? 'bg-accent text-white shadow-lg scale-105 ring-4 ring-yellow-500/80 border-2 border-yellow-400'
+                        : item.day === nextSlotToClaim
+                        ? 'bg-primary text-white animate-pulse ring-4 ring-yellow-500/80 border-2 border-yellow-400'
+                        : 'bg-muted text-muted-foreground ring-4 ring-yellow-500/80 border-2 border-yellow-400'
+                      : checkedDays.includes(item.day)
                       ? 'bg-accent text-white shadow-lg scale-105'
                       : item.day === nextSlotToClaim
                       ? 'bg-primary text-white animate-pulse ring-2 ring-primary'
