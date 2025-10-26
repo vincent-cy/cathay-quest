@@ -22,15 +22,6 @@ interface ShopItem {
 const shopItems: ShopItem[] = [
   // In-Flight Perks
   {
-    id: "meal-voucher",
-    name: "Meal Voucher",
-    description: "One complimentary meal on your next flight. Valid for 3 months.",
-    points: 150,
-    category: "inflight",
-    icon: Coffee,
-    availability: "Any flight"
-  },
-  {
     id: "snack-voucher",
     name: "Premium Snack Box",
     description: "Upgrade your snack to a premium selection on any flight.",
@@ -43,7 +34,7 @@ const shopItems: ShopItem[] = [
     id: "wifi-pass",
     name: "Wi-Fi Pass",
     description: "One hour of complimentary Wi-Fi on your next flight.",
-    points: 200,
+    points: 150,
     category: "inflight",
     icon: Wifi,
     availability: "Long-haul flights"
@@ -52,22 +43,22 @@ const shopItems: ShopItem[] = [
     id: "wifi-full",
     name: "Full Flight Wi-Fi",
     description: "Unlimited Wi-Fi for one complete flight journey.",
-    points: 400,
+    points: 300,
     category: "inflight",
     icon: Wifi,
     availability: "Long-haul flights"
   },
+  {
+    id: "meal-voucher",
+    name: "Meal Voucher",
+    description: "One complimentary meal on your next flight. Valid for 3 months.",
+    points: 400,
+    category: "inflight",
+    icon: Coffee,
+    availability: "Any flight"
+  },
   
   // Travel Perks
-  {
-    id: "baggage-voucher",
-    name: "Extra Baggage Voucher",
-    description: "Add one checked bag (up to 23kg) for free on your next flight.",
-    points: 250,
-    category: "travel",
-    icon: Luggage,
-    availability: "One flight"
-  },
   {
     id: "priority-checkin",
     name: "Priority Check-in",
@@ -78,10 +69,19 @@ const shopItems: ShopItem[] = [
     availability: "One-time use"
   },
   {
+    id: "baggage-voucher",
+    name: "Extra Baggage Voucher",
+    description: "Add one checked bag (up to 23kg) for free on your next flight.",
+    points: 350,
+    category: "travel",
+    icon: Luggage,
+    availability: "One flight"
+  },
+  {
     id: "asia-miles-500",
     name: "500 Asia Miles",
     description: "Boost your Asia Miles account with 500 miles.",
-    points: 600,
+    points: 500,
     category: "travel",
     icon: Plane,
     availability: "Instant credit"
@@ -90,7 +90,7 @@ const shopItems: ShopItem[] = [
     id: "asia-miles-1000",
     name: "1,000 Asia Miles",
     description: "Add 1,000 miles directly to your Asia Miles account.",
-    points: 1100,
+    points: 950,
     category: "travel",
     icon: Plane,
     availability: "Instant credit"
@@ -101,7 +101,7 @@ const shopItems: ShopItem[] = [
     id: "seat-selection",
     name: "Preferred Seat Selection",
     description: "Choose your preferred seat (extra legroom or window) for free.",
-    points: 120,
+    points: 200,
     category: "upgrades",
     icon: Star,
     availability: "One flight"
@@ -110,7 +110,7 @@ const shopItems: ShopItem[] = [
     id: "lounge-pass",
     name: "Lounge Day Pass",
     description: "Access to Cathay Pacific lounges for one visit (3-hour limit).",
-    points: 800,
+    points: 700,
     category: "upgrades",
     icon: Award,
     availability: "Valid 6 months"
