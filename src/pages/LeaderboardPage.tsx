@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { BottomNav } from "@/components/BottomNav";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Trophy, Crown, Award } from "lucide-react";
+import { Trophy, Crown, Award, Star, Flame, MapPin } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const topUsers = [
   { rank: 1, name: "Sarah Chen", miles: 2450, streak: 47, region: "Hong Kong" },
@@ -14,6 +16,8 @@ const topUsers = [
 ];
 
 const LeaderboardPage = () => {
+  const [selectedUser, setSelectedUser] = useState<typeof topUsers[0] | null>(null);
+
   return (
     <div className="min-h-screen bg-background pb-20">
       <header className="p-4 border-b border-border">
@@ -28,7 +32,8 @@ const LeaderboardPage = () => {
         {topUsers.map((user, index) => (
           <Card
             key={index}
-            className="p-4 shadow-card"
+            className="p-4 shadow-card cursor-pointer hover:shadow-lg transition-shadow"
+            onClick={() => setSelectedUser(user)}
             style={{
               background: user.rank === 1 
                 ? 'linear-gradient(135deg, hsl(45 90% 88%), hsl(45 90% 95%))' // Gold
@@ -85,6 +90,70 @@ const LeaderboardPage = () => {
           </Card>
         ))}
       </div>
+
+      {/* User Statistics Dialog */}
+      <Dialog open={!!selectedUser} onOpenChange={() => setSelectedUser(null)}>
+        <DialogContent className="max-w-md">
+          {selectedUser && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-3">
+                  {selectedUser.rank === 1 ? (
+                    <Crown className="w-6 h-6" style={{ color: 'hsl(45 90% 50%)' }} />
+                  ) : selectedUser.rank === 2 ? (
+                    <Trophy className="w-5 h-5" style={{ color: 'hsl(0 0% 75%)' }} />
+                  ) : selectedUser.rank === 3 ? (
+                    <Award className="w-5 h-5" style={{ color: 'hsl(25 75% 47%)' }} />
+                  ) : null}
+                  <span>{selectedUser.name}</span>
+                </DialogTitle>
+              </DialogHeader>
+              
+              <div className="space-y-4 py-4">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <MapPin className="w-4 h-4" />
+                  <span>{selectedUser.region}</span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <Card className="p-4 text-center">
+                    <Trophy className="w-6 h-6 text-accent mx-auto mb-2" />
+                    <p className="text-2xl font-bold text-foreground">{selectedUser.miles.toLocaleString()}</p>
+                    <p className="text-xs text-muted-foreground">Cathay Points</p>
+                  </Card>
+                  
+                  <Card className="p-4 text-center">
+                    <Flame className="w-6 h-6 text-accent mx-auto mb-2" />
+                    <p className="text-2xl font-bold text-foreground">{selectedUser.streak}</p>
+                    <p className="text-xs text-muted-foreground">Day Streak</p>
+                  </Card>
+                  
+                  <Card className="p-4 text-center">
+                    <Star className="w-6 h-6 text-accent mx-auto mb-2" />
+                    <p className="text-2xl font-bold text-foreground">{Math.floor(selectedUser.miles / 50)}</p>
+                    <p className="text-xs text-muted-foreground">Quests Completed</p>
+                  </Card>
+                  
+                  <Card className="p-4 text-center">
+                    <Award className="w-6 h-6 text-accent mx-auto mb-2" />
+                    <p className="text-2xl font-bold text-foreground">{Math.floor(selectedUser.streak / 5)}</p>
+                    <p className="text-xs text-muted-foreground">Badges Earned</p>
+                  </Card>
+                </div>
+
+                <div className="pt-2">
+                  <h4 className="font-bold text-foreground mb-2 text-sm">Recent Achievements</h4>
+                  <div className="flex gap-2 flex-wrap">
+                    <Badge variant="outline" className="bg-muted/50">🌱 Eco Warrior</Badge>
+                    <Badge variant="outline" className="bg-muted/50">🔥 {selectedUser.streak} Day Streak</Badge>
+                    <Badge variant="outline" className="bg-muted/50">✈️ Frequent Flyer</Badge>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <BottomNav />
     </div>
