@@ -7,6 +7,8 @@ import { Trophy, Calendar, Target, Users, Lock, CheckCircle2 } from "lucide-reac
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import heroFlight from "@/assets/hero-flight.jpg";
+import halloweenBg from "@/assets/halloween-bg.jpg";
+import earthdayBg from "@/assets/earthday-bg.jpg";
 
 const seasonalEvents = [
   {
@@ -16,6 +18,7 @@ const seasonalEvents = [
     reward: 500,
     participants: 12450,
     endsIn: "15 days",
+    backgroundImage: halloweenBg,
     theme: {
       primary: "hsl(25 95% 53%)", // Orange
       secondary: "hsl(0 0% 0%)", // Black
@@ -35,6 +38,7 @@ const seasonalEvents = [
     reward: 600,
     participants: 18230,
     endsIn: "22 days",
+    backgroundImage: earthdayBg,
     theme: {
       primary: "hsl(142 76% 36%)", // Green
       secondary: "hsl(142 71% 45%)", // Light Green
@@ -148,7 +152,7 @@ const Events = () => {
 
       <Tabs defaultValue="seasonal" className="p-4">
         <TabsList className="grid w-full grid-cols-2 mb-6">
-          <TabsTrigger value="seasonal">Seasonal Badges</TabsTrigger>
+          <TabsTrigger value="seasonal">Seasonal Events</TabsTrigger>
           <TabsTrigger value="community">Community Challenges</TabsTrigger>
         </TabsList>
 
@@ -164,7 +168,7 @@ const Events = () => {
               }}
             >
               <div className="relative h-48">
-                <img src={heroFlight} alt={event.title} className="w-full h-full object-cover opacity-50" />
+                <img src={event.backgroundImage} alt={event.title} className="w-full h-full object-cover opacity-60" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4">
                   <h2 className="text-3xl font-bold text-white drop-shadow-lg mb-2">
