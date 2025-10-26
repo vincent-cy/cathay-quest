@@ -58,7 +58,7 @@ const communityMilestones = [
     goal: "50,000",
     goalNum: 50000,
     title: "Quest Master Legend",
-    description: "Receive one complimentary priority boarding pass and a single lounge access voucher valid for 12 months",
+    description: "Priority boarding pass & lounge voucher",
     reward: "500 Points + Priority Pass & Lounge Voucher",
     status: "LOCKED",
     funded: false,
@@ -68,7 +68,7 @@ const communityMilestones = [
     goal: "40,000",
     goalNum: 40000,
     title: "Elite Explorer",
-    description: "Get two seat upgrade vouchers for economy to premium economy on select routes, valid for 6 months",
+    description: "Two seat upgrade vouchers",
     reward: "$20 Travel Credit + 2 Upgrade Vouchers",
     status: "LOCKED",
     funded: false,
@@ -78,7 +78,7 @@ const communityMilestones = [
     goal: "30,000",
     goalNum: 30000,
     title: "Adventure Champion",
-    description: "Enjoy 25% off one checked bag fee and receive a complimentary Wi-Fi pass for your next international flight",
+    description: "25% off checked bag + Wi-Fi pass",
     reward: "$12 Travel Credit + Wi-Fi Pass",
     status: "IN PROGRESS",
     funded: false,
@@ -89,7 +89,7 @@ const communityMilestones = [
     goal: "20,000",
     goalNum: 20000,
     title: "Journey Veteran",
-    description: "Redeem one complimentary meal voucher on any flight plus priority check-in access for one month",
+    description: "Meal voucher + priority check-in",
     reward: "$8 Dining Voucher + Priority Check-in",
     status: "FUNDED",
     funded: true,
@@ -99,7 +99,7 @@ const communityMilestones = [
     goal: "15,000",
     goalNum: 15000,
     title: "Quest Enthusiast",
-    description: "Get one free checked bag on your next flight and early access to new quest releases for 30 days",
+    description: "Free checked bag + early quest access",
     reward: "$6 Baggage Voucher + Early Quest Access",
     status: "FUNDED",
     funded: true,
@@ -109,7 +109,7 @@ const communityMilestones = [
     goal: "10,000",
     goalNum: 10000,
     title: "Rising Adventurer",
-    description: "Claim a $4 voucher for premium snacks or beverages plus 1.5x bonus points on one weekend quest",
+    description: "Snack voucher + 1.5x weekend bonus",
     reward: "$4 Snack Voucher + Weekend Bonus",
     status: "FUNDED",
     funded: true,
@@ -119,7 +119,7 @@ const communityMilestones = [
     goal: "5,000",
     goalNum: 5000,
     title: "First Steps",
-    description: "Receive a $2.50 coupon for in-flight snacks and unlock one bonus daily quest in your region",
+    description: "Snack coupon + bonus daily quest",
     reward: "$2.50 Snack Coupon + Bonus Quest",
     status: "FUNDED",
     funded: true,
@@ -129,7 +129,7 @@ const communityMilestones = [
     goal: "1,000",
     goalNum: 1000,
     title: "Community Kickoff",
-    description: "Welcome reward for early participants - get 25% extra points on your next two completed quests",
+    description: "25% extra points on next two quests",
     reward: "25 Points + Quest Bonus",
     status: "FUNDED",
     funded: true,
@@ -225,7 +225,7 @@ const Events = () => {
               <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-accent via-primary to-muted/30 transform -translate-x-1/2" />
 
               {/* Milestones */}
-              <div className="space-y-8">
+              <div className="space-y-6">
                 {communityMilestones.map((milestone, index) => (
                   <div key={index} className="relative">
                     {/* Milestone Circle */}
@@ -288,12 +288,12 @@ const Events = () => {
                           />
                         </div>
 
-                        <div className="space-y-2">
+                        <div className="space-y-1.5">
                           <div className="flex items-center justify-between gap-2">
-                            <h3 className="font-bold text-base">{milestone.title}</h3>
+                            <h3 className="font-bold text-sm">{milestone.title}</h3>
                             <Badge
                               variant="outline"
-                              className={`text-xs ${
+                              className={`text-xs shrink-0 ${
                                 milestone.funded
                                   ? "bg-white/20 text-white border-white/30"
                                   : milestone.status === "IN PROGRESS"
@@ -305,19 +305,19 @@ const Events = () => {
                             </Badge>
                           </div>
                           <p
-                            className={`text-sm ${
-                              milestone.funded ? "text-white/90" : "text-muted-foreground"
+                            className={`text-xs leading-relaxed ${
+                              milestone.funded ? "text-white/80" : "text-muted-foreground"
                             }`}
                           >
                             {milestone.description}
                           </p>
-                          <div className="flex items-center gap-2 text-xs font-semibold">
+                          <div className="flex items-center gap-1.5 text-xs font-semibold pt-0.5">
                             <Trophy
-                              className={`w-3 h-3 ${
+                              className={`w-3 h-3 shrink-0 ${
                                 milestone.funded ? "text-white" : "text-accent"
                               }`}
                             />
-                            <span>{milestone.reward}</span>
+                            <span className="leading-tight">{milestone.reward}</span>
                           </div>
                           {milestone.status === "IN PROGRESS" && milestone.currentAmount && (
                             <div className="mt-2 space-y-1">
