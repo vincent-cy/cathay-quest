@@ -52,7 +52,7 @@ const shopItems: ShopItem[] = [
     id: "meal-voucher",
     name: "Meal Voucher",
     description: "One complimentary meal on your next flight. Valid for 3 months.",
-    points: 600,
+    points: 400,
     category: "inflight",
     icon: Coffee,
     availability: "Any flight"
@@ -63,7 +63,7 @@ const shopItems: ShopItem[] = [
     id: "priority-checkin",
     name: "Priority Check-in",
     description: "Skip the regular queue with priority check-in access for one trip.",
-    points: 250,
+    points: 200,
     category: "travel",
     icon: Zap,
     availability: "One-time use"
@@ -101,7 +101,7 @@ const shopItems: ShopItem[] = [
     id: "seat-selection",
     name: "Preferred Seat Selection",
     description: "Choose your preferred seat (extra legroom or window) for free.",
-    points: 300,
+    points: 500,
     category: "upgrades",
     icon: Star,
     availability: "One flight"
