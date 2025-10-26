@@ -221,24 +221,25 @@ const Events = () => {
           <Card className="p-6 shadow-card bg-gradient-to-br from-primary/5 via-background to-accent/5 overflow-hidden">
             {/* Vertical Milestone Path */}
             <div className="relative max-w-2xl mx-auto py-6">
-              {/* Central Vertical Line with Segments */}
-              <div className="absolute left-1/2 top-0 bottom-0 w-1 transform -translate-x-1/2 bg-muted/30" />
-              
-              {/* Progress segments - only show for funded milestones */}
+              {/* Progress Line Segments */}
               {communityMilestones.map((milestone, index) => {
-                const nextMilestone = communityMilestones[index + 1];
-                const shouldShowProgress = milestone.funded || milestone.status === "IN PROGRESS";
+                const isLastItem = index === communityMilestones.length - 1;
+                const segmentHeight = isLastItem ? '50%' : '100%';
+                const topPosition = (index / communityMilestones.length) * 100;
                 
-                return shouldShowProgress ? (
+                return (
                   <div
-                    key={`progress-${index}`}
-                    className="absolute left-1/2 w-1 transform -translate-x-1/2 bg-gradient-to-b from-accent via-primary to-accent transition-all"
+                    key={`line-${index}`}
+                    className="absolute left-1/2 w-1 transform -translate-x-1/2"
                     style={{
-                      top: `${(index / communityMilestones.length) * 100}%`,
-                      height: nextMilestone ? `${(1 / communityMilestones.length) * 100}%` : '0%'
+                      top: `${topPosition}%`,
+                      height: isLastItem ? `${(0.5 / communityMilestones.length) * 100}%` : `${(1 / communityMilestones.length) * 100}%`,
+                      background: milestone.funded || milestone.status === "IN PROGRESS" 
+                        ? 'hsl(var(--accent))' // Gold for achieved
+                        : 'hsl(var(--primary))' // Green for locked
                     }}
                   />
-                ) : null;
+                );
               })}
 
               {/* Milestones */}
