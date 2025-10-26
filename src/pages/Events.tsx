@@ -201,23 +201,24 @@ const Events = () => {
 
         {/* Community Challenges Tab */}
         <TabsContent value="community" className="space-y-4">
-          <Card className="p-6 shadow-card bg-gradient-to-br from-primary/5 via-background to-accent/5 overflow-hidden">
-            {/* Header with Final Reward - Sticky */}
-            <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm text-center pb-6 pt-2 -mt-2 -mx-6 px-6 mb-2 border-b border-border/50">
-              <h2 className="text-3xl font-bold text-foreground mb-2 tracking-wider">
-                COMMUNITY MILESTONES
-              </h2>
-              <div className="inline-flex items-center gap-3 bg-gradient-achievement px-6 py-3 rounded-full shadow-glow">
-                <Trophy className="w-6 h-6 text-white" />
-                <span className="text-white font-bold text-lg">
-                  {communityMilestones[0].reward}
-                </span>
-              </div>
-              <p className="text-muted-foreground mt-4 text-sm">
-                Community Progress: {(currentProgress / 1000).toFixed(1)}K / {(totalGoal / 1000).toFixed(0)}K Quests
-              </p>
+          {/* Sticky Header */}
+          <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm text-center pb-4 pt-2 -mx-4 px-4 border-b border-border/50">
+            <h2 className="text-3xl font-bold text-foreground mb-2 tracking-wider">
+              COMMUNITY MILESTONES
+            </h2>
+            <div className="inline-flex items-center gap-3 bg-gradient-achievement px-6 py-3 rounded-full shadow-glow">
+              <Trophy className="w-6 h-6 text-white" />
+              <span className="text-white font-bold text-lg">
+                {communityMilestones[0].reward}
+              </span>
             </div>
+            <p className="text-muted-foreground mt-4 text-sm">
+              Community Progress: {(currentProgress / 1000).toFixed(1)}K / {(totalGoal / 1000).toFixed(0)}K Quests
+            </p>
+          </div>
 
+          {/* Milestone Path Card */}
+          <Card className="p-6 shadow-card bg-gradient-to-br from-primary/5 via-background to-accent/5 overflow-hidden">
             {/* Vertical Milestone Path */}
             <div className="relative max-w-2xl mx-auto py-6">
               {/* Central Vertical Line */}
