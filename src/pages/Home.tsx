@@ -63,7 +63,7 @@ const Home = () => {
         <DialogContent className="max-w-2xl flex flex-col max-h-[85vh]">
           <DialogHeader className="flex-shrink-0">
             <DialogTitle className="text-2xl font-bold text-center">
-              Daily Check-in Rewards
+              Daily Login Rewards
             </DialogTitle>
           </DialogHeader>
           <div className="overflow-y-auto flex-1 px-4">
@@ -115,7 +115,11 @@ const Home = () => {
                 ? 'All Rewards Claimed!' 
                 : hasClaimedToday 
                 ? 'Already Claimed Today' 
-                : `Claim Reward ${dailyRewards[nextSlotToClaim - 1]?.reward || 0}`}
+                : (
+                  <>
+                    Claim Reward <Trophy className="w-4 h-4 inline mx-1" /> {dailyRewards[nextSlotToClaim - 1]?.reward || 0}
+                  </>
+                )}
             </Button>
           </div>
         </DialogContent>
@@ -141,7 +145,7 @@ const Home = () => {
           variant="default"
         >
           <Gift className="w-5 h-5 mr-2" />
-          Daily Check-in Rewards
+          Daily Login Rewards
         </Button>
 
         <Card className="p-6 shadow-card text-center">
