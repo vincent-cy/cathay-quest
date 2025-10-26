@@ -221,8 +221,25 @@ const Events = () => {
           <Card className="p-6 shadow-card bg-gradient-to-br from-primary/5 via-background to-accent/5 overflow-hidden">
             {/* Vertical Milestone Path */}
             <div className="relative max-w-2xl mx-auto py-6">
-              {/* Central Vertical Line */}
-              <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-accent via-primary to-muted/30 transform -translate-x-1/2" />
+              {/* Central Vertical Line with Segments */}
+              <div className="absolute left-1/2 top-0 bottom-0 w-1 transform -translate-x-1/2 bg-muted/30" />
+              
+              {/* Progress segments - only show for funded milestones */}
+              {communityMilestones.map((milestone, index) => {
+                const nextMilestone = communityMilestones[index + 1];
+                const shouldShowProgress = milestone.funded || milestone.status === "IN PROGRESS";
+                
+                return shouldShowProgress ? (
+                  <div
+                    key={`progress-${index}`}
+                    className="absolute left-1/2 w-1 transform -translate-x-1/2 bg-gradient-to-b from-accent via-primary to-accent transition-all"
+                    style={{
+                      top: `${(index / communityMilestones.length) * 100}%`,
+                      height: nextMilestone ? `${(1 / communityMilestones.length) * 100}%` : '0%'
+                    }}
+                  />
+                ) : null;
+              })}
 
               {/* Milestones */}
               <div className="space-y-6">
@@ -289,21 +306,7 @@ const Events = () => {
                         </div>
 
                         <div className="space-y-1.5">
-                          <div className="flex items-center justify-between gap-2">
-                            <h3 className="font-bold text-sm">{milestone.title}</h3>
-                            <Badge
-                              variant="outline"
-                              className={`text-xs shrink-0 ${
-                                milestone.funded
-                                  ? "bg-white/20 text-white border-white/30"
-                                  : milestone.status === "IN PROGRESS"
-                                  ? "bg-primary/20 border-primary"
-                                  : ""
-                              }`}
-                            >
-                              {milestone.goal}
-                            </Badge>
-                          </div>
+                          <h3 className="font-bold text-sm">{milestone.title}</h3>
                           <p
                             className={`text-xs leading-relaxed ${
                               milestone.funded ? "text-white/80" : "text-muted-foreground"
