@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Clock, Trophy, X, Heart, AlertCircle, CheckCircle2, Shield } from "lucide-react";
+import { MapPin, Clock, X, Heart, AlertCircle, CheckCircle2, Shield } from "lucide-react";
+import cathayPointsLogo from "@/assets/cathay-points-logo.png";
 
 interface Quest {
   id: string;
@@ -246,7 +247,7 @@ export const SwipeableQuest = ({ quest, onAccept, onReject, isInFlight = false, 
               <Badge className="backdrop-blur-md ml-auto text-base px-4 py-2 shadow-lg bg-accent/90" style={{
                 transform: 'translateZ(30px)',
               }}>
-                <Trophy className="w-5 h-5 mr-2" />
+                <img src={cathayPointsLogo} alt="Cathay Points" className="w-5 h-5 mr-2" />
                 {quest.reward} pts
               </Badge>
             </div>

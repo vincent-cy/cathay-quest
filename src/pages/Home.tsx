@@ -4,7 +4,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Trophy, Flame, Star, Award, Gift, Coffee, Wifi, Luggage, Plane, Zap, Ticket } from "lucide-react";
+import { Flame, Star, Award, Gift, Coffee, Wifi, Luggage, Plane, Zap, Ticket } from "lucide-react";
+import cathayPointsLogo from "@/assets/cathay-points-logo.png";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { useQuests } from "@/contexts/QuestContext";
 import { useToast } from "@/hooks/use-toast";
@@ -95,7 +96,7 @@ const Home = () => {
                   >
                     <div className="text-sm font-bold mb-0.5">{item.day}</div>
                     <div className="flex items-center gap-1">
-                      <Trophy className="w-3.5 h-3.5" />
+                      <img src={cathayPointsLogo} alt="Cathay Points" className="w-3.5 h-3.5" />
                       <span className="text-xs font-semibold">{item.reward}</span>
                     </div>
                   </div>
@@ -117,7 +118,7 @@ const Home = () => {
                 ? 'Already Claimed Today' 
                 : (
                   <>
-                    Claim Reward <Trophy className="w-4 h-4 inline mx-1" /> {dailyRewards[nextSlotToClaim - 1]?.reward || 0}
+                    Claim Reward <img src={cathayPointsLogo} alt="Cathay Points" className="w-4 h-4 inline mx-1" /> {dailyRewards[nextSlotToClaim - 1]?.reward || 0}
                   </>
                 )}
             </Button>
@@ -161,7 +162,7 @@ const Home = () => {
           <h3 className="font-bold text-foreground mb-4">Your Stats</h3>
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center p-3 rounded-lg bg-muted/50">
-              <Trophy className="w-6 h-6 text-accent mx-auto mb-2" />
+              <img src={cathayPointsLogo} alt="Cathay Points" className="w-6 h-6 mx-auto mb-2" />
               <p className="text-2xl font-bold text-foreground">{cathayPoints.toLocaleString()}</p>
               <p className="text-xs text-muted-foreground">Cathay Points</p>
             </div>

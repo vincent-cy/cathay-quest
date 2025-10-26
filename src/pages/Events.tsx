@@ -3,7 +3,8 @@ import { BottomNav } from "@/components/BottomNav";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Trophy, Calendar, Target, Users, Lock, CheckCircle2 } from "lucide-react";
+import { Calendar, Target, Users, Lock, CheckCircle2 } from "lucide-react";
+import cathayPointsLogo from "@/assets/cathay-points-logo.png";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import heroFlight from "@/assets/hero-flight.jpg";
@@ -190,7 +191,7 @@ const Events = () => {
                     </span>
                   </div>
                   <Badge className="bg-accent">
-                    <Trophy className="w-3 h-3 mr-1" />
+                    <img src={cathayPointsLogo} alt="Cathay Points" className="w-3 h-3 mr-1" />
                     {event.reward}
                   </Badge>
                 </div>
@@ -207,7 +208,7 @@ const Events = () => {
               COMMUNITY MILESTONES
             </h2>
             <div className="inline-flex items-center gap-3 bg-gradient-achievement px-6 py-3 rounded-full shadow-glow">
-              <Trophy className="w-6 h-6 text-white" />
+              <img src={cathayPointsLogo} alt="Cathay Points" className="w-6 h-6" />
               <span className="text-white font-bold text-lg">
                 {communityMilestones[0].reward}
               </span>
@@ -315,11 +316,7 @@ const Events = () => {
                             {milestone.description}
                           </p>
                           <div className="flex items-center gap-1.5 text-xs font-semibold pt-0.5">
-                            <Trophy
-                              className={`w-3 h-3 shrink-0 ${
-                                milestone.funded ? "text-white" : "text-accent"
-                              }`}
-                            />
+                            <img src={cathayPointsLogo} alt="Cathay Points" className="w-3 h-3 shrink-0" />
                             <span className="leading-tight">{milestone.reward}</span>
                           </div>
                           {milestone.status === "IN PROGRESS" && milestone.currentAmount && (
@@ -370,7 +367,7 @@ const Events = () => {
                         <p className="text-sm text-muted-foreground">{quest.description}</p>
                       </div>
                       <Badge className="bg-accent ml-2">
-                        <Trophy className="w-3 h-3 mr-1" />
+                        <img src={cathayPointsLogo} alt="Cathay Points" className="w-3 h-3 mr-1" />
                         {quest.reward}
                       </Badge>
                     </div>
