@@ -224,7 +224,6 @@ const Events = () => {
               {/* Progress Line Segments */}
               {communityMilestones.map((milestone, index) => {
                 const isLastItem = index === communityMilestones.length - 1;
-                const segmentHeight = isLastItem ? '50%' : '100%';
                 const topPosition = (index / communityMilestones.length) * 100;
                 
                 return (
@@ -234,9 +233,9 @@ const Events = () => {
                     style={{
                       top: `${topPosition}%`,
                       height: isLastItem ? `${(0.5 / communityMilestones.length) * 100}%` : `${(1 / communityMilestones.length) * 100}%`,
-                      background: milestone.funded || milestone.status === "IN PROGRESS" 
-                        ? 'hsl(var(--accent))' // Gold for achieved
-                        : 'hsl(var(--primary))' // Green for locked
+                      background: milestone.funded 
+                        ? 'hsl(var(--accent))' // Gold for achieved only
+                        : 'hsl(var(--primary))' // Green for in-progress and locked
                     }}
                   />
                 );
