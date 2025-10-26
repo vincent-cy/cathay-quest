@@ -22,11 +22,11 @@ const Home = () => {
 
   const dailyRewards = [
     { day: 1, reward: 10 }, { day: 2, reward: 10 }, { day: 3, reward: 15 }, { day: 4, reward: 15 },
-    { day: 5, reward: 20 }, { day: 6, reward: 20 }, { day: 7, reward: 25 }, { day: 8, reward: 25 },
+    { day: 5, reward: 20 }, { day: 6, reward: 20 }, { day: 7, reward: 50 }, { day: 8, reward: 25 },
     { day: 9, reward: 30 }, { day: 10, reward: 30 }, { day: 11, reward: 35 }, { day: 12, reward: 35 },
-    { day: 13, reward: 40 }, { day: 14, reward: 40 }, { day: 15, reward: 45 }, { day: 16, reward: 45 },
+    { day: 13, reward: 40 }, { day: 14, reward: 75 }, { day: 15, reward: 45 }, { day: 16, reward: 45 },
     { day: 17, reward: 50 }, { day: 18, reward: 50 }, { day: 19, reward: 55 }, { day: 20, reward: 55 },
-    { day: 21, reward: 60 }, { day: 22, reward: 60 }, { day: 23, reward: 65 }, { day: 24, reward: 65 },
+    { day: 21, reward: 100 }, { day: 22, reward: 60 }, { day: 23, reward: 65 }, { day: 24, reward: 65 },
     { day: 25, reward: 70 }, { day: 26, reward: 70 }, { day: 27, reward: 75 }, { day: 28, reward: 75 },
     { day: 29, reward: 80 }, { day: 30, reward: 80 }, { day: 31, reward: 200 }
   ];
@@ -68,30 +68,39 @@ const Home = () => {
           </DialogHeader>
           <div className="overflow-y-auto flex-1 px-4">
             <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-7 gap-2 sm:gap-3 py-4">
-              {dailyRewards.map((item) => (
-                <div
-                  key={item.day}
-                  className={`aspect-square rounded-xl flex flex-col items-center justify-center p-2 text-xs font-semibold transition-all ${
-                    item.day === 31
-                      ? checkedDays.includes(item.day)
-                        ? 'bg-accent text-white shadow-lg scale-105 ring-4 ring-yellow-500/80 border-2 border-yellow-400'
+              {dailyRewards.map((item) => {
+                const isMilestone = item.day === 7 || item.day === 14 || item.day === 21;
+                return (
+                  <div
+                    key={item.day}
+                    className={`aspect-square rounded-xl flex flex-col items-center justify-center p-2 text-xs font-semibold transition-all ${
+                      item.day === 31
+                        ? checkedDays.includes(item.day)
+                          ? 'bg-accent text-white shadow-lg scale-105 ring-4 ring-yellow-500/80 border-2 border-yellow-400'
+                          : item.day === nextSlotToClaim
+                          ? 'bg-primary text-white animate-pulse ring-4 ring-yellow-500/80 border-2 border-yellow-400'
+                          : 'bg-muted text-muted-foreground ring-4 ring-yellow-500/80 border-2 border-yellow-400'
+                        : isMilestone
+                        ? checkedDays.includes(item.day)
+                          ? 'bg-accent text-white shadow-lg scale-105 ring-2 ring-gray-400 border-2 border-gray-300'
+                          : item.day === nextSlotToClaim
+                          ? 'bg-primary text-white animate-pulse ring-2 ring-gray-400 border-2 border-gray-300'
+                          : 'bg-muted text-muted-foreground ring-2 ring-gray-400 border-2 border-gray-300'
+                        : checkedDays.includes(item.day)
+                        ? 'bg-accent text-white shadow-lg scale-105'
                         : item.day === nextSlotToClaim
-                        ? 'bg-primary text-white animate-pulse ring-4 ring-yellow-500/80 border-2 border-yellow-400'
-                        : 'bg-muted text-muted-foreground ring-4 ring-yellow-500/80 border-2 border-yellow-400'
-                      : checkedDays.includes(item.day)
-                      ? 'bg-accent text-white shadow-lg scale-105'
-                      : item.day === nextSlotToClaim
-                      ? 'bg-primary text-white animate-pulse ring-2 ring-primary'
-                      : 'bg-muted text-muted-foreground'
-                  }`}
-                >
-                  <div className="text-sm font-bold mb-0.5">{item.day}</div>
-                  <div className="flex items-center gap-1">
-                    <Trophy className="w-3.5 h-3.5" />
-                    <span className="text-xs font-semibold">{item.reward}</span>
+                        ? 'bg-primary text-white animate-pulse ring-2 ring-primary'
+                        : 'bg-muted text-muted-foreground'
+                    }`}
+                  >
+                    <div className="text-sm font-bold mb-0.5">{item.day}</div>
+                    <div className="flex items-center gap-1">
+                      <Trophy className="w-3.5 h-3.5" />
+                      <span className="text-xs font-semibold">{item.reward}</span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
           <div className="flex-shrink-0 p-4 pt-0">
@@ -102,7 +111,11 @@ const Home = () => {
               size="lg"
             >
               <Gift className="w-5 h-5 mr-2" />
-              {nextSlotToClaim > 31 ? 'All Rewards Claimed!' : hasClaimedToday ? 'Already Claimed Today' : `Claim Reward ${nextSlotToClaim}`}
+              {nextSlotToClaim > 31 
+                ? 'All Rewards Claimed!' 
+                : hasClaimedToday 
+                ? 'Already Claimed Today' 
+                : `Claim Reward ${dailyRewards[nextSlotToClaim - 1]?.reward || 0}`}
             </Button>
           </div>
         </DialogContent>
