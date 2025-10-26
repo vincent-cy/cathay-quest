@@ -27,6 +27,25 @@ const seasonalEvents = [
       { title: "Ghost Story Quiz", description: "Answer Halloween trivia questions", reward: 50 },
       { title: "Pumpkin Patch Photo", description: "Share your Halloween spirit", reward: 75 }
     ]
+  },
+  {
+    id: "earthday",
+    title: "Earth Day Green Initiative",
+    description: "Celebrate our planet and make sustainable travel choices",
+    reward: 600,
+    participants: 18230,
+    endsIn: "22 days",
+    theme: {
+      primary: "hsl(142 76% 36%)", // Green
+      secondary: "hsl(142 71% 45%)", // Light Green
+      gradient: "linear-gradient(135deg, hsl(142 76% 36%), hsl(199 89% 48%))"
+    },
+    quests: [
+      { title: "Carbon Offset Champion", description: "Opt-in to carbon offset for your next flight", reward: 125 },
+      { title: "Eco-Friendly Packing", description: "Travel with reusable items only", reward: 100 },
+      { title: "Green Travel Quiz", description: "Test your environmental travel knowledge", reward: 75 },
+      { title: "Nature Photo Share", description: "Capture and share sustainable travel moments", reward: 100 }
+    ]
   }
 ];
 
