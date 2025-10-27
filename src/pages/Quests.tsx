@@ -8,6 +8,7 @@ import { Plane, MapPin, RefreshCw, Clock, RotateCcw } from "lucide-react";
 import { Toaster } from "@/components/ui/toaster";
 import { toast } from "@/hooks/use-toast";
 import heroFlight from "@/assets/hero-flight.jpg";
+import { useQuests } from "@/contexts/QuestContext";
 
 const allQuests = [
   {
@@ -337,6 +338,7 @@ const getRandomIndices = (count: number, max: number): number[] => {
 };
 
 const Quests = () => {
+  const { setCathayPoints, ownedVouchers, removeVoucher } = useQuests();
   const [isInFlight, setIsInFlight] = useState(false);
   const [daysUntilRefresh] = useState(4);
   const [flightTimeLeft, setFlightTimeLeft] = useState({ hours: 2, minutes: 15 });
@@ -385,17 +387,34 @@ const Quests = () => {
   }, [inFlightSlots]);
 
   const handleResetSwipes = () => {
+    // Reset quest-related localStorage
     localStorage.removeItem('questSwipesLeft');
     localStorage.removeItem('weeklySlots');
     localStorage.removeItem('oneTimeSlots');
     localStorage.removeItem('inFlightSlots');
+    
+    // Reset daily rewards localStorage
+    localStorage.removeItem('dailyRewardsCheckedDays');
+    localStorage.removeItem('hasClaimedDailyReward');
+    localStorage.removeItem('lastClaimDate');
+    
+    // Reset quest state
     setSwipesLeft(3);
     setWeeklySlots(getRandomIndices(3, allWeeklyQuests.length));
     setOneTimeSlots(getRandomIndices(3, allOneTimeQuests.length));
     setInFlightSlots(getRandomIndices(3, allInFlightQuests.length));
+    
+    // Reset Cathay Points
+    setCathayPoints(2750);
+    
+    // Remove all vouchers
+    ownedVouchers.forEach((voucher) => {
+      removeVoucher(voucher.id);
+    });
+    
     toast({
-      title: "Quests Reset",
-      description: "Swipes and quest selection have been reset.",
+      title: "Variables Reset",
+      description: "All variables have been reset to their original state",
     });
   };
 
