@@ -163,7 +163,7 @@ const Home = () => {
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center p-3 rounded-lg bg-muted/50">
               {/* <Trophy className="w-6 h-6 text-accent mx-auto mb-2" /> */}
-              <img src={cathayPointsLogo} alt="Cathay Points" className="w-6 h-6 mx-auto mb-2" />
+              <img src={cathayPointsLogo} alt="Cathay Points" className="w-10 h-10 mx-auto mb-2" />
               <p className="text-2xl font-bold text-foreground">{cathayPoints.toLocaleString()}</p>
               <p className="text-xs text-muted-foreground">Cathay Points</p>
             </div>
