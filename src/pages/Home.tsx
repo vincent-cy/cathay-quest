@@ -1,24 +1,53 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BottomNav } from "@/components/BottomNav";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Trophy, Flame, Star, Award, Gift, Coffee, Wifi, Luggage, Plane, Zap, Ticket } from "lucide-react";
+import { Trophy, Flame, Star, Award, Gift, Coffee, Wifi, Luggage, Plane, Zap, Ticket, CheckCircle2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { useQuests } from "@/contexts/QuestContext";
 import { useToast } from "@/hooks/use-toast";
 
 const Home = () => {
   const [showCalendar, setShowCalendar] = useState(false);
-  const [checkedDays, setCheckedDays] = useState<number[]>([1, 2, 3, 4]);
-  const [hasClaimedToday, setHasClaimedToday] = useState(false);
   const [selectedVoucher, setSelectedVoucher] = useState<any>(null);
   const { cathayPoints, addCathayPoints, ownedVouchers, removeVoucher } = useQuests();
   const { toast } = useToast();
+
+  // Initialize state from localStorage
+  const [checkedDays, setCheckedDays] = useState<number[]>(() => {
+    const saved = localStorage.getItem('dailyRewardsCheckedDays');
+    return saved ? JSON.parse(saved) : [1, 2, 3, 4];
+  });
+
+  const [hasClaimedToday, setHasClaimedToday] = useState(() => {
+    const saved = localStorage.getItem('hasClaimedDailyReward');
+    const lastClaimDate = localStorage.getItem('lastClaimDate');
+    const today = new Date().toDateString();
+    
+    // Reset if it's a new day
+    if (lastClaimDate !== today) {
+      localStorage.setItem('hasClaimedDailyReward', 'false');
+      return false;
+    }
+    return saved === 'true';
+  });
   
   // Calculate next slot to claim (additive system)
   const nextSlotToClaim = checkedDays.length + 1;
+
+  // Save to localStorage whenever state changes
+  useEffect(() => {
+    localStorage.setItem('dailyRewardsCheckedDays', JSON.stringify(checkedDays));
+  }, [checkedDays]);
+
+  useEffect(() => {
+    localStorage.setItem('hasClaimedDailyReward', String(hasClaimedToday));
+    if (hasClaimedToday) {
+      localStorage.setItem('lastClaimDate', new Date().toDateString());
+    }
+  }, [hasClaimedToday]);
 
   const dailyRewards = [
     { day: 1, reward: 10 }, { day: 2, reward: 10 }, { day: 3, reward: 15 }, { day: 4, reward: 15 },
@@ -140,12 +169,21 @@ const Home = () => {
         {/* Daily Check-in Button */}
         <Button 
           onClick={() => setShowCalendar(true)}
-          className="w-full"
+          className={`w-full ${hasClaimedToday ? 'bg-accent' : ''}`}
           size="lg"
-          variant="default"
+          variant={hasClaimedToday ? "secondary" : "default"}
         >
-          <Gift className="w-5 h-5 mr-2" />
-          Daily Login Rewards
+          {hasClaimedToday ? (
+            <>
+              <CheckCircle2 className="w-5 h-5 mr-2" />
+              Reward Claimed Today!
+            </>
+          ) : (
+            <>
+              <Gift className="w-5 h-5 mr-2" />
+              Daily Login Rewards
+            </>
+          )}
         </Button>
 
         <Card className="p-6 shadow-card text-center">

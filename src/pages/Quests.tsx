@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BottomNav } from "@/components/BottomNav";
 import { CompactQuestCard } from "@/components/CompactQuestCard";
 import { Card } from "@/components/ui/card";
@@ -326,9 +326,17 @@ const allQuests = [
   },
 ];
 
+// Helper function to get random indices without duplicates
+const getRandomIndices = (count: number, max: number): number[] => {
+  const indices = new Set<number>();
+  while (indices.size < Math.min(count, max)) {
+    indices.add(Math.floor(Math.random() * max));
+  }
+  return Array.from(indices);
+};
+
 const Quests = () => {
   const [isInFlight, setIsInFlight] = useState(false);
-  const [swipesLeft, setSwipesLeft] = useState(3);
   const [daysUntilRefresh] = useState(4);
   const [flightTimeLeft, setFlightTimeLeft] = useState({ hours: 2, minutes: 15 });
 
@@ -337,15 +345,43 @@ const Quests = () => {
   const allOneTimeQuests = allQuests.filter((quest) => quest.type === "One-Time");
   const allInFlightQuests = allQuests.filter((quest) => quest.type === "In-Flight");
 
-  // Track current visible quest indices for each slot (0, 1, 2)
-  const [weeklySlots, setWeeklySlots] = useState([0, 1, 2]);
-  const [oneTimeSlots, setOneTimeSlots] = useState([0, 1, 2]);
-  const [inFlightSlots, setInFlightSlots] = useState([0, 1, 2]);
+  // Initialize state from localStorage or defaults
+  const [swipesLeft, setSwipesLeft] = useState(() => {
+    const saved = localStorage.getItem('questSwipesLeft');
+    return saved ? JSON.parse(saved) : 3;
+  });
 
-  // Track next available quest index
-  const [weeklyNextIndex, setWeeklyNextIndex] = useState(3);
-  const [oneTimeNextIndex, setOneTimeNextIndex] = useState(3);
-  const [inFlightNextIndex, setInFlightNextIndex] = useState(3);
+  const [weeklySlots, setWeeklySlots] = useState<number[]>(() => {
+    const saved = localStorage.getItem('weeklySlots');
+    return saved ? JSON.parse(saved) : getRandomIndices(3, allWeeklyQuests.length);
+  });
+
+  const [oneTimeSlots, setOneTimeSlots] = useState<number[]>(() => {
+    const saved = localStorage.getItem('oneTimeSlots');
+    return saved ? JSON.parse(saved) : getRandomIndices(3, allOneTimeQuests.length);
+  });
+
+  const [inFlightSlots, setInFlightSlots] = useState<number[]>(() => {
+    const saved = localStorage.getItem('inFlightSlots');
+    return saved ? JSON.parse(saved) : getRandomIndices(3, allInFlightQuests.length);
+  });
+
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('questSwipesLeft', JSON.stringify(swipesLeft));
+  }, [swipesLeft]);
+
+  useEffect(() => {
+    localStorage.setItem('weeklySlots', JSON.stringify(weeklySlots));
+  }, [weeklySlots]);
+
+  useEffect(() => {
+    localStorage.setItem('oneTimeSlots', JSON.stringify(oneTimeSlots));
+  }, [oneTimeSlots]);
+
+  useEffect(() => {
+    localStorage.setItem('inFlightSlots', JSON.stringify(inFlightSlots));
+  }, [inFlightSlots]);
 
   const handleSwipeLeft = (questId: string, type: string, slotIndex: number) => {
     if (swipesLeft > 0) {
@@ -361,23 +397,33 @@ const Quests = () => {
         return next;
       });
 
-      // After animation, replace the swiped card at its position
+      // After animation, replace the swiped card with a random quest
       setTimeout(() => {
         if (type === "Weekly") {
           const newSlots = [...weeklySlots];
-          newSlots[slotIndex] = weeklyNextIndex % allWeeklyQuests.length;
+          // Get a random quest that's not currently visible
+          let randomIndex;
+          do {
+            randomIndex = Math.floor(Math.random() * allWeeklyQuests.length);
+          } while (newSlots.includes(randomIndex));
+          newSlots[slotIndex] = randomIndex;
           setWeeklySlots(newSlots);
-          setWeeklyNextIndex((prev) => prev + 1);
         } else if (type === "One-Time") {
           const newSlots = [...oneTimeSlots];
-          newSlots[slotIndex] = oneTimeNextIndex % allOneTimeQuests.length;
+          let randomIndex;
+          do {
+            randomIndex = Math.floor(Math.random() * allOneTimeQuests.length);
+          } while (newSlots.includes(randomIndex));
+          newSlots[slotIndex] = randomIndex;
           setOneTimeSlots(newSlots);
-          setOneTimeNextIndex((prev) => prev + 1);
         } else if (type === "In-Flight") {
           const newSlots = [...inFlightSlots];
-          newSlots[slotIndex] = inFlightNextIndex % allInFlightQuests.length;
+          let randomIndex;
+          do {
+            randomIndex = Math.floor(Math.random() * allInFlightQuests.length);
+          } while (newSlots.includes(randomIndex));
+          newSlots[slotIndex] = randomIndex;
           setInFlightSlots(newSlots);
-          setInFlightNextIndex((prev) => prev + 1);
         }
       }, 300);
     }
@@ -521,8 +567,12 @@ const Quests = () => {
             {allInFlightQuests.length > 0 ? (
               <div className="space-y-3">
                   {inFlightSlots.map((questIndex, slotIndex) => {
-                    const quest = allInFlightQuests[questIndex % allInFlightQuests.length];
-                    const nextQuestIndex = inFlightNextIndex % allInFlightQuests.length;
+                    const quest = allInFlightQuests[questIndex];
+                    // Get a random next quest that's not currently visible
+                    let nextQuestIndex;
+                    do {
+                      nextQuestIndex = Math.floor(Math.random() * allInFlightQuests.length);
+                    } while (inFlightSlots.includes(nextQuestIndex));
                     const nextQuest = allInFlightQuests[nextQuestIndex];
                     return (
                     <CompactQuestCard
@@ -551,8 +601,12 @@ const Quests = () => {
               {allWeeklyQuests.length > 0 ? (
                 <div className="space-y-3">
                   {weeklySlots.map((questIndex, slotIndex) => {
-                    const quest = allWeeklyQuests[questIndex % allWeeklyQuests.length];
-                    const nextQuestIndex = weeklyNextIndex % allWeeklyQuests.length;
+                    const quest = allWeeklyQuests[questIndex];
+                    // Get a random next quest that's not currently visible
+                    let nextQuestIndex;
+                    do {
+                      nextQuestIndex = Math.floor(Math.random() * allWeeklyQuests.length);
+                    } while (weeklySlots.includes(nextQuestIndex));
                     const nextQuest = allWeeklyQuests[nextQuestIndex];
                     return (
                       <CompactQuestCard
@@ -577,8 +631,12 @@ const Quests = () => {
               {allOneTimeQuests.length > 0 ? (
                 <div className="space-y-3">
                   {oneTimeSlots.map((questIndex, slotIndex) => {
-                    const quest = allOneTimeQuests[questIndex % allOneTimeQuests.length];
-                    const nextQuestIndex = oneTimeNextIndex % allOneTimeQuests.length;
+                    const quest = allOneTimeQuests[questIndex];
+                    // Get a random next quest that's not currently visible
+                    let nextQuestIndex;
+                    do {
+                      nextQuestIndex = Math.floor(Math.random() * allOneTimeQuests.length);
+                    } while (oneTimeSlots.includes(nextQuestIndex));
                     const nextQuest = allOneTimeQuests[nextQuestIndex];
                     return (
                       <CompactQuestCard
