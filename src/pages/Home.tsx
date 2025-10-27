@@ -8,7 +8,7 @@ import { Trophy, Flame, Star, Award, Gift, Coffee, Wifi, Luggage, Plane, Zap, Ti
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { useQuests } from "@/contexts/QuestContext";
 import { useToast } from "@/hooks/use-toast";
-import cathayPointsLogo from "@/assets/cathay-points-logo.png";
+import cathayPointsLogo from "@/assets/cathay-quest-logo.png";
 
 const Home = () => {
   const [showCalendar, setShowCalendar] = useState(false);
