@@ -3,7 +3,8 @@ import { BottomNav } from "@/components/BottomNav";
 import { CompactQuestCard } from "@/components/CompactQuestCard";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plane, MapPin, RefreshCw, Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Plane, MapPin, RefreshCw, Clock, RotateCcw } from "lucide-react";
 import { Toaster } from "@/components/ui/toaster";
 import { toast } from "@/hooks/use-toast";
 import heroFlight from "@/assets/hero-flight.jpg";
@@ -383,6 +384,21 @@ const Quests = () => {
     localStorage.setItem('inFlightSlots', JSON.stringify(inFlightSlots));
   }, [inFlightSlots]);
 
+  const handleResetSwipes = () => {
+    localStorage.removeItem('questSwipesLeft');
+    localStorage.removeItem('weeklySlots');
+    localStorage.removeItem('oneTimeSlots');
+    localStorage.removeItem('inFlightSlots');
+    setSwipesLeft(3);
+    setWeeklySlots(getRandomIndices(3, allWeeklyQuests.length));
+    setOneTimeSlots(getRandomIndices(3, allOneTimeQuests.length));
+    setInFlightSlots(getRandomIndices(3, allInFlightQuests.length));
+    toast({
+      title: "Quests Reset",
+      description: "Swipes and quest selection have been reset.",
+    });
+  };
+
   const handleSwipeLeft = (questId: string, type: string, slotIndex: number) => {
     if (swipesLeft > 0) {
       setSwipesLeft((prev) => {
@@ -439,21 +455,34 @@ const Quests = () => {
         }`}
       >
         <div className="flex items-center justify-between">
-          <div>
-            <h1
-              className={`text-3xl font-bold transition-all duration-500 ${
-                isInFlight ? "text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.3)]" : "text-foreground"
+          <div className="flex items-center gap-3">
+            <div>
+              <h1
+                className={`text-3xl font-bold transition-all duration-500 ${
+                  isInFlight ? "text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.3)]" : "text-foreground"
+                }`}
+              >
+                Your Quests
+              </h1>
+              <p
+                className={`text-base transition-all duration-500 ${
+                  isInFlight ? "text-white/90" : "text-muted-foreground"
+                }`}
+              >
+                Swipe to discover missions
+              </p>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleResetSwipes}
+              className={`transition-all duration-500 ${
+                isInFlight ? "text-white/70 hover:text-white" : "text-muted-foreground hover:text-foreground"
               }`}
+              title="Reset swipes and quests (for testing)"
             >
-              Your Quests
-            </h1>
-            <p
-              className={`text-base transition-all duration-500 ${
-                isInFlight ? "text-white/90" : "text-muted-foreground"
-              }`}
-            >
-              Swipe to discover missions
-            </p>
+              <RotateCcw className="w-4 h-4" />
+            </Button>
           </div>
           <div className="text-right">
             <div className="flex items-center gap-2">

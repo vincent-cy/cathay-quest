@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Trophy, Flame, Star, Award, Gift, Coffee, Wifi, Luggage, Plane, Zap, Ticket, CheckCircle2 } from "lucide-react";
+import { Trophy, Flame, Star, Award, Gift, Coffee, Wifi, Luggage, Plane, Zap, Ticket, CheckCircle2, RotateCcw } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { useQuests } from "@/contexts/QuestContext";
 import { useToast } from "@/hooks/use-toast";
@@ -60,6 +60,18 @@ const Home = () => {
     { day: 29, reward: 80 }, { day: 30, reward: 80 }, { day: 31, reward: 200 }
   ];
 
+  const handleResetDaily = () => {
+    localStorage.removeItem('dailyRewardsCheckedDays');
+    localStorage.removeItem('hasClaimedDailyReward');
+    localStorage.removeItem('lastClaimDate');
+    setCheckedDays([1, 2, 3, 4]);
+    setHasClaimedToday(false);
+    toast({
+      title: "Daily Rewards Reset",
+      description: "You can now claim the daily reward again.",
+    });
+  };
+
   const handleClaimReward = () => {
     if (nextSlotToClaim <= 31 && !hasClaimedToday) {
       const rewardAmount = dailyRewards[nextSlotToClaim - 1].reward;
@@ -91,9 +103,22 @@ const Home = () => {
       <Dialog open={showCalendar} onOpenChange={setShowCalendar}>
         <DialogContent className="max-w-2xl flex flex-col max-h-[85vh]">
           <DialogHeader className="flex-shrink-0">
-            <DialogTitle className="text-2xl font-bold text-center">
-              Daily Login Rewards
-            </DialogTitle>
+            <div className="flex items-center justify-between">
+              <div className="flex-1 text-center">
+                <DialogTitle className="text-2xl font-bold">
+                  Daily Login Rewards
+                </DialogTitle>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleResetDaily}
+                className="text-muted-foreground hover:text-foreground"
+                title="Reset daily rewards (for testing)"
+              >
+                <RotateCcw className="w-4 h-4" />
+              </Button>
+            </div>
           </DialogHeader>
           <div className="overflow-y-auto flex-1 px-4">
             <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-7 gap-2 sm:gap-3 py-4">
