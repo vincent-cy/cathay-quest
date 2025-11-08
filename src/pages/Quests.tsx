@@ -369,6 +369,43 @@ const Quests = () => {
     return saved ? JSON.parse(saved) : getRandomIndices(3, allInFlightQuests.length);
   });
 
+  // Store the next quest indices for preview
+  const [nextWeeklySlots, setNextWeeklySlots] = useState<number[]>(() => {
+    const saved = localStorage.getItem('nextWeeklySlots');
+    if (saved) return JSON.parse(saved);
+    return weeklySlots.map(() => {
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * allWeeklyQuests.length);
+      } while (weeklySlots.includes(randomIndex));
+      return randomIndex;
+    });
+  });
+
+  const [nextOneTimeSlots, setNextOneTimeSlots] = useState<number[]>(() => {
+    const saved = localStorage.getItem('nextOneTimeSlots');
+    if (saved) return JSON.parse(saved);
+    return oneTimeSlots.map(() => {
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * allOneTimeQuests.length);
+      } while (oneTimeSlots.includes(randomIndex));
+      return randomIndex;
+    });
+  });
+
+  const [nextInFlightSlots, setNextInFlightSlots] = useState<number[]>(() => {
+    const saved = localStorage.getItem('nextInFlightSlots');
+    if (saved) return JSON.parse(saved);
+    return inFlightSlots.map(() => {
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * allInFlightQuests.length);
+      } while (inFlightSlots.includes(randomIndex));
+      return randomIndex;
+    });
+  });
+
   // Save state to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('questSwipesLeft', JSON.stringify(swipesLeft));
@@ -386,12 +423,27 @@ const Quests = () => {
     localStorage.setItem('inFlightSlots', JSON.stringify(inFlightSlots));
   }, [inFlightSlots]);
 
+  useEffect(() => {
+    localStorage.setItem('nextWeeklySlots', JSON.stringify(nextWeeklySlots));
+  }, [nextWeeklySlots]);
+
+  useEffect(() => {
+    localStorage.setItem('nextOneTimeSlots', JSON.stringify(nextOneTimeSlots));
+  }, [nextOneTimeSlots]);
+
+  useEffect(() => {
+    localStorage.setItem('nextInFlightSlots', JSON.stringify(nextInFlightSlots));
+  }, [nextInFlightSlots]);
+
   const handleResetSwipes = () => {
     // Reset quest-related localStorage
     localStorage.removeItem('questSwipesLeft');
     localStorage.removeItem('weeklySlots');
     localStorage.removeItem('oneTimeSlots');
     localStorage.removeItem('inFlightSlots');
+    localStorage.removeItem('nextWeeklySlots');
+    localStorage.removeItem('nextOneTimeSlots');
+    localStorage.removeItem('nextInFlightSlots');
     
     // Reset daily rewards localStorage
     localStorage.removeItem('dailyRewardsCheckedDays');
@@ -399,10 +451,39 @@ const Quests = () => {
     localStorage.removeItem('lastClaimDate');
     
     // Reset quest state
+    const newWeeklySlots = getRandomIndices(3, allWeeklyQuests.length);
+    const newOneTimeSlots = getRandomIndices(3, allOneTimeQuests.length);
+    const newInFlightSlots = getRandomIndices(3, allInFlightQuests.length);
+    
     setSwipesLeft(3);
-    setWeeklySlots(getRandomIndices(3, allWeeklyQuests.length));
-    setOneTimeSlots(getRandomIndices(3, allOneTimeQuests.length));
-    setInFlightSlots(getRandomIndices(3, allInFlightQuests.length));
+    setWeeklySlots(newWeeklySlots);
+    setOneTimeSlots(newOneTimeSlots);
+    setInFlightSlots(newInFlightSlots);
+    
+    // Generate new next slots
+    setNextWeeklySlots(newWeeklySlots.map(() => {
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * allWeeklyQuests.length);
+      } while (newWeeklySlots.includes(randomIndex));
+      return randomIndex;
+    }));
+    
+    setNextOneTimeSlots(newOneTimeSlots.map(() => {
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * allOneTimeQuests.length);
+      } while (newOneTimeSlots.includes(randomIndex));
+      return randomIndex;
+    }));
+    
+    setNextInFlightSlots(newInFlightSlots.map(() => {
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * allInFlightQuests.length);
+      } while (newInFlightSlots.includes(randomIndex));
+      return randomIndex;
+    }));
     
     // Reset Cathay Points
     setCathayPoints(2750);
@@ -432,33 +513,46 @@ const Quests = () => {
         return next;
       });
 
-      // After animation, replace the swiped card with a random quest
+      // After animation, replace the swiped card with the pre-calculated next quest
       setTimeout(() => {
         if (type === "Weekly") {
           const newSlots = [...weeklySlots];
-          // Get a random quest that's not currently visible
+          // Use the pre-calculated next quest
+          newSlots[slotIndex] = nextWeeklySlots[slotIndex];
+          setWeeklySlots(newSlots);
+          
+          // Generate a new next quest for this slot
+          const newNextSlots = [...nextWeeklySlots];
           let randomIndex;
           do {
             randomIndex = Math.floor(Math.random() * allWeeklyQuests.length);
           } while (newSlots.includes(randomIndex));
-          newSlots[slotIndex] = randomIndex;
-          setWeeklySlots(newSlots);
+          newNextSlots[slotIndex] = randomIndex;
+          setNextWeeklySlots(newNextSlots);
         } else if (type === "One-Time") {
           const newSlots = [...oneTimeSlots];
+          newSlots[slotIndex] = nextOneTimeSlots[slotIndex];
+          setOneTimeSlots(newSlots);
+          
+          const newNextSlots = [...nextOneTimeSlots];
           let randomIndex;
           do {
             randomIndex = Math.floor(Math.random() * allOneTimeQuests.length);
           } while (newSlots.includes(randomIndex));
-          newSlots[slotIndex] = randomIndex;
-          setOneTimeSlots(newSlots);
+          newNextSlots[slotIndex] = randomIndex;
+          setNextOneTimeSlots(newNextSlots);
         } else if (type === "In-Flight") {
           const newSlots = [...inFlightSlots];
+          newSlots[slotIndex] = nextInFlightSlots[slotIndex];
+          setInFlightSlots(newSlots);
+          
+          const newNextSlots = [...nextInFlightSlots];
           let randomIndex;
           do {
             randomIndex = Math.floor(Math.random() * allInFlightQuests.length);
           } while (newSlots.includes(randomIndex));
-          newSlots[slotIndex] = randomIndex;
-          setInFlightSlots(newSlots);
+          newNextSlots[slotIndex] = randomIndex;
+          setNextInFlightSlots(newNextSlots);
         }
       }, 300);
     }
@@ -616,12 +710,7 @@ const Quests = () => {
               <div className="space-y-3">
                   {inFlightSlots.map((questIndex, slotIndex) => {
                     const quest = allInFlightQuests[questIndex];
-                    // Get a random next quest that's not currently visible
-                    let nextQuestIndex;
-                    do {
-                      nextQuestIndex = Math.floor(Math.random() * allInFlightQuests.length);
-                    } while (inFlightSlots.includes(nextQuestIndex));
-                    const nextQuest = allInFlightQuests[nextQuestIndex];
+                    const nextQuest = allInFlightQuests[nextInFlightSlots[slotIndex]];
                     return (
                     <CompactQuestCard
                       key={`inflight-slot-${slotIndex}`}
@@ -650,12 +739,7 @@ const Quests = () => {
                 <div className="space-y-3">
                   {weeklySlots.map((questIndex, slotIndex) => {
                     const quest = allWeeklyQuests[questIndex];
-                    // Get a random next quest that's not currently visible
-                    let nextQuestIndex;
-                    do {
-                      nextQuestIndex = Math.floor(Math.random() * allWeeklyQuests.length);
-                    } while (weeklySlots.includes(nextQuestIndex));
-                    const nextQuest = allWeeklyQuests[nextQuestIndex];
+                    const nextQuest = allWeeklyQuests[nextWeeklySlots[slotIndex]];
                     return (
                       <CompactQuestCard
                         key={`weekly-slot-${slotIndex}`}
@@ -680,12 +764,7 @@ const Quests = () => {
                 <div className="space-y-3">
                   {oneTimeSlots.map((questIndex, slotIndex) => {
                     const quest = allOneTimeQuests[questIndex];
-                    // Get a random next quest that's not currently visible
-                    let nextQuestIndex;
-                    do {
-                      nextQuestIndex = Math.floor(Math.random() * allOneTimeQuests.length);
-                    } while (oneTimeSlots.includes(nextQuestIndex));
-                    const nextQuest = allOneTimeQuests[nextQuestIndex];
+                    const nextQuest = allOneTimeQuests[nextOneTimeSlots[slotIndex]];
                     return (
                       <CompactQuestCard
                         key={`onetime-slot-${slotIndex}`}
