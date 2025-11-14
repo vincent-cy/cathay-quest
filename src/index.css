@@ -6,7 +6,6 @@
 All colors MUST be HSL.
 */
 
-@layer base {
   :root {
     --background: 0 0% 100%;
     --foreground: 174 100% 20%;
@@ -62,6 +61,81 @@ All colors MUST be HSL.
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
+  /* Gold & Green Theme (Default) */
+  .gold-green {
+    --background: 0 0% 100%;
+    --foreground: 174 100% 20%;
+    --card: 0 0% 100%;
+    --card-foreground: 174 100% 20%;
+    --primary: 174 100% 20%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 174 100% 30%;
+    --secondary: 45 33% 71%;
+    --secondary-foreground: 174 100% 20%;
+    --accent: 45 33% 71%;
+    --accent-foreground: 174 100% 20%;
+    --gradient-hero: linear-gradient(135deg, hsl(174 100% 20%) 0%, hsl(174 100% 25%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(174 10% 98%) 100%);
+    --gradient-achievement: linear-gradient(135deg, hsl(45 33% 71%) 0%, hsl(45 33% 75%) 100%);
+    --shadow-card: 0 4px 20px -2px hsl(174 50% 30% / 0.1);
+    --shadow-elevated: 0 10px 40px -5px hsl(174 50% 30% / 0.15);
+    --shadow-glow: 0 0 30px hsl(174 100% 30% / 0.3);
+    --shadow-achievement: 0 0 40px hsl(45 33% 71% / 0.4);
+  }
+
+  /* Liquid Glass Theme */
+  .liquid-glass {
+    --background: 220 20% 97%;
+    --foreground: 220 60% 15%;
+
+    --card: 0 0% 100% / 0.4;
+    --card-foreground: 220 60% 15%;
+
+    --popover: 0 0% 100% / 0.95;
+    --popover-foreground: 220 60% 15%;
+
+    --primary: 210 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 210 100% 60%;
+
+    --secondary: 200 20% 85%;
+    --secondary-foreground: 220 60% 15%;
+
+    --muted: 220 15% 92%;
+    --muted-foreground: 220 30% 45%;
+
+    --accent: 190 80% 50%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 20% 88%;
+    --input: 220 20% 90%;
+    --ring: 210 100% 55%;
+
+    --radius: 1rem;
+
+    /* Liquid Glass design tokens */
+    --gradient-hero: linear-gradient(135deg, hsl(210 100% 50% / 0.9) 0%, hsl(190 80% 50% / 0.9) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100% / 0.6) 0%, hsl(220 30% 95% / 0.4) 100%);
+    --gradient-achievement: linear-gradient(135deg, hsl(190 80% 50% / 0.8) 0%, hsl(210 100% 60% / 0.8) 100%);
+    
+    --shadow-card: 0 8px 32px hsl(220 60% 20% / 0.1);
+    --shadow-elevated: 0 12px 48px hsl(220 60% 20% / 0.15);
+    --shadow-glow: 0 0 40px hsl(210 100% 50% / 0.4);
+    --shadow-achievement: 0 0 50px hsl(190 80% 50% / 0.5);
+
+    --sidebar-background: 0 0% 100% / 0.8;
+    --sidebar-foreground: 220 60% 15%;
+    --sidebar-primary: 210 100% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 20% 90%;
+    --sidebar-accent-foreground: 220 60% 15%;
+    --sidebar-border: 220 20% 85%;
+    --sidebar-ring: 210 100% 55%;
+  }
+
   .dark {
     --background: 180 15% 8%;
     --foreground: 0 0% 95%;
@@ -110,6 +184,76 @@ All colors MUST be HSL.
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
+  .gold-green.dark {
+    --background: 180 15% 8%;
+    --foreground: 0 0% 95%;
+    --card: 180 15% 12%;
+    --card-foreground: 0 0% 95%;
+    --primary: 174 100% 25%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 174 100% 35%;
+    --secondary: 45 33% 71%;
+    --secondary-foreground: 180 15% 8%;
+    --accent: 45 33% 71%;
+    --accent-foreground: 180 15% 8%;
+    --gradient-hero: linear-gradient(135deg, hsl(174 100% 15%) 0%, hsl(174 100% 20%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(174 15% 12%) 0%, hsl(174 15% 10%) 100%);
+    --gradient-achievement: linear-gradient(135deg, hsl(45 33% 65%) 0%, hsl(45 33% 71%) 100%);
+    --shadow-card: 0 4px 20px -2px hsl(0 0% 0% / 0.3);
+    --shadow-elevated: 0 10px 40px -5px hsl(0 0% 0% / 0.4);
+    --shadow-glow: 0 0 30px hsl(174 100% 30% / 0.5);
+    --shadow-achievement: 0 0 40px hsl(45 33% 71% / 0.6);
+  }
+
+  .liquid-glass.dark {
+    --background: 220 30% 8%;
+    --foreground: 220 20% 95%;
+
+    --card: 220 25% 12% / 0.6;
+    --card-foreground: 220 20% 95%;
+
+    --popover: 220 25% 10% / 0.95;
+    --popover-foreground: 220 20% 95%;
+
+    --primary: 210 100% 55%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 210 100% 65%;
+
+    --secondary: 220 20% 25%;
+    --secondary-foreground: 220 20% 95%;
+
+    --muted: 220 20% 18%;
+    --muted-foreground: 220 15% 65%;
+
+    --accent: 190 80% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 20% 20%;
+    --input: 220 20% 22%;
+    --ring: 210 100% 60%;
+
+    --gradient-hero: linear-gradient(135deg, hsl(210 100% 40% / 0.8) 0%, hsl(190 80% 40% / 0.8) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(220 25% 12% / 0.6) 0%, hsl(220 30% 8% / 0.4) 100%);
+    --gradient-achievement: linear-gradient(135deg, hsl(190 80% 45% / 0.7) 0%, hsl(210 100% 50% / 0.7) 100%);
+    
+    --shadow-card: 0 8px 32px hsl(220 80% 5% / 0.4);
+    --shadow-elevated: 0 12px 48px hsl(220 80% 5% / 0.5);
+    --shadow-glow: 0 0 40px hsl(210 100% 50% / 0.5);
+    --shadow-achievement: 0 0 50px hsl(190 80% 50% / 0.6);
+
+    --sidebar-background: 220 25% 10% / 0.8;
+    --sidebar-foreground: 220 20% 95%;
+    --sidebar-primary: 210 100% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 20% 20%;
+    --sidebar-accent-foreground: 220 20% 95%;
+    --sidebar-border: 220 20% 18%;
+    --sidebar-ring: 210 100% 60%;
+  }
 }
 
 @layer base {
@@ -118,7 +262,22 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground transition-colors duration-300;
+  }
+
+  /* Liquid Glass specific effects */
+  .liquid-glass .card,
+  .liquid-glass [class*="card"] {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  .liquid-glass body {
+    background: linear-gradient(135deg, hsl(220 20% 97%) 0%, hsl(210 30% 94%) 100%);
+  }
+
+  .liquid-glass.dark body {
+    background: linear-gradient(135deg, hsl(220 30% 8%) 0%, hsl(210 40% 6%) 100%);
   }
 
   /* Hide scrollbar for Chrome, Safari and Opera */
