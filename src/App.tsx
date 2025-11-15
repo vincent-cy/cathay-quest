@@ -5,13 +5,14 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QuestProvider, useQuests } from "./contexts/QuestContext";
+import { NaevvProvider } from "./contexts/NaevvContext";
 import { InitialSurvey } from "./components/InitialSurvey";
 import { PersonalizationLoader } from "./components/PersonalizationLoader";
 import Home from "./pages/Home";
 import Quests from "./pages/Quests";
 import Events from "./pages/Events";
 import Shop from "./pages/Shop";
-import LeaderboardPage from "./pages/LeaderboardPage";
+import AIAssistantPage from "./pages/AIAssistantPage";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import AdminSurveyResults from "./pages/AdminSurveyResults";
@@ -19,7 +20,8 @@ import AdminSurveyResults from "./pages/AdminSurveyResults";
 const queryClient = new QueryClient();
 
 const AppContent = () => {
-  const { hasCompletedSurvey, setHasCompletedSurvey, setUserPreferences } = useQuests();
+  const { hasCompletedSurvey, setHasCompletedSurvey, setUserPreferences } =
+    useQuests();
   const [showLoader, setShowLoader] = useState(false);
 
   const handleSurveyComplete = (responses: Record<string, string>) => {
@@ -37,9 +39,21 @@ const AppContent = () => {
       {!hasCompletedSurvey && !showLoader && (
         <InitialSurvey onComplete={handleSurveyComplete} />
       )}
-      {showLoader && <PersonalizationLoader onComplete={handleLoaderComplete} />}
+      {showLoader && (
+        <PersonalizationLoader onComplete={handleLoaderComplete} />
+      )}
       {hasCompletedSurvey && (
         <BrowserRouter>
+          <NaevvProvider>
+            <Routes>
+              <Route path="/" element={<Quests />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/shop" element={<Shop />} />
+              <Route path="/naevv" element={<AIAssistantPage />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </NaevvProvider>
           <Routes>
             <Route path="/" element={<Quests />} />
             <Route path="/events" element={<Events />} />
