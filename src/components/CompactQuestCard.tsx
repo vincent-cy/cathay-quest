@@ -1,7 +1,45 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, MapPin, Plane, Recycle, Bus, Brain, Film, Activity, ChevronDown, ChevronUp, Target, Award, Trophy, Coffee, Music, Book, Camera, Utensils, Moon, Languages, Wifi, Star, Droplet, Briefcase, ShoppingBag, Headphones, Newspaper } from "lucide-react";
+import {
+  Clock,
+  MapPin,
+  Plane,
+  Recycle,
+  Bus,
+  Brain,
+  Film,
+  Activity,
+  ChevronDown,
+  ChevronUp,
+  Target,
+  Award,
+  Trophy,
+  Coffee,
+  Music,
+  Book,
+  Camera,
+  Utensils,
+  Moon,
+  Languages,
+  Wifi,
+  Star,
+  Droplet,
+  Briefcase,
+  ShoppingBag,
+  Headphones,
+  Newspaper,
+  QrCode,
+  Check,
+  X,
+} from "lucide-react";
+import { Scanner } from "@yudiel/react-qr-scanner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface Quest {
   id: string;
@@ -11,7 +49,10 @@ interface Quest {
   type: string;
   timeLeft: string;
   location?: string;
-  image: string;
+  image?: string;
+  qrEnabled: boolean;
+  requirements: string[];
+  verification: string;
 }
 
 interface CompactQuestCardProps {
@@ -21,6 +62,9 @@ interface CompactQuestCardProps {
   onSwipeLeft?: () => void;
   swipesLeft: number;
   disableSwipe?: boolean;
+  onComplete?: () => void;
+  onNext?: () => void;
+  completed?: boolean;
 }
 
 const getQuestIcon = (title: string) => {
@@ -28,194 +72,65 @@ const getQuestIcon = (title: string) => {
   if (title.includes("Recycle")) return Recycle;
   if (title.includes("Transport")) return Bus;
   if (title.includes("Quiz") || title.includes("Cultural")) return Brain;
-  if (title.includes("Movie") || title.includes("Film") || title.includes("Documentary")) return Film;
-  if (title.includes("Wellness") || title.includes("Stretching")) return Activity;
+  if (
+    title.includes("Movie") ||
+    title.includes("Film") ||
+    title.includes("Documentary")
+  )
+    return Film;
+  if (title.includes("Wellness") || title.includes("Stretching"))
+    return Activity;
   if (title.includes("Complete") && title.includes("Quests")) return Target;
   if (title.includes("Book") && title.includes("Flights")) return Plane;
   if (title.includes("Eco Warrior")) return Award;
-  if (title.includes("Frequent Flyer") || title.includes("miles")) return Trophy;
-  if (title.includes("Coffee") || title.includes("Drink") || title.includes("Beverage")) return Coffee;
+  if (title.includes("Frequent Flyer") || title.includes("miles"))
+    return Trophy;
+  if (
+    title.includes("Coffee") ||
+    title.includes("Drink") ||
+    title.includes("Beverage")
+  )
+    return Coffee;
   if (title.includes("Music")) return Music;
   if (title.includes("Magazine") || title.includes("Reading")) return Book;
   if (title.includes("Photo") || title.includes("Sky")) return Camera;
-  if (title.includes("Meal") || title.includes("Culinary") || title.includes("Snack")) return Utensils;
+  if (
+    title.includes("Meal") ||
+    title.includes("Culinary") ||
+    title.includes("Snack")
+  )
+    return Utensils;
   if (title.includes("Sleep")) return Moon;
   if (title.includes("Language")) return Languages;
   if (title.includes("Wi-Fi") || title.includes("Wifi")) return Wifi;
-  if (title.includes("Rating") || title.includes("Feedback") || title.includes("Survey")) return Star;
+  if (
+    title.includes("Rating") ||
+    title.includes("Feedback") ||
+    title.includes("Survey")
+  )
+    return Star;
   if (title.includes("Hydration") || title.includes("Water")) return Droplet;
   if (title.includes("Business") || title.includes("Planner")) return Briefcase;
-  if (title.includes("Shopping") || title.includes("Duty-Free")) return ShoppingBag;
+  if (title.includes("Shopping") || title.includes("Duty-Free"))
+    return ShoppingBag;
   if (title.includes("Podcast")) return Headphones;
-  if (title.includes("Destination") || title.includes("Explorer")) return MapPin;
+  if (title.includes("Destination") || title.includes("Explorer"))
+    return MapPin;
   if (title.includes("Meditation")) return Activity;
   return Plane;
 };
 
-const getQuestDetails = (title: string) => {
-  if (title.includes("Check-in")) {
-    return {
-      requirements: ["Valid boarding pass", "Airport kiosk access"],
-      verification: "QR code scan at kiosk",
-    };
-  }
-  if (title.includes("Recycle")) {
-    return {
-      requirements: ["Recyclable items", "Designated recycling bin"],
-      verification: "Photo of recycling receipt",
-    };
-  }
-  if (title.includes("Transport")) {
-    return {
-      requirements: ["Public transport ticket or pass"],
-      verification: "Upload transport ticket photo",
-    };
-  }
-  if (title.includes("Quiz") || title.includes("Cultural")) {
-    return {
-      requirements: ["Complete in-flight entertainment system access"],
-      verification: "Automatic upon quiz completion",
-    };
-  }
-  if (title.includes("Movie") || title.includes("Documentary")) {
-    return {
-      requirements: ["Access to in-flight entertainment"],
-      verification: "Watch time tracked automatically",
-    };
-  }
-  if (title.includes("Wellness") || title.includes("Stretching")) {
-    return {
-      requirements: ["Follow the exercise guide on screen"],
-      verification: "Self-reported completion",
-    };
-  }
-  if (title.includes("Complete") && title.includes("Quests")) {
-    return {
-      requirements: ["Complete any 50 quests from weekly or in-flight categories"],
-      verification: "Automatically tracked through your quest history",
-    };
-  }
-  if (title.includes("Book") && title.includes("Flights")) {
-    return {
-      requirements: ["Book 15 flights through the Cathay Pacific mobile app"],
-      verification: "Automatically verified through booking system",
-    };
-  }
-  if (title.includes("Eco Warrior")) {
-    return {
-      requirements: ["Complete 25 eco-friendly or sustainability quests"],
-      verification: "Tracked automatically via quest completion data",
-    };
-  }
-  if (title.includes("Frequent Flyer")) {
-    return {
-      requirements: ["Accumulate 100,000 total miles in your account"],
-      verification: "Verified through your mileage balance",
-    };
-  }
-  if (title.includes("Meal") || title.includes("Culinary")) {
-    return {
-      requirements: ["Browse menu and place order through entertainment system"],
-      verification: "Order confirmation tracked automatically",
-    };
-  }
-  if (title.includes("Drink") || title.includes("Coffee") || title.includes("Beverage")) {
-    return {
-      requirements: ["Order through entertainment system or cabin crew"],
-      verification: "Order recorded in flight system",
-    };
-  }
-  if (title.includes("Destination") || title.includes("Explorer")) {
-    return {
-      requirements: ["Access destination guide on entertainment system"],
-      verification: "Time spent browsing tracked automatically",
-    };
-  }
-  if (title.includes("Shopping") || title.includes("Duty-Free")) {
-    return {
-      requirements: ["Browse catalog and save at least 3 items"],
-      verification: "Saved items tracked in your profile",
-    };
-  }
-  if (title.includes("Language")) {
-    return {
-      requirements: ["Complete language lesson module on entertainment system"],
-      verification: "Progress tracked automatically",
-    };
-  }
-  if (title.includes("Sleep")) {
-    return {
-      requirements: ["Enable sleep mode and rest for at least 2 hours"],
-      verification: "Sleep mode duration tracked",
-    };
-  }
-  if (title.includes("Meditation")) {
-    return {
-      requirements: ["Follow guided meditation audio on entertainment system"],
-      verification: "Session completion tracked",
-    };
-  }
-  if (title.includes("Photo") || title.includes("Sky")) {
-    return {
-      requirements: ["Take a window view photo and share via app"],
-      verification: "Photo upload confirmation",
-    };
-  }
-  if (title.includes("Planner")) {
-    return {
-      requirements: ["Use onboard planning tools to create itinerary"],
-      verification: "Saved itinerary in your account",
-    };
-  }
-  if (title.includes("Podcast")) {
-    return {
-      requirements: ["Listen to complete episode on entertainment system"],
-      verification: "Listening time tracked automatically",
-    };
-  }
-  if (title.includes("Magazine") || title.includes("Reading")) {
-    return {
-      requirements: ["Read digital magazine content"],
-      verification: "Reading time tracked automatically",
-    };
-  }
-  if (title.includes("Snack")) {
-    return {
-      requirements: ["Order healthy snack option from menu"],
-      verification: "Order confirmation in system",
-    };
-  }
-  if (title.includes("Music")) {
-    return {
-      requirements: ["Listen to playlist for at least 30 minutes"],
-      verification: "Listening duration tracked",
-    };
-  }
-  if (title.includes("Wi-Fi") || title.includes("Wifi")) {
-    return {
-      requirements: ["Connect to inflight Wi-Fi service"],
-      verification: "Connection logged automatically",
-    };
-  }
-  if (title.includes("Rating") || title.includes("Feedback") || title.includes("Survey")) {
-    return {
-      requirements: ["Complete feedback form on entertainment system"],
-      verification: "Survey submission confirmed",
-    };
-  }
-  if (title.includes("Hydration") || title.includes("Water")) {
-    return {
-      requirements: ["Request and drink at least 3 glasses of water"],
-      verification: "Self-reported with crew confirmation",
-    };
-  }
-  return {
-    requirements: ["Complete the quest requirements"],
-    verification: "Automatic verification",
-  };
-};
-
-export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, swipesLeft, disableSwipe = false }: CompactQuestCardProps) => {
+export const CompactQuestCard = ({
+  quest,
+  nextQuest,
+  isInFlight,
+  onSwipeLeft,
+  swipesLeft,
+  disableSwipe = false,
+  onComplete,
+  onNext,
+  completed = false,
+}: CompactQuestCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [dragX, setDragX] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -223,6 +138,9 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
   const [hasMoved, setHasMoved] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
   const [isWiggling, setIsWiggling] = useState(false);
+  const [showQRScanner, setShowQRScanner] = useState(false);
+  const [qrResult, setQrResult] = useState<string | null>(null);
+  const [showVerified, setShowVerified] = useState(false);
 
   // NEW: controls the unblur/fade-in of the next card
   const [promoteNext, setPromoteNext] = useState(false);
@@ -231,7 +149,6 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
 
   const QuestIcon = getQuestIcon(quest.title);
   const NextQuestIcon = nextQuest ? getQuestIcon(nextQuest.title) : null;
-  const questDetails = getQuestDetails(quest.title);
 
   // Reset transient state whenever the top card changes
   useEffect(() => {
@@ -300,14 +217,17 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
         <div className="absolute inset-0 pointer-events-none z-0">
           <Card
             className={`${
-              isInFlight ? "bg-white/10 border-white/30" : "bg-card border-border"
+              isInFlight
+                ? "bg-white/10 border-white/30"
+                : "bg-card border-border"
             } overflow-hidden`}
             style={{
               // Heavily blur until swipe is committed
               filter: `blur(${promoteNext ? 0 : 5}px) brightness(0.9)`,
               opacity: promoteNext ? 1 : 1,
               transform: "scale(0.98)",
-              transition: "filter 250ms ease, opacity 250ms ease, transform 200ms ease",
+              transition:
+                "filter 250ms ease, opacity 250ms ease, transform 200ms ease",
             }}
           >
             {/* duplicated next card content (unchanged) */}
@@ -318,23 +238,37 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
                 } w-16 h-16 flex-shrink-0 rounded-lg flex items-center justify-center`}
               >
                 {NextQuestIcon ? (
-                  <NextQuestIcon className={`w-8 h-8 ${isInFlight ? "text-white/80" : "text-muted-foreground"}`} />
+                  <NextQuestIcon
+                    className={`w-8 h-8 ${
+                      isInFlight ? "text-white/80" : "text-muted-foreground"
+                    }`}
+                  />
                 ) : null}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2 mb-2">
-                  <h3 className={`font-bold text-base ${isInFlight ? "text-white/80" : "text-foreground"}`}>
+                  <h3
+                    className={`font-bold text-base ${
+                      isInFlight ? "text-white/80" : "text-foreground"
+                    }`}
+                  >
                     {nextQuest?.title}
                   </h3>
                   <Badge
                     className={`${
-                      isInFlight ? "bg-secondary/80 text-white border-secondary/20" : "bg-accent text-accent-foreground"
+                      isInFlight
+                        ? "bg-secondary/80 text-white border-secondary/20"
+                        : "bg-accent text-accent-foreground"
                     } flex-shrink-0`}
                   >
                     +{nextQuest?.reward}
                   </Badge>
                 </div>
-                <p className={`text-sm line-clamp-2 ${isInFlight ? "text-white/70" : "text-muted-foreground"}`}>
+                <p
+                  className={`text-sm line-clamp-2 ${
+                    isInFlight ? "text-white/70" : "text-muted-foreground"
+                  }`}
+                >
                   {nextQuest?.description}
                 </p>
               </div>
@@ -349,16 +283,22 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
           isRemoving
             ? "transition-all duration-300 ease-out"
             : isWiggling
-              ? "transition-all duration-100"
-              : "transition-transform duration-200"
+            ? "transition-all duration-100"
+            : "transition-transform duration-200"
         } ${
-          isInFlight
+          // change appearance if quest is completed
+          completed
+            ? "bg-emerald-600/8 border-emerald-500/30"
+            : isInFlight
             ? "bg-white/10 border-white/30 backdrop-blur-sm hover:bg-white/15"
             : "bg-card border-border hover:shadow-md"
         }`}
         style={{
           transform: `translateX(${dragX}px) rotate(${dragX * 0.05}deg)`,
-          opacity: dragX < -SWIPE_THRESHOLD && swipesLeft > 0 && !disableSwipe ? 0.7 : 1,
+          opacity:
+            dragX < -SWIPE_THRESHOLD && swipesLeft > 0 && !disableSwipe
+              ? 0.7
+              : 1,
           userSelect: "none",
           willChange: "transform, opacity",
           position: "relative",
@@ -377,16 +317,28 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
               isInFlight ? "bg-white/20 border border-white/30" : "bg-muted"
             } w-16 h-16 flex-shrink-0 rounded-lg flex items-center justify-center`}
           >
-            <QuestIcon className={`w-8 h-8 ${isInFlight ? "text-white" : "text-muted-foreground"}`} />
+            <QuestIcon
+              className={`w-8 h-8 ${
+                isInFlight ? "text-white" : "text-muted-foreground"
+              }`}
+            />
           </div>
 
           {/* Quest Info */}
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2 mb-2">
-              <h3 className={`font-bold text-base ${isInFlight ? "text-white" : "text-foreground"}`}>{quest.title}</h3>
+              <h3
+                className={`font-bold text-base ${
+                  isInFlight ? "text-white" : "text-foreground"
+                }`}
+              >
+                {quest.title}
+              </h3>
               <Badge
                 className={`${
-                  isInFlight ? "bg-secondary text-white border-secondary/20" : "bg-accent text-accent-foreground"
+                  isInFlight
+                    ? "bg-secondary text-white border-secondary/20"
+                    : "bg-accent text-accent-foreground"
                 } flex-shrink-0`}
               >
                 +{quest.reward}
@@ -394,7 +346,9 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
             </div>
 
             <p
-              className={`text-sm ${isExpanded ? "" : "line-clamp-2"} mb-3 min-h-[2.5rem] ${
+              className={`text-sm ${
+                isExpanded ? "" : "line-clamp-2"
+              } mb-3 min-h-[2.5rem] ${
                 isInFlight ? "text-white/80" : "text-muted-foreground"
               }`}
             >
@@ -404,7 +358,11 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
             {!isExpanded && quest.description.length > 80 && (
               <button
                 type="button"
-                className={`${isInFlight ? "text-white/80 hover:text-white" : "text-accent hover:text-accent"} text-xs font-medium underline`}
+                className={`${
+                  isInFlight
+                    ? "text-white/80 hover:text-white"
+                    : "text-accent hover:text-accent"
+                } text-xs font-medium underline`}
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsExpanded(true);
@@ -416,13 +374,31 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
             {!isExpanded && (
               <div className="flex items-center gap-4 text-xs">
                 <div className="flex items-center gap-1">
-                  <Clock className={`w-3 h-3 ${isInFlight ? "text-white/70" : "text-muted-foreground"}`} />
-                  <span className={isInFlight ? "text-white/70" : "text-muted-foreground"}>{quest.timeLeft}</span>
+                  <Clock
+                    className={`w-3 h-3 ${
+                      isInFlight ? "text-white/70" : "text-muted-foreground"
+                    }`}
+                  />
+                  <span
+                    className={
+                      isInFlight ? "text-white/70" : "text-muted-foreground"
+                    }
+                  >
+                    {quest.timeLeft}
+                  </span>
                 </div>
                 {quest.location && (
                   <div className="flex items-center gap-1">
-                    <MapPin className={`w-3 h-3 ${isInFlight ? "text-white/70" : "text-muted-foreground"}`} />
-                    <span className={`line-clamp-1 ${isInFlight ? "text-white/70" : "text-muted-foreground"}`}>
+                    <MapPin
+                      className={`w-3 h-3 ${
+                        isInFlight ? "text-white/70" : "text-muted-foreground"
+                      }`}
+                    />
+                    <span
+                      className={`line-clamp-1 ${
+                        isInFlight ? "text-white/70" : "text-muted-foreground"
+                      }`}
+                    >
                       {quest.location}
                     </span>
                   </div>
@@ -434,37 +410,77 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
           {/* Expand Icon */}
           <div className="flex items-center">
             {isExpanded ? (
-              <ChevronUp className={`w-5 h-5 ${isInFlight ? "text-white/70" : "text-muted-foreground"}`} />
+              <ChevronUp
+                className={`w-5 h-5 ${
+                  isInFlight ? "text-white/70" : "text-muted-foreground"
+                }`}
+              />
             ) : (
-              <ChevronDown className={`w-5 h-5 ${isInFlight ? "text-white/70" : "text-muted-foreground"}`} />
+              <ChevronDown
+                className={`w-5 h-5 ${
+                  isInFlight ? "text-white/70" : "text-muted-foreground"
+                }`}
+              />
             )}
           </div>
         </div>
 
         {/* Expanded Details */}
         {isExpanded && (
-          <div className={`px-4 pb-4 space-y-4 border-t ${isInFlight ? "border-white/20" : "border-border"}`}>
+          <div
+            className={`px-4 pb-4 space-y-4 border-t ${
+              isInFlight ? "border-white/20" : "border-border"
+            }`}
+          >
             {/* Time and Location */}
             <div className="flex items-center gap-4 text-sm pt-4">
               <div className="flex items-center gap-1">
-                <Clock className={`w-4 h-4 ${isInFlight ? "text-white/70" : "text-muted-foreground"}`} />
-                <span className={isInFlight ? "text-white/80" : "text-muted-foreground"}>{quest.timeLeft}</span>
+                <Clock
+                  className={`w-4 h-4 ${
+                    isInFlight ? "text-white/70" : "text-muted-foreground"
+                  }`}
+                />
+                <span
+                  className={
+                    isInFlight ? "text-white/80" : "text-muted-foreground"
+                  }
+                >
+                  {quest.timeLeft}
+                </span>
               </div>
               {quest.location && (
                 <div className="flex items-center gap-1">
-                  <MapPin className={`w-4 h-4 ${isInFlight ? "text-white/70" : "text-muted-foreground"}`} />
-                  <span className={isInFlight ? "text-white/80" : "text-muted-foreground"}>{quest.location}</span>
+                  <MapPin
+                    className={`w-4 h-4 ${
+                      isInFlight ? "text-white/70" : "text-muted-foreground"
+                    }`}
+                  />
+                  <span
+                    className={
+                      isInFlight ? "text-white/80" : "text-muted-foreground"
+                    }
+                  >
+                    {quest.location}
+                  </span>
                 </div>
               )}
             </div>
 
             {/* Requirements */}
             <div>
-              <h4 className={`font-semibold text-sm mb-2 ${isInFlight ? "text-white" : "text-foreground"}`}>
+              <h4
+                className={`font-semibold text-sm mb-2 ${
+                  isInFlight ? "text-white" : "text-foreground"
+                }`}
+              >
                 Requirements
               </h4>
-              <ul className={`text-sm space-y-1 ${isInFlight ? "text-white/80" : "text-muted-foreground"}`}>
-                {questDetails.requirements.map((req, idx) => (
+              <ul
+                className={`text-sm space-y-1 ${
+                  isInFlight ? "text-white/80" : "text-muted-foreground"
+                }`}
+              >
+                {quest.requirements.map((req, idx) => (
                   <li key={idx}>• {req}</li>
                 ))}
               </ul>
@@ -472,16 +488,231 @@ export const CompactQuestCard = ({ quest, nextQuest, isInFlight, onSwipeLeft, sw
 
             {/* Verification */}
             <div>
-              <h4 className={`font-semibold text-sm mb-2 ${isInFlight ? "text-white" : "text-foreground"}`}>
+              <h4
+                className={`font-semibold text-sm mb-2 ${
+                  isInFlight ? "text-white" : "text-foreground"
+                }`}
+              >
                 Verification Method
               </h4>
-              <p className={`text-sm ${isInFlight ? "text-white/80" : "text-muted-foreground"}`}>
-                {questDetails.verification}
+              <p
+                className={`text-sm ${
+                  isInFlight ? "text-white/80" : "text-muted-foreground"
+                }`}
+              >
+                {quest.verification}
               </p>
             </div>
+
+            {/* QR Code Scanner Button or Completed / Next actions */}
+            {quest.qrEnabled && !completed && (
+              <div className="pt-4 border-t border-border">
+                <button
+                  onClick={() => setShowQRScanner(true)}
+                  className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all ${
+                    isInFlight
+                      ? "bg-secondary/80 text-white hover:bg-secondary border border-secondary/20"
+                      : "bg-accent text-accent-foreground hover:bg-accent/90"
+                  }`}
+                >
+                  <QrCode className="w-4 h-4" />
+                  Scan QR Code to Complete
+                </button>
+              </div>
+            )}
+
+            {completed && (
+              <div className="pt-4 border-t border-border flex flex-col gap-2">
+                <div className="text-sm font-medium text-emerald-600">
+                  Quest completed
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => onNext?.()}
+                    className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-all ${
+                      isInFlight
+                        ? "bg-emerald-600/80 text-white hover:bg-emerald-600 border border-emerald-500/20"
+                        : "bg-emerald-600 text-white hover:bg-emerald-700"
+                    }`}
+                  >
+                    Next Quest
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </Card>
+
+      {/* QR Code Scanner Dialog */}
+      <Dialog open={showQRScanner} onOpenChange={setShowQRScanner}>
+        <DialogContent
+          className={`${
+            isInFlight ? "bg-primary border-white/30" : "bg-background"
+          }`}
+        >
+          <DialogHeader>
+            <DialogTitle
+              className={isInFlight ? "text-white" : "text-foreground"}
+            >
+              Scan QR Code
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {!qrResult && !showVerified ? (
+              <div className="w-full rounded-lg overflow-hidden relative qr-scanner-container">
+                {/* hide possible SVG/canvas/viewfinder from the scanner lib and provide our own thin green viewfinder */}
+                <style>{`
+                  /* remove typical overlay elements the scanner may inject */
+                  .qr-scanner-container svg,
+                  .qr-scanner-container canvas,
+                  .qr-scanner-container [role="presentation"],
+                  .qr-scanner-container::before,
+                  .qr-scanner-container::after,
+                  .qr-scanner-container *::before,
+                  .qr-scanner-container *::after {
+                    display: none !important;
+                    visibility: hidden !important;
+                    opacity: 0 !important;
+                    pointer-events: none !important;
+                  }
+
+                  /* Force any borders/lines to be transparent */
+                  .qr-scanner-container *,
+                  .qr-scanner-container svg path,
+                  .qr-scanner-container svg rect,
+                  .qr-scanner-container svg line,
+                  .qr-scanner-container svg circle {
+                    stroke: transparent !important;
+                    fill: transparent !important;
+                    border-color: transparent !important;
+                    box-shadow: none !important;
+                    outline: none !important;
+                    background: transparent !important;
+                  }
+
+                  /* Make the camera video fill the square container */
+                  .qr-scanner-container video {
+                    object-fit: cover !important;
+                    width: 100% !important;
+                    height: 100% !important;
+                    display: block !important;
+                  }
+
+                  /* Ensure our custom viewfinder remains visible */
+                  .qr-scanner-container .qr-viewfinder {
+                    display: block !important;
+                    visibility: visible !important;
+                    opacity: 1 !important;
+                    pointer-events: none !important;
+                    border-color: rgba(16,185,129,0.95) !important;
+                    box-shadow: 0 0 0 2px rgba(16,185,129,0.06) inset, 0 0 0 1px rgba(16,185,129,0.22) !important;
+                    background: transparent !important;
+                  }
+                `}</style>
+                <div className="w-full aspect-square bg-black rounded-lg overflow-hidden">
+                  <Scanner
+                    onScan={(detectedCodes) => {
+                      if (detectedCodes && detectedCodes.length > 0) {
+                        const value = detectedCodes[0].rawValue;
+                        setQrResult(value);
+                        // immediately show verified feedback
+                        setShowVerified(true);
+                        // call parent to mark complete
+                        onComplete?.();
+                        console.log("QR detected:", value);
+                        // auto-close and reset shortly after showing success
+                        setTimeout(() => {
+                          setShowVerified(false);
+                          setShowQRScanner(false);
+                          setQrResult(null);
+                        }, 2500);
+                      }
+                    }}
+                    onError={(error) => {
+                      console.error("QR Scanner Error:", error);
+                    }}
+                  />
+                </div>
+
+                {/* green centered square viewfinder */}
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                  <div className="qr-viewfinder w-48 h-48 border-2 border-emerald-500/90" />
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div
+                  className={`p-4 rounded-lg ${
+                    isInFlight
+                      ? "bg-white/10 border border-white/20"
+                      : "bg-muted border border-border"
+                  }`}
+                >
+                  <p
+                    className={`text-sm font-semibold mb-2 ${
+                      isInFlight ? "text-white/70" : "text-muted-foreground"
+                    }`}
+                  >
+                    Scanned Code:
+                  </p>
+                  <p
+                    className={`break-all text-sm ${
+                      isInFlight ? "text-white" : "text-foreground"
+                    }`}
+                  >
+                    {qrResult}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setQrResult(null);
+                    }}
+                    className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-all ${
+                      isInFlight
+                        ? "bg-white/10 text-white hover:bg-white/20 border border-white/20"
+                        : "bg-muted text-foreground hover:bg-muted/80 border border-border"
+                    }`}
+                  >
+                    Scan Again
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowQRScanner(false);
+                      setQrResult(null);
+                      // Here you can add logic to complete the quest
+                      console.log("Quest completed with QR:", qrResult);
+                    }}
+                    className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-all ${
+                      isInFlight
+                        ? "bg-secondary/80 text-white hover:bg-secondary border border-secondary/20"
+                        : "bg-accent text-accent-foreground hover:bg-accent/90"
+                    }`}
+                  >
+                    Confirm & Complete
+                  </button>
+                </div>
+              </div>
+            )}
+            {/* Verified overlay shown briefly when a QR is detected */}
+            {showVerified && (
+              <div className="absolute inset-0 flex items-center justify-center p-6">
+                <div className="flex items-center gap-3 p-4 rounded-md bg-emerald-600/95 text-white shadow-lg">
+                  <Check className="w-6 h-6" />
+                  <div>
+                    <div className="font-semibold">Verified successfully</div>
+                    <div className="text-xs opacity-90">
+                      Preparing confirmation…
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
