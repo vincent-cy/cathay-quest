@@ -1,4 +1,4 @@
-import { Home, Target, Trophy, Users, ShoppingBag } from "lucide-react";
+import { Home, Target, Trophy, ShoppingBag, Bot } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 const navItems = [
@@ -6,7 +6,7 @@ const navItems = [
   { icon: Trophy, label: "Events", path: "/events" },
   { icon: Home, label: "Profile", path: "/home" },
   { icon: ShoppingBag, label: "Shop", path: "/shop" },
-  { icon: Users, label: "Leaderboard", path: "/leaderboard" },
+  { icon: Bot, label: "Naevv", path: "/naevv" },
 ];
 
 export const BottomNav = () => {

@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QuestProvider, useQuests } from "./contexts/QuestContext";
+import { NaevvProvider } from "./contexts/NaevvContext";
 import { InitialSurvey } from "./components/InitialSurvey";
 import { PersonalizationLoader } from "./components/PersonalizationLoader";
 import Home from "./pages/Home";
@@ -39,14 +40,16 @@ const AppContent = () => {
       {showLoader && <PersonalizationLoader onComplete={handleLoaderComplete} />}
       {hasCompletedSurvey && (
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Quests />} />
-            <Route path="/events" element={<Events />} />
-            <Route path="/shop" element={<Shop />} />
-            <Route path="/leaderboard" element={<LeaderboardPage />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <NaevvProvider>
+            <Routes>
+              <Route path="/" element={<Quests />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/shop" element={<Shop />} />
+              <Route path="/naevv" element={<LeaderboardPage />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </NaevvProvider>
         </BrowserRouter>
       )}
     </>
