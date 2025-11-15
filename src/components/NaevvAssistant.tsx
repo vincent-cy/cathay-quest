@@ -16,14 +16,16 @@ interface Message {
   timestamp: Date;
 }
 
-const OPENROUTER_API_KEY = "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";
-const OPENROUTER_MODEL = "qwen/qwen2.5-vl-32b-instruct:free";
+// OpenRouter API Configuration
+// Vite only exposes variables prefixed with VITE_ to client-side code
+// These must be set in .env file
+const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
+const OPENROUTER_MODEL = import.meta.env.VITE_OPENROUTER_MODEL || "qwen/qwen2.5-vl-32b-instruct:free";
 const OPENROUTER_API_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
 
-// // OpenRouter API Configuration
-// const OPENROUTER_API_KEY = import.meta.env.OPENROUTER_API_KEY;
-// const OPENROUTER_MODEL = import.meta.env.OPENROUTER_MODEL || "qwen/qwen3-235b-a22b:free";
-// const OPENROUTER_API_ENDPOINT = import.meta.env.OPENROUTER_API_ENDPOINT;
+if (!OPENROUTER_API_KEY) {
+  console.error("VITE_OPENROUTER_API_KEY is not set in environment variables. Please create a .env file with your API key.");
+}
 
 // Configurable Intent Detection System
 interface IntentPattern {
