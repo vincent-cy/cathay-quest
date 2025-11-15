@@ -20,6 +20,7 @@
     "timeLeft": "6h left",
     "location": "Any location",
     "qrEnabled": false,
+    "snapPhoto": true,
     "requirements": ["Recyclable items", "Designated recycling bin"],
     "verification": "Photo of recycling receipt"
   },
@@ -44,7 +45,8 @@
     "timeLeft": "5d left",
     "location": "Any Airport",
     "qrEnabled": false,
-    "requirements": ["Reusable water bottle", "Access to water fountains"],
+    "uploadPhoto": true,
+    "requirements": ["Reusable water bottle", "Access to water fountains", "Upload a photo"],
     "verification": "Self-reported with photo evidence"
   },
   {
@@ -55,9 +57,10 @@
     "type": "Weekly",
     "timeLeft": "7d left",
     "location": "Any destination",
-    "qrEnabled": true,
-    "requirements": ["Use public transport at destination", "Check-in via app"],
-    "verification": "QR code scan at transit station"
+    "qrEnabled": false,
+    "uploadPhoto": true,
+    "requirements": ["Use public transport at destination", "Upload screenshot of transaction (e.g., Octopus card)"],
+    "verification": "Upload photo of public transport transaction receipt"
   },
   {
     "id": "36",
@@ -74,14 +77,15 @@
   {
     "id": "38",
     "title": "Park Picnic",
-    "description": "Have a picnic at a local park and relax",
+    "description": "Have a picnic at a local park and relax for 1 hour",
     "reward": 20,
     "type": "Weekly",
     "timeLeft": "7d left",
     "location": "Any location",
-    "qrEnabled": true,
-    "requirements": ["Visit a designated park", "Check-in via app"],
-    "verification": "GPS location verification and photo"
+    "qrEnabled": false,
+    "gpsLocation": true,
+    "requirements": ["Visit a designated park", "Stay for 1 hour"],
+    "verification": "GPS location verification and automatic time tracking"
   },
   {
     "id": "39",
@@ -116,6 +120,7 @@
     "timeLeft": "7d left",
     "location": "Any destination",
     "qrEnabled": false,
+    "uploadPhoto": true,
     "requirements": ["Take 5 travel photos", "Submit via app"],
     "verification": "Photo gallery submission with geotags"
   },
@@ -128,7 +133,8 @@
     "timeLeft": "7d left",
     "location": "Any destination",
     "qrEnabled": false,
-    "requirements": ["Witness sunrise or sunset at scenic spot"],
+    "snapPhoto": true,
+    "requirements": ["Witness sunrise or sunset at scenic spot", "Snap a photo"],
     "verification": "Photo with timestamp verification"
   },
   {
@@ -164,6 +170,7 @@
     "timeLeft": "7d left",
     "location": "Any destination",
     "qrEnabled": false,
+    "snapPhoto": true,
     "requirements": ["Spend 2+ hours exploring at night"],
     "verification": "Geotagged photos from evening with timestamps"
   },
@@ -197,6 +204,7 @@
     "type": "In-Flight",
     "timeLeft": "During flight",
     "qrEnabled": false,
+    "freeQuest": true,
     "requirements": ["Follow the exercise guide on screen"],
     "verification": "Self-reported completion"
   },
@@ -252,6 +260,7 @@
     "type": "In-Flight",
     "timeLeft": "During flight",
     "qrEnabled": false,
+    "freeQuest": true,
     "requirements": ["Follow guided meditation audio on entertainment system"],
     "verification": "Session completion tracked"
   },
