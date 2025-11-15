@@ -1,12 +1,13 @@
-import { Home, Target, Trophy, ShoppingBag, Bot } from "lucide-react";
+import { Users, Trophy, ShoppingBag, Bot } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { EarnStarIcon } from "./EarnStarIcon";
 
 const navItems = [
-  { icon: Target, label: "Quests", path: "/", isCenter: true },
   { icon: Trophy, label: "Events", path: "/events" },
-  { icon: Home, label: "Profile", path: "/home" },
-  { icon: ShoppingBag, label: "Shop", path: "/shop" },
+  { icon: EarnStarIcon, label: "Earn", path: "/", isCenter: true },
   { icon: Bot, label: "Naevv", path: "/naevv" },
+  { icon: ShoppingBag, label: "Redeem", path: "/shop" },
+  { icon: Users, label: "Profile", path: "/home" },
 ];
 
 export const BottomNav = () => {
