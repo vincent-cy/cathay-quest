@@ -15,6 +15,7 @@ import Shop from "./pages/Shop";
 import AIAssistantPage from "./pages/AIAssistantPage";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import AdminSurveyResults from "./pages/AdminSurveyResults";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,15 @@ const AppContent = () => {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </NaevvProvider>
+          <Routes>
+            <Route path="/" element={<Quests />} />
+            <Route path="/events" element={<Events />} />
+            <Route path="/shop" element={<Shop />} />
+            <Route path="/leaderboard" element={<LeaderboardPage />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/admin/survey-results" element={<AdminSurveyResults />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </BrowserRouter>
       )}
     </>
