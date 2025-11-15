@@ -8,6 +8,7 @@ import { QuestProvider, useQuests } from "./contexts/QuestContext";
 import { NaevvProvider } from "./contexts/NaevvContext";
 import { InitialSurvey } from "./components/InitialSurvey";
 import { PersonalizationLoader } from "./components/PersonalizationLoader";
+import { LandingPage } from "./components/ui/LandingPage";
 import Home from "./pages/Home";
 import Quests from "./pages/Quests";
 import Events from "./pages/Events";
@@ -23,6 +24,11 @@ const AppContent = () => {
   const { hasCompletedSurvey, setHasCompletedSurvey, setUserPreferences } =
     useQuests();
   const [showLoader, setShowLoader] = useState(false);
+  const [showLandingPage, setShowLandingPage] = useState(true);
+
+  const handleGetStarted = () => {
+    setShowLandingPage(false);
+  };
 
   const handleSurveyComplete = (responses: Record<string, string>) => {
     setUserPreferences(responses);
@@ -36,7 +42,10 @@ const AppContent = () => {
 
   return (
     <>
-      {!hasCompletedSurvey && !showLoader && (
+      {showLandingPage && !hasCompletedSurvey && !showLoader && (
+        <LandingPage onGetStarted={handleGetStarted} />
+      )}
+      {!showLandingPage && !hasCompletedSurvey && !showLoader && (
         <InitialSurvey onComplete={handleSurveyComplete} />
       )}
       {showLoader && (

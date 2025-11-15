@@ -390,6 +390,16 @@ Please provide a helpful, accurate, and friendly response to the user's latest m
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         const errorMessage = errorData?.error?.message || errorData?.message || response.statusText;
+        
+        // Handle specific error codes
+        if (response.status === 502) {
+          throw new Error(`OpenRouter API is temporarily unavailable (502 Bad Gateway). Please try again in a moment.`);
+        } else if (response.status === 401 || response.status === 403) {
+          throw new Error(`OpenRouter API authentication failed. Please check your API key in the .env file.`);
+        } else if (response.status === 429) {
+          throw new Error(`OpenRouter API rate limit exceeded. Please wait a moment before trying again.`);
+        }
+        
         throw new Error(`OpenRouter API error: ${response.status} - ${errorMessage}`);
       }
 
