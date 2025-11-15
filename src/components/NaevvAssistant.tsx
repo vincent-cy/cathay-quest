@@ -19,11 +19,23 @@ const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
 const GEMINI_MODEL = import.meta.env.VITE_GEMINI_MODEL || "gemini-2.5-flash-lite";
 const CUSTOM_API_ENDPOINT = import.meta.env.VITE_NAEVV_API_URL;
 
+// Debug: Check if environment variables are loaded (remove in production)
+if (typeof window !== 'undefined') {
+  console.log('API_KEY loaded:', API_KEY ? 'YES (hidden)' : 'NO');
+  console.log('GEMINI_MODEL:', GEMINI_MODEL);
+  console.log('CUSTOM_API_ENDPOINT:', CUSTOM_API_ENDPOINT || 'Not set');
+}
+
 // Only construct Gemini endpoint if API key is available
 const GEMINI_API_ENDPOINT = API_KEY 
   ? `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${API_KEY}`
   : null;
 const API_ENDPOINT = CUSTOM_API_ENDPOINT || GEMINI_API_ENDPOINT;
+
+// Debug: Check final API endpoint
+if (typeof window !== 'undefined') {
+  console.log('API_ENDPOINT:', API_ENDPOINT ? 'Configured' : 'NOT CONFIGURED');
+}
 
 export const NaevvAssistant = () => {
   const [messages, setMessages] = useState<Message[]>([
