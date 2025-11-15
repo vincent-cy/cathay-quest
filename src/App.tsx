@@ -12,7 +12,7 @@ import Home from "./pages/Home";
 import Quests from "./pages/Quests";
 import Events from "./pages/Events";
 import Shop from "./pages/Shop";
-import LeaderboardPage from "./pages/LeaderboardPage";
+import AIAssistantPage from "./pages/AIAssistantPage";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
@@ -48,7 +48,7 @@ const AppContent = () => {
               <Route path="/" element={<Quests />} />
               <Route path="/events" element={<Events />} />
               <Route path="/shop" element={<Shop />} />
-              <Route path="/naevv" element={<LeaderboardPage />} />
+              <Route path="/naevv" element={<AIAssistantPage />} />
               <Route path="/home" element={<Home />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

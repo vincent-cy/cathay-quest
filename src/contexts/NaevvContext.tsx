@@ -1,35 +1,14 @@
-import { createContext, useContext, useState, useCallback } from "react";
-import {
-  isNaevvConfigured,
-  getNaevvConfig,
-  type NaevvConfig,
-} from "@/config/naevv.config";
+import { createContext, useContext } from "react";
 
 interface NaevvContextType {
-  isConfigured: boolean;
-  config: NaevvConfig;
-  refreshConfig: () => void;
+  // Context kept for future extensibility
 }
 
 const NaevvContext = createContext<NaevvContextType | undefined>(undefined);
 
 export const NaevvProvider = ({ children }: { children: React.ReactNode }) => {
-  const [isConfigured, setIsConfigured] = useState(isNaevvConfigured());
-  const [config, setConfig] = useState(getNaevvConfig());
-
-  const refreshConfig = useCallback(() => {
-    setConfig(getNaevvConfig());
-    setIsConfigured(isNaevvConfigured());
-  }, []);
-
   return (
-    <NaevvContext.Provider
-      value={{
-        isConfigured,
-        config,
-        refreshConfig,
-      }}
-    >
+    <NaevvContext.Provider value={{}}>
       {children}
     </NaevvContext.Provider>
   );

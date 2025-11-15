@@ -492,8 +492,15 @@ const Quests = () => {
   return (
     <div
       className={`min-h-screen pb-20 transition-all duration-700 ${
-        isInFlight ? "bg-primary" : "bg-background"
+        isInFlight ? "" : "bg-background"
       }`}
+      style={
+        isInFlight
+          ? {
+              backgroundColor: "hsl(174, 100%, 20%)",
+            }
+          : undefined
+      }
     >
       <header
         className={`p-6 border-b space-y-4 transition-all duration-700 ${
@@ -614,7 +621,11 @@ const Quests = () => {
           style={{
             transform: isInFlight ? "scale(1.02) translateY(-2px)" : "scale(1)",
           }}
-          onClick={() => setIsInFlight(!isInFlight)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsInFlight((prev) => !prev);
+          }}
         >
           <div className="flex items-center gap-4">
             <div
