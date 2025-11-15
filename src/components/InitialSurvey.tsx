@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Plane, Utensils, Camera, Leaf, Dumbbell, Music, BookOpen, MapPin, Heart, Calendar, Clock, AlertCircle, Sun, Moon, Compass, Accessibility, TrendingUp, Shield, Trophy, Globe, Wifi, Users as UsersIcon, Palette, Eye, Briefcase } from "lucide-react";
+import { saveSurveyToDynamoDB } from "@/utils/dynamoDBService";
 
 interface SurveyOption {
   id: string;
@@ -194,19 +195,22 @@ export const InitialSurvey = ({ onComplete }: InitialSurveyProps) => {
         completedAt: new Date().toLocaleString(),
       };
 
-      // Save to localStorage as fallback
+      // Save to localStorage as fallback (always do this first for offline support)
       const existingResults = JSON.parse(localStorage.getItem('surveyResults') || '[]');
       existingResults.push(surveyResult);
       localStorage.setItem('surveyResults', JSON.stringify(existingResults));
 
-      // Also attempt to save to a JSON file via API
-      fetch('/api/save-survey', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(surveyResult),
-      }).catch(() => {
-        // Silently fail if API not available, localStorage is backup
-        console.log('Survey saved to localStorage');
+      // Save directly to DynamoDB via API (real-time sync)
+      saveSurveyToDynamoDB(surveyResult).then((result) => {
+        if (result.success) {
+          console.log('Survey saved to DynamoDB:', result.message);
+        } else {
+          console.warn('Failed to save to DynamoDB (saved to localStorage):', result.message);
+          // Data is still in localStorage, can be synced later
+        }
+      }).catch((error) => {
+        console.error('Error saving to DynamoDB:', error);
+        // Data is still in localStorage, can be synced later
       });
 
       onComplete(responses);
