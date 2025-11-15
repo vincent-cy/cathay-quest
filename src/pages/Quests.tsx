@@ -762,7 +762,7 @@ const Quests = () => {
             {/* One-Time Quests */}
             <div className="space-y-3">
               <h2 className="text-xl font-bold text-foreground px-2">
-                One-Time Quests
+                Milestones
               </h2>
               {allOneTimeQuests.length > 0 ? (
                 <div className="space-y-3">
