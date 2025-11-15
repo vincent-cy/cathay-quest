@@ -2,7 +2,7 @@
  * DynamoDB Service - Utility functions for interacting with DynamoDB via API
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+const API_BASE_URL = 'http://localhost:5000';
 
 export interface SurveyResult {
   userId: string;
