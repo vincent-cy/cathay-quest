@@ -16,15 +16,14 @@ interface Message {
   timestamp: Date;
 }
 
-// Google Gemini API Configuration
-const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
-const GEMINI_MODEL = import.meta.env.VITE_GEMINI_MODEL || "gemini-2.5-flash-lite";
-const CUSTOM_API_ENDPOINT = import.meta.env.VITE_NAEVV_API_URL;
+const OPENROUTER_API_KEY = "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";
+const OPENROUTER_MODEL = "qwen/qwen2.5-vl-32b-instruct:free";
+const OPENROUTER_API_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
 
-const GEMINI_API_ENDPOINT = API_KEY 
-  ? `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${API_KEY}`
-  : null;
-const API_ENDPOINT = CUSTOM_API_ENDPOINT || GEMINI_API_ENDPOINT;
+// // OpenRouter API Configuration
+// const OPENROUTER_API_KEY = import.meta.env.OPENROUTER_API_KEY;
+// const OPENROUTER_MODEL = import.meta.env.OPENROUTER_MODEL || "qwen/qwen3-235b-a22b:free";
+// const OPENROUTER_API_ENDPOINT = import.meta.env.OPENROUTER_API_ENDPOINT;
 
 // Configurable Intent Detection System
 interface IntentPattern {
@@ -301,7 +300,7 @@ export const NaevvAssistant = () => {
   }, [messages, isLoading]);
 
   const callNaevvAPI = async (userMessage: string): Promise<string> => {
-    if (!API_ENDPOINT) {
+    if (!OPENROUTER_API_KEY) {
       const lowerMessage = userMessage.toLowerCase();
       
       if (lowerMessage.includes("quest") || lowerMessage.includes("recommend")) {
@@ -311,27 +310,23 @@ export const NaevvAssistant = () => {
       } else if (lowerMessage.includes("help") || lowerMessage.includes("how")) {
         return "I'm here to help! I can assist you with quest recommendations, explain how the points system works, guide you through the app features, and answer questions about Cathay Quest. What would you like to know?";
       } else {
-        return "Thanks for your message! The AI assistant is currently not configured. Please set up the VITE_GOOGLE_API_KEY or VITE_NAEVV_API_URL environment variable to enable full functionality. For now, feel free to explore the Quests, Shop, and Events sections of the app!";
+        return "Thanks for your message! The AI assistant is currently not configured. Please set up the OpenRouter API key to enable full functionality. For now, feel free to explore the Quests, Shop, and Events sections of the app!";
       }
     }
 
     try {
+      // Build conversation history in OpenRouter format
       const conversationHistory = messages.slice(1).map((msg) => ({
-        role: msg.sender === "user" ? "user" : "model",
-        parts: [{ text: msg.text }],
+        role: msg.sender === "user" ? "user" : "assistant",
+        content: msg.text,
       }));
 
       const requestBody = {
-        contents: [
-          ...conversationHistory,
+        model: OPENROUTER_MODEL,
+        messages: [
           {
-            role: "user",
-            parts: [{ text: userMessage }],
-          },
-        ],
-        systemInstruction: {
-          parts: [{ 
-            text: `You are Cathay Pacific's AI Travel Concierge, an expert in helping customers plan and optimize their travel experiences while staying within their specified budget constraints.
+            role: "system",
+            content: `You are Cathay Pacific's AI Travel Concierge, an expert in helping customers plan and optimize their travel experiences while staying within their specified budget constraints.
 
 PRIMARY ROLE
 DO NOT GO OUT OF CATHAY PACIFIC OR OUR ASSISTANT'S AUTHORITY.
@@ -352,58 +347,40 @@ MANDATORY DATA USAGE RULES:
 NEVER make up, guess, or estimate user data. ALWAYS use the exact information provided in the context above. If the context shows "0 active quests", say "0 active quests", not "you have some quests". If the context shows specific point amounts, use those exact amounts.
 
 CORE CAPABILITIES
-
 - Budget Analysis: Carefully analyze the user's stated budget and provide realistic travel options within those constraints
 - Flight Planning: Suggest optimal Cathay Pacific flight routes, timing, and fare classes that offer the best value
 - Multi-destination Itineraries: Create efficient multi-city itineraries using Cathay Pacific's extensive route network
 - Value Optimization: Identify cost-saving opportunities through strategic timing, package deals, and partner offers
 - Experience Planning: Recommend activities, dining, and accommodations that match both budget and travel preferences
 
-BUDGET PLANNING FRAMEWORK
-
-When users provide a budget, you will:
-
-1. Budget Breakdown Analysis:
-   - Allocate percentages to flights, accommodation, activities, and contingencies
-   - Suggest optimal spending distribution based on travel duration and destination
-   - Identify areas where splurging vs. saving makes the most impact
-
-2. Smart Cost Optimization:
-   - Recommend best booking windows for flights
-   - Suggest alternative airports or routes for cost savings
-   - Identify Cathay Pacific partner hotels and services for bundled savings
-   - Highlight seasonal promotions and Marco Polo member benefits
-
-3. Tiered Budget Scenarios:
-   - Provide multiple options at different price points within their budget
-   - Show trade-offs between cost and experience quality
-   - Suggest budget-stretching strategies for longer trips
-
-STRICT FORMATTING RULES:
-- USE markdown formatting (**bold**, *italic*, # headers, - bullets, etc.)
-- Use asterisks, underscores, or special symbols for formatting
+RESPONSE FORMAT:
 - Keep responses concise, friendly, and conversational
-- If you want to give a bullet point list, use the following format:
-  - Bullet point 1
-  - Bullet point 2
-  - Bullet point 3
-  - ...
-- Don't be shy to add emojis to make the response more engaging and friendly.
-- If you want to input a line break, please write down <br>. This is necessary for proper formatting. DO NOT FORGET THIS.
+- Use natural line breaks and paragraphs for readability
+- Feel free to use emojis to make the response more engaging and friendly
+- Provide clear, actionable advice
 
-This is the user input:
+USER CONTEXT:
 ${getUserContext()}
 
-Please provide a helpful, accurate, and friendly response to the user's latest message based on the above context.
-`
-          }],
-        },
+Please provide a helpful, accurate, and friendly response to the user's latest message based on the above context.`
+          },
+          ...conversationHistory,
+          {
+            role: "user",
+            content: userMessage,
+          },
+        ],
+        max_tokens: 2000,
+        temperature: 0.7,
       };
 
-      const response = await fetch(API_ENDPOINT, {
+      const response = await fetch(OPENROUTER_API_ENDPOINT, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+          "HTTP-Referer": window.location.origin,
+          "X-Title": "Cathay Quest",
         },
         body: JSON.stringify(requestBody),
       });
@@ -411,62 +388,41 @@ Please provide a helpful, accurate, and friendly response to the user's latest m
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         const errorMessage = errorData?.error?.message || errorData?.message || response.statusText;
-        
-        if (errorMessage.includes("location is not supported") || errorMessage.includes("FAILED_PRECONDITION")) {
-          throw new Error("GEO_RESTRICTION: Your API key has geographic restrictions. Please check your Google Cloud API key settings or use a VPN.");
-        }
-        
-        throw new Error(`API error: ${response.status} - ${errorMessage}`);
+        throw new Error(`OpenRouter API error: ${response.status} - ${errorMessage}`);
       }
 
       const data = await response.json();
       
       let responseText = "";
-      if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-        responseText = data.candidates[0].content.parts[0].text;
+      if (data.choices && data.choices[0] && data.choices[0].message) {
+        responseText = data.choices[0].message.content;
       } else {
-        responseText = data.response || data.message || "I apologize, but I couldn't process your request at this time.";
+        responseText = "I apologize, but I couldn't process your request at this time.";
       }
       
+      // Clean up response while preserving line breaks
       responseText = responseText
-        .replace(/\*\*(.*?)\*\*/g, '$1') // Remove **bold**
-        .replace(/\*(.*?)\*/g, '$1') // Remove *italic*
-        .replace(/`(.*?)`/g, '$1') // Remove code backticks
-        .replace(/\[(.*?)\]\(.*?\)/g, '$1') // Remove markdown links
-        // Clean up excessive line breaks but preserve paragraphs
-        .replace(/\n{4,}/g, '\n\n\n') // Maximum of 3 consecutive line breaks
+        .replace(/\*\*(.*?)\*\*/g, '$1')
+        .replace(/\*(.*?)\*/g, '$1')
+        .replace(/`(.*?)`/g, '$1')
+        .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+        .replace(/\n{4,}/g, '\n\n\n')
         .trim();
       
       return responseText;
     } catch (err) {
-      if (err instanceof Error && err.message.includes("GEO_RESTRICTION")) {
-        const lowerMessage = userMessage.toLowerCase();
-        
-        if (lowerMessage.includes("quest") || lowerMessage.includes("recommend")) {
-          return "I'd love to help you with quest recommendations! Based on your preferences, I suggest checking out the Weekly Quests section. You can find eco-friendly quests, in-flight activities, and achievement milestones. What type of quest interests you most?";
-        } else if (lowerMessage.includes("point") || lowerMessage.includes("reward")) {
-          return "Great question! You earn Cathay Points by completing quests. Each quest has different point rewards - Weekly quests typically give 10-30 points, while One-Time achievements can give up to 100 points. You can redeem your points in the Shop for vouchers and upgrades!";
-        } else if (lowerMessage.includes("help") || lowerMessage.includes("how")) {
-          return "I'm here to help! I can assist you with quest recommendations, explain how the points system works, guide you through the app features, and answer questions about Cathay Quest. What would you like to know?";
-        } else {
-          return "Thanks for your message! I'm here to help with quest recommendations, points information, and guide you through Cathay Quest. What would you like to know?";
-        }
-      }
+      // Fallback responses for API errors
+      const lowerMessage = userMessage.toLowerCase();
       
-      if (err instanceof TypeError && err.message.includes("Failed to fetch")) {
-        const lowerMessage = userMessage.toLowerCase();
-        
-        if (lowerMessage.includes("quest") || lowerMessage.includes("recommend")) {
-          return "I'd love to help you with quest recommendations! Based on your preferences, I suggest checking out the Weekly Quests section. You can find eco-friendly quests, in-flight activities, and achievement milestones. What type of quest interests you most?";
-        } else if (lowerMessage.includes("point") || lowerMessage.includes("reward")) {
-          return "Great question! You earn Cathay Points by completing quests. Each quest has different point rewards - Weekly quests typically give 10-30 points, while One-Time achievements can give up to 100 points. You can redeem your points in the Shop for vouchers and upgrades!";
-        } else if (lowerMessage.includes("help") || lowerMessage.includes("how")) {
-          return "I'm here to help! I can assist you with quest recommendations, explain how the points system works, guide you through the app features, and answer questions about Cathay Quest. What would you like to know?";
-        } else {
-          return "Thanks for your message! I'm currently in development mode. Once the API is connected, I'll be able to provide more personalized assistance. For now, feel free to explore the Quests, Shop, and Events sections of the app!";
-        }
+      if (lowerMessage.includes("quest") || lowerMessage.includes("recommend")) {
+        return "I'd love to help you with quest recommendations! Based on your preferences, I suggest checking out the Weekly Quests section. You can find eco-friendly quests, in-flight activities, and achievement milestones. What type of quest interests you most?";
+      } else if (lowerMessage.includes("point") || lowerMessage.includes("reward")) {
+        return "Great question! You earn Cathay Points by completing quests. Each quest has different point rewards - Weekly quests typically give 10-30 points, while One-Time achievements can give up to 100 points. You can redeem your points in the Shop for vouchers and upgrades!";
+      } else if (lowerMessage.includes("help") || lowerMessage.includes("how")) {
+        return "I'm here to help! I can assist you with quest recommendations, explain how the points system works, guide you through the app features, and answer questions about Cathay Quest. What would you like to know?";
+      } else {
+        return "Thanks for your message! I'm currently experiencing some technical difficulties. Please try again in a moment, or feel free to explore the Quests, Shop, and Events sections of the app!";
       }
-      throw err;
     }
   };
 
@@ -499,22 +455,16 @@ Please provide a helpful, accurate, and friendly response to the user's latest m
 
       setMessages((prev) => [...prev, naevvResponse]);
     } catch (err) {
-      if (
-        err instanceof Error && 
-        !err.message.includes("GEO_RESTRICTION") &&
-        !(err instanceof TypeError && err.message.includes("Failed to fetch"))
-      ) {
-        const errorMessage = err.message || "Failed to get response from Naevv";
-        setError(errorMessage);
+      const errorMessage = err instanceof Error ? err.message : "Failed to get response from Naevv";
+      setError(errorMessage);
 
-        const errorResponse: Message = {
-          id: (Date.now() + 1).toString(),
-          text: "I'm sorry, I encountered an error. Please try again in a moment.",
-          sender: "naevv",
-          timestamp: new Date(),
-        };
-        setMessages((prev) => [...prev, errorResponse]);
-      }
+      const errorResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        text: "I'm sorry, I encountered an error. Please try again in a moment.",
+        sender: "naevv",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorResponse]);
     } finally {
       setIsLoading(false);
     }
