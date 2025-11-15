@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import { BottomNav } from "@/components/BottomNav";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +10,7 @@ import { Coffee, Wifi, Luggage, Plane, Star, Award, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuests } from "@/contexts/QuestContext";
 
-interface ShopItem {
+export interface ShopItem {
   id: string;
   name: string;
   description: string;
@@ -19,7 +20,7 @@ interface ShopItem {
   availability: string;
 }
 
-const shopItems: ShopItem[] = [
+export const shopItems: ShopItem[] = [
   // In-Flight Perks
   {
     id: "snack-voucher",
@@ -127,9 +128,54 @@ const shopItems: ShopItem[] = [
 ];
 
 const Shop = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const highlightProductId = searchParams.get("highlight");
+  
   const [selectedItem, setSelectedItem] = useState<ShopItem | null>(null);
+  const [activeTab, setActiveTab] = useState<"inflight" | "travel" | "upgrades">("inflight");
+  const [highlightedItemId, setHighlightedItemId] = useState<string | null>(highlightProductId);
+  const itemRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  
   const { cathayPoints, deductCathayPoints, addVoucher } = useQuests();
   const { toast } = useToast();
+
+  // Handle highlighting product from URL parameter
+  useEffect(() => {
+    if (highlightProductId) {
+      const product = shopItems.find(item => item.id === highlightProductId);
+      if (product) {
+        setActiveTab(product.category);
+        setHighlightedItemId(highlightProductId);
+        
+        // Scroll to the highlighted item after a short delay
+        setTimeout(() => {
+          const itemElement = itemRefs.current[highlightProductId];
+          if (itemElement) {
+            itemElement.scrollIntoView({ behavior: "smooth", block: "center" });
+            // Optionally auto-open the dialog
+            setTimeout(() => {
+              setSelectedItem(product);
+            }, 500);
+          }
+        }, 300);
+        
+        // Remove highlight param from URL after processing
+        setTimeout(() => {
+          setSearchParams({}, { replace: true });
+        }, 1000);
+      }
+    }
+  }, [highlightProductId, setSearchParams]);
+
+  // Remove highlight after animation
+  useEffect(() => {
+    if (highlightedItemId) {
+      const timer = setTimeout(() => {
+        setHighlightedItemId(null);
+      }, 3000); // Keep highlight for 3 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [highlightedItemId]);
 
   const handleRedeem = (item: ShopItem) => {
     const success = deductCathayPoints(item.points);
@@ -175,7 +221,7 @@ const Shop = () => {
         <p className="text-sm text-muted-foreground">Redeem your Cathay Points for exclusive rewards</p>
       </header>
 
-      <Tabs defaultValue="inflight" className="p-4">
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)} className="p-4">
         <TabsList className="grid w-full grid-cols-3 mb-6">
           <TabsTrigger value="inflight">In-Flight</TabsTrigger>
           <TabsTrigger value="travel">Travel</TabsTrigger>
@@ -187,12 +233,18 @@ const Shop = () => {
           {getCategoryItems("inflight").map((item) => {
             const Icon = item.icon;
             const canAfford = cathayPoints >= item.points;
+            const isHighlighted = highlightedItemId === item.id;
             
             return (
               <Card
                 key={item.id}
+                ref={(el) => (itemRefs.current[item.id] = el)}
                 className={`p-4 cursor-pointer transition-all hover:shadow-card ${
                   !canAfford ? "opacity-60" : ""
+                } ${
+                  isHighlighted 
+                    ? "ring-2 ring-primary ring-offset-2 shadow-lg animate-pulse" 
+                    : ""
                 }`}
                 onClick={() => setSelectedItem(item)}
               >
@@ -223,12 +275,18 @@ const Shop = () => {
           {getCategoryItems("travel").map((item) => {
             const Icon = item.icon;
             const canAfford = cathayPoints >= item.points;
+            const isHighlighted = highlightedItemId === item.id;
             
             return (
               <Card
                 key={item.id}
+                ref={(el) => (itemRefs.current[item.id] = el)}
                 className={`p-4 cursor-pointer transition-all hover:shadow-card ${
                   !canAfford ? "opacity-60" : ""
+                } ${
+                  isHighlighted 
+                    ? "ring-2 ring-primary ring-offset-2 shadow-lg animate-pulse" 
+                    : ""
                 }`}
                 onClick={() => setSelectedItem(item)}
               >
@@ -259,12 +317,18 @@ const Shop = () => {
           {getCategoryItems("upgrades").map((item) => {
             const Icon = item.icon;
             const canAfford = cathayPoints >= item.points;
+            const isHighlighted = highlightedItemId === item.id;
             
             return (
               <Card
                 key={item.id}
+                ref={(el) => (itemRefs.current[item.id] = el)}
                 className={`p-4 cursor-pointer transition-all hover:shadow-card ${
                   !canAfford ? "opacity-60" : ""
+                } ${
+                  isHighlighted 
+                    ? "ring-2 ring-primary ring-offset-2 shadow-lg animate-pulse" 
+                    : ""
                 }`}
                 onClick={() => setSelectedItem(item)}
               >
