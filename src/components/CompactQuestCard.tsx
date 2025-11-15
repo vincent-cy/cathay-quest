@@ -616,7 +616,7 @@ export const CompactQuestCard = ({
 
             {completed && (
               <div className="pt-4 border-t border-border flex flex-col gap-2">
-                <div className="text-sm font-medium text-emerald-600">
+                <div className="text-sm font-medium text-emerald-700">
                   Quest completed
                 </div>
                 <div className="flex gap-2">
@@ -624,8 +624,8 @@ export const CompactQuestCard = ({
                     onClick={() => onNext?.()}
                     className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-all ${
                       isInFlight
-                        ? "bg-emerald-600/80 text-white hover:bg-emerald-600 border border-emerald-500/20"
-                        : "bg-emerald-600 text-white hover:bg-emerald-700"
+                        ? "bg-emerald-700 text-white hover:bg-emerald-700 border border-emerald-700"
+                        : "bg-emerald-700 text-white hover:bg-emerald-700"
                     }`}
                   >
                     Next Quest
@@ -795,7 +795,7 @@ export const CompactQuestCard = ({
             {/* Verified overlay shown briefly when a QR is detected */}
             {showVerified && (
               <div className="absolute inset-0 flex items-center justify-center p-6">
-                <div className="flex items-center gap-3 p-4 rounded-md bg-emerald-600/95 text-white shadow-lg">
+                <div className="flex items-center gap-3 p-4 rounded-md bg-emerald-700 text-white shadow-lg">
                   <Check className="w-6 h-6" />
                   <div>
                     <div className="font-semibold">Verified successfully</div>
