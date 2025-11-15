@@ -18,20 +18,108 @@ interface Message {
 
 // Google Gemini API Configuration
 const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
-// Available models: gemini-2.5-flash-lite (fastest), gemini-2.5-flash, gemini-2.5-pro, gemini-1.5-flash, gemini-1.5-pro
 const GEMINI_MODEL = import.meta.env.VITE_GEMINI_MODEL || "gemini-2.5-flash-lite";
 const CUSTOM_API_ENDPOINT = import.meta.env.VITE_NAEVV_API_URL;
 
-// Only construct Gemini endpoint if API key is available
 const GEMINI_API_ENDPOINT = API_KEY 
   ? `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${API_KEY}`
   : null;
 const API_ENDPOINT = CUSTOM_API_ENDPOINT || GEMINI_API_ENDPOINT;
 
+// Configurable Intent Detection System
+interface IntentPattern {
+  id: string;
+  keywords: string[];
+  requiredMatches?: number;
+  excludeKeywords?: string[];
+  confidenceThreshold?: number;
+  actionButton?: {
+    icon: React.ComponentType<any>;
+    label: string;
+    navigateTo: string;
+  };
+}
+
+interface DetectedIntent {
+  type: 'shop' | 'quest' | 'event' | 'none';
+  confidence: number;
+  specificProduct?: ShopItem | null;
+  metadata?: any;
+}
+
+// Easily configurable patterns - modify these without touching code logic
+const INTENT_PATTERNS: Record<string, IntentPattern> = {
+  shop: {
+    id: 'shop',
+    keywords: [
+      'shop', 'buy', 'purchase', 'redeem', 'voucher', 'reward', 
+      'points', 'item', 'product', 'cost', 'price', 'afford',
+      'available in shop', 'what can i get', 'rewards shop',
+      'exchange points', 'use my points', 'purchase with points'
+    ],
+    requiredMatches: 2,
+    excludeKeywords: ['quest', 'event', 'activity'],
+    confidenceThreshold: 0.5,
+    actionButton: {
+      icon: ShoppingBag,
+      label: 'View Shop',
+      navigateTo: '/shop'
+    }
+  },
+  quest: {
+    id: 'quest',
+    keywords: [
+      'quest', 'mission', 'task', 'challenge', 'achievement',
+      'complete', 'accept', 'active quest', 'weekly quest',
+      'progress', 'milestone', 'objective', 'goal',
+      'recommend quest', 'find quest', 'available quest'
+    ],
+    requiredMatches: 2,
+    excludeKeywords: ['shop', 'buy', 'event'],
+    confidenceThreshold: 0.5,
+    actionButton: {
+      icon: Target,
+      label: 'View Quests',
+      navigateTo: '/'
+    }
+  },
+  event: {
+    id: 'event',
+    keywords: [
+      'event', 'activity', 'happening', 'schedule', 'calendar',
+      'upcoming', 'join', 'participate', 'special event',
+      'limited time', 'exclusive', 'current event',
+      'what events', 'find events', 'event recommendation'
+    ],
+    requiredMatches: 2,
+    excludeKeywords: ['shop', 'quest'],
+    confidenceThreshold: 0.5,
+    actionButton: {
+      icon: Calendar,
+      label: 'View Events',
+      navigateTo: '/events'
+    }
+  }
+};
+
+// Enhanced product detection with fuzzy matching
+const PRODUCT_SYNONYMS: Record<string, string[]> = {
+  'snack-voucher': ['snack box', 'premium snack', 'snack voucher', 'snacks', 'food box', 'snack pack'],
+  'wifi-pass': ['wifi pass', 'wifi', 'wi-fi pass', 'one hour wifi', 'internet', 'wifi access'],
+  'wifi-full': ['full flight wifi', 'unlimited wifi', 'complete wifi', 'entire flight wifi'],
+  'meal-voucher': ['meal voucher', 'complimentary meal', 'free meal', 'food voucher', 'dining voucher'],
+  'priority-checkin': ['priority check', 'priority check-in', 'check-in', 'fast check-in'],
+  'baggage-voucher': ['baggage', 'extra baggage', 'checked bag', 'luggage', 'baggage allowance'],
+  'asia-miles-500': ['500 miles', '500 asia miles', 'five hundred miles'],
+  'asia-miles-1000': ['1000 miles', '1,000 miles', '1000 asia miles', 'thousand miles'],
+  'seat-selection': ['seat selection', 'preferred seat', 'choose seat', 'seat choice', 'select seat'],
+  'lounge-pass': ['lounge pass', 'lounge day pass', 'lounge access', 'airport lounge'],
+  'upgrade-voucher': ['upgrade voucher', 'upgrade', 'premium economy', 'economy upgrade', 'class upgrade']
+};
+
 export const NaevvAssistant = () => {
   const navigate = useNavigate();
   
-  // Get user data from QuestContext
   const { 
     cathayPoints, 
     acceptedQuests, 
@@ -52,176 +140,98 @@ export const NaevvAssistant = () => {
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Function to find a specific product mentioned in the conversation
+  // Flexible intent detection using configurable patterns
+  const detectIntent = (
+    naevvResponse: string, 
+    userQuestion?: string
+  ): DetectedIntent => {
+    const combinedText = `${userQuestion || ''} ${naevvResponse}`.toLowerCase();
+    
+    let bestIntent: DetectedIntent = { type: 'none', confidence: 0 };
+    const words = combinedText.split(/\s+/);
+
+    // Check each intent pattern
+    Object.entries(INTENT_PATTERNS).forEach(([intentType, pattern]) => {
+      let matches = 0;
+      
+      // Count keyword matches
+      pattern.keywords.forEach(keyword => {
+        if (combinedText.includes(keyword)) {
+          matches++;
+        }
+      });
+      
+      // Check for exclusion (negative matches)
+      let exclusions = 0;
+      pattern.excludeKeywords?.forEach(excludeWord => {
+        if (combinedText.includes(excludeWord)) {
+          exclusions++;
+        }
+      });
+      
+      // Calculate confidence score
+      let confidence = matches / Math.max(pattern.keywords.length, 1);
+      
+      // Penalize for exclusion matches
+      if (exclusions > 0) {
+        confidence *= 0.3;
+      }
+      
+      // Boost confidence if we meet required matches
+      if (matches >= (pattern.requiredMatches || 1)) {
+        confidence *= 1.5;
+      }
+      
+      // Normalize confidence
+      confidence = Math.min(confidence, 1);
+      
+      // Update best intent if this one is better
+      if (confidence > bestIntent.confidence && confidence >= (pattern.confidenceThreshold || 0.3)) {
+        bestIntent = {
+          type: intentType as 'shop' | 'quest' | 'event',
+          confidence,
+          specificProduct: intentType === 'shop' ? findMentionedProduct(combinedText) : null
+        };
+      }
+    });
+
+    return bestIntent;
+  };
+
+  // Enhanced product detection with fuzzy matching
   const findMentionedProduct = (text: string): ShopItem | null => {
     const lowerText = text.toLowerCase();
     
-    // Match product names (case-insensitive, partial matches)
+    // First, try exact product name matches
     for (const item of shopItems) {
       const itemNameLower = item.name.toLowerCase();
-      // Check for exact product name matches or key words from product name
       if (lowerText.includes(itemNameLower)) {
         return item;
       }
+    }
+    
+    // Then try synonym matching
+    for (const item of shopItems) {
+      const synonyms = PRODUCT_SYNONYMS[item.id] || [];
+      const foundSynonym = synonyms.some(synonym => lowerText.includes(synonym.toLowerCase()));
       
-      // Also check for common aliases/variations
-      const nameWords = itemNameLower.split(' ');
-      if (nameWords.length > 1) {
-        // Check if multiple words from product name appear
-        const wordMatches = nameWords.filter(word => 
-          word.length > 3 && lowerText.includes(word)
-        );
-        if (wordMatches.length >= 2) {
-          return item;
-        }
+      if (foundSynonym) {
+        return item;
       }
+    }
+    
+    // Finally, try partial word matching for longer product names
+    for (const item of shopItems) {
+      const nameWords = item.name.toLowerCase().split(' ').filter(word => word.length > 3);
+      const wordMatches = nameWords.filter(word => lowerText.includes(word));
       
-      // Check for specific keywords that match products
-      const keywords: { [key: string]: string[] } = {
-        'snack-voucher': ['snack box', 'premium snack', 'snack voucher'],
-        'wifi-pass': ['wifi pass', 'wifi', 'wi-fi pass', 'one hour wifi'],
-        'wifi-full': ['full flight wifi', 'unlimited wifi', 'complete wifi'],
-        'meal-voucher': ['meal voucher', 'complimentary meal', 'free meal'],
-        'priority-checkin': ['priority check', 'priority check-in', 'check-in'],
-        'baggage-voucher': ['baggage', 'extra baggage', 'checked bag', 'luggage'],
-        'asia-miles-500': ['500 miles', '500 asia miles'],
-        'asia-miles-1000': ['1000 miles', '1,000 miles', '1000 asia miles'],
-        'seat-selection': ['seat selection', 'preferred seat', 'choose seat', 'seat choice'],
-        'lounge-pass': ['lounge pass', 'lounge day pass', 'lounge access'],
-        'upgrade-voucher': ['upgrade voucher', 'upgrade', 'premium economy', 'economy upgrade']
-      };
-      
-      if (keywords[item.id]) {
-        const foundKeyword = keywords[item.id].some(keyword => lowerText.includes(keyword));
-        if (foundKeyword) {
-          return item;
-        }
+      // If majority of important words match, consider it a match
+      if (wordMatches.length >= Math.max(1, nameWords.length / 2)) {
+        return item;
       }
     }
     
     return null;
-  };
-
-  // Function to detect if the conversation is about shop products
-  const isShopRelated = (naevvResponse: string, userQuestion?: string): ShopItem | null => {
-    const lowerResponse = naevvResponse.toLowerCase();
-    const lowerQuestion = userQuestion?.toLowerCase() || '';
-    const combinedText = `${lowerQuestion} ${lowerResponse}`;
-    
-    // First check if a specific product is mentioned
-    const mentionedProduct = findMentionedProduct(combinedText);
-    if (mentionedProduct) {
-      return mentionedProduct;
-    }
-    
-    // Strong shop intent indicators - these phrases suggest clear shop interest
-    const strongShopPatterns = [
-      'reward shop', 'rewards shop', 'visit the shop', 'go to the shop',
-      'what can i buy', 'what can you buy', 'what items', 'what products',
-      'redeem points', 'redeem your points', 'use your points',
-      'shop items', 'available shop', 'affordable items', 'can redeem',
-      'available in the shop', 'check out the shop', 'browse the shop',
-      'shop for', 'buy with points', 'purchase with points'
-    ];
-    
-    // Check for strong shop intent in either user question or response
-    const hasStrongIntent = strongShopPatterns.some(pattern => 
-      lowerQuestion.includes(pattern) || lowerResponse.includes(pattern)
-    );
-    
-    if (hasStrongIntent) {
-      return null; // Shop related but no specific product
-    }
-    
-    // Multiple keywords suggesting shop context (need at least 2)
-    const shopKeywords = ['shop', 'product', 'item', 'buy', 'purchase', 'redeem', 'voucher'];
-    const keywordCount = shopKeywords.filter(keyword => 
-      lowerResponse.includes(keyword) || lowerQuestion.includes(keyword)
-    ).length;
-    
-    // Only show if multiple keywords AND the response actually mentions shop/redeem/buy context
-    const mentionsShopAction = lowerResponse.includes('shop') || 
-                               lowerResponse.includes('redeem') ||
-                               lowerResponse.includes('buy') ||
-                               lowerResponse.includes('purchase');
-    
-    if (keywordCount >= 2 && mentionsShopAction) {
-      return null; // Shop related but no specific product
-    }
-    
-    return null; // Not shop related
-  };
-
-  // Function to detect if the conversation is about quests
-  const isQuestRelated = (naevvResponse: string, userQuestion?: string): boolean => {
-    const lowerResponse = naevvResponse.toLowerCase();
-    const lowerQuestion = userQuestion?.toLowerCase() || '';
-    
-    // Strong quest intent indicators
-    const strongQuestPatterns = [
-      'quest', 'quests', 'available quest', 'active quest', 'weekly quest',
-      'recommend quest', 'quest recommendation', 'what quest', 'new quest',
-      'complete quest', 'accept quest', 'find quest', 'discover quest',
-      'quest section', 'quest page', 'go to quest', 'check quest',
-      'achievement', 'milestone', 'challenge'
-    ];
-    
-    // Check for strong quest intent in either user question or response
-    const hasStrongIntent = strongQuestPatterns.some(pattern => 
-      lowerQuestion.includes(pattern) || lowerResponse.includes(pattern)
-    );
-    
-    if (hasStrongIntent) return true;
-    
-    // Multiple keywords suggesting quest context (need at least 2)
-    const questKeywords = ['quest', 'challenge', 'task', 'mission', 'achievement', 'milestone', 'complete'];
-    const keywordCount = questKeywords.filter(keyword => 
-      lowerResponse.includes(keyword) || lowerQuestion.includes(keyword)
-    ).length;
-    
-    // Only show if multiple keywords AND the response actually mentions quest context
-    const mentionsQuestAction = lowerResponse.includes('quest') || 
-                               lowerResponse.includes('challenge') ||
-                               lowerResponse.includes('achievement') ||
-                               lowerResponse.includes('complete');
-    
-    return keywordCount >= 2 && mentionsQuestAction;
-  };
-
-  // Function to detect if the conversation is about events
-  const isEventRelated = (naevvResponse: string, userQuestion?: string): boolean => {
-    const lowerResponse = naevvResponse.toLowerCase();
-    const lowerQuestion = userQuestion?.toLowerCase() || '';
-    
-    // Strong event intent indicators
-    const strongEventPatterns = [
-      'event', 'events', 'upcoming event', 'available event', 'current event',
-      'what event', 'new event', 'join event', 'participate event',
-      'event section', 'event page', 'go to event', 'check event',
-      'special event', 'exclusive event', 'limited event', 'find event',
-      'discover event', 'event calendar', 'event schedule'
-    ];
-    
-    // Check for strong event intent in either user question or response
-    const hasStrongIntent = strongEventPatterns.some(pattern => 
-      lowerQuestion.includes(pattern) || lowerResponse.includes(pattern)
-    );
-    
-    if (hasStrongIntent) return true;
-    
-    // Multiple keywords suggesting event context (need at least 2)
-    const eventKeywords = ['event', 'events', 'activity', 'activities', 'happening', 'schedule', 'calendar'];
-    const keywordCount = eventKeywords.filter(keyword => 
-      lowerResponse.includes(keyword) || lowerQuestion.includes(keyword)
-    ).length;
-    
-    // Only show if multiple keywords AND the response actually mentions event context
-    const mentionsEventAction = lowerResponse.includes('event') || 
-                               lowerResponse.includes('activity') ||
-                               lowerResponse.includes('happening') ||
-                               lowerResponse.includes('schedule');
-    
-    return keywordCount >= 2 && mentionsEventAction;
   };
 
   // Function to build user context information for the LLM
@@ -291,9 +301,7 @@ export const NaevvAssistant = () => {
   }, [messages, isLoading]);
 
   const callNaevvAPI = async (userMessage: string): Promise<string> => {
-    // Check if API endpoint is configured
     if (!API_ENDPOINT) {
-      // No API configured - provide helpful fallback response
       const lowerMessage = userMessage.toLowerCase();
       
       if (lowerMessage.includes("quest") || lowerMessage.includes("recommend")) {
@@ -308,7 +316,6 @@ export const NaevvAssistant = () => {
     }
 
     try {
-      // Build conversation context for Gemini API
       const conversationHistory = messages.slice(1).map((msg) => ({
         role: msg.sender === "user" ? "user" : "model",
         parts: [{ text: msg.text }],
@@ -382,6 +389,7 @@ STRICT FORMATTING RULES:
   - Bullet point 3
   - ...
 - Don't be shy to add emojis to make the response more engaging and friendly.
+- If you want to input a line break, please write down <br>. This is necessary for proper formatting. DO NOT FORGET THIS.
 
 This is the user input:
 ${getUserContext()}
@@ -404,7 +412,6 @@ Please provide a helpful, accurate, and friendly response to the user's latest m
         const errorData = await response.json().catch(() => ({}));
         const errorMessage = errorData?.error?.message || errorData?.message || response.statusText;
         
-        // Handle specific error cases
         if (errorMessage.includes("location is not supported") || errorMessage.includes("FAILED_PRECONDITION")) {
           throw new Error("GEO_RESTRICTION: Your API key has geographic restrictions. Please check your Google Cloud API key settings or use a VPN.");
         }
@@ -414,7 +421,6 @@ Please provide a helpful, accurate, and friendly response to the user's latest m
 
       const data = await response.json();
       
-      // Extract response from Gemini API format
       let responseText = "";
       if (data.candidates && data.candidates[0] && data.candidates[0].content) {
         responseText = data.candidates[0].content.parts[0].text;
@@ -422,23 +428,18 @@ Please provide a helpful, accurate, and friendly response to the user's latest m
         responseText = data.response || data.message || "I apologize, but I couldn't process your request at this time.";
       }
       
-      // Clean markdown formatting from response
       responseText = responseText
         .replace(/\*\*(.*?)\*\*/g, '$1') // Remove **bold**
         .replace(/\*(.*?)\*/g, '$1') // Remove *italic*
-        .replace(/#{1,6}\s+/g, '') // Remove headers
         .replace(/`(.*?)`/g, '$1') // Remove code backticks
         .replace(/\[(.*?)\]\(.*?\)/g, '$1') // Remove markdown links
-        .replace(/^\s*[-*+]\s+/gm, '') // Remove bullet points
-        .replace(/^\s*\d+\.\s+/gm, '') // Remove numbered lists
-        .replace(/\n{3,}/g, '\n\n') // Remove excessive line breaks
+        // Clean up excessive line breaks but preserve paragraphs
+        .replace(/\n{4,}/g, '\n\n\n') // Maximum of 3 consecutive line breaks
         .trim();
       
       return responseText;
     } catch (err) {
-      // Handle geographic restriction errors
       if (err instanceof Error && err.message.includes("GEO_RESTRICTION")) {
-        // Provide helpful fallback response for geo-restricted API
         const lowerMessage = userMessage.toLowerCase();
         
         if (lowerMessage.includes("quest") || lowerMessage.includes("recommend")) {
@@ -452,9 +453,7 @@ Please provide a helpful, accurate, and friendly response to the user's latest m
         }
       }
       
-      // If API is not available, provide a helpful fallback response
       if (err instanceof TypeError && err.message.includes("Failed to fetch")) {
-        // API server is not running - provide a helpful response
         const lowerMessage = userMessage.toLowerCase();
         
         if (lowerMessage.includes("quest") || lowerMessage.includes("recommend")) {
@@ -478,7 +477,6 @@ Please provide a helpful, accurate, and friendly response to the user's latest m
     setInputValue("");
     setError(null);
 
-    // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
       text: userMessageText,
@@ -490,10 +488,8 @@ Please provide a helpful, accurate, and friendly response to the user's latest m
     setIsLoading(true);
 
     try {
-      // Call the API
       const responseText = await callNaevvAPI(userMessageText);
 
-      // Add Naevv response
       const naevvResponse: Message = {
         id: (Date.now() + 1).toString(),
         text: responseText,
@@ -503,8 +499,6 @@ Please provide a helpful, accurate, and friendly response to the user's latest m
 
       setMessages((prev) => [...prev, naevvResponse]);
     } catch (err) {
-      // Handle errors - fallback responses are already handled in callNaevvAPI
-      // Only show error alert for unexpected errors (not geo-restriction or network errors)
       if (
         err instanceof Error && 
         !err.message.includes("GEO_RESTRICTION") &&
@@ -513,7 +507,6 @@ Please provide a helpful, accurate, and friendly response to the user's latest m
         const errorMessage = err.message || "Failed to get response from Naevv";
         setError(errorMessage);
 
-        // Add error message to chat for unexpected errors
         const errorResponse: Message = {
           id: (Date.now() + 1).toString(),
           text: "I'm sorry, I encountered an error. Please try again in a moment.",
@@ -522,7 +515,6 @@ Please provide a helpful, accurate, and friendly response to the user's latest m
         };
         setMessages((prev) => [...prev, errorResponse]);
       }
-      // For geo-restriction and network errors, the fallback response is already returned from callNaevvAPI
     } finally {
       setIsLoading(false);
     }
@@ -559,10 +551,14 @@ Please provide a helpful, accurate, and friendly response to the user's latest m
       <ScrollArea className="h-[calc(100vh-250px)]">
         <div className="p-4 space-y-4">
           {messages.map((message, index) => {
-            // Find the corresponding user question for this Naevv response
             const userQuestion = message.sender === "naevv" && index > 0
               ? messages[index - 1]?.sender === "user" ? messages[index - 1].text : undefined
               : undefined;
+            
+            // Use the flexible intent detection
+            const detectedIntent = message.sender === "naevv" 
+              ? detectIntent(message.text, userQuestion)
+              : { type: 'none' as const, confidence: 0 };
             
             return (
               <div key={message.id}>
@@ -578,7 +574,7 @@ Please provide a helpful, accurate, and friendly response to the user's latest m
                         : "bg-muted text-foreground rounded-bl-none"
                     }`}
                   >
-                    <p className="text-sm">{message.text}</p>
+                    <p className="text-sm whitespace-pre-wrap">{message.text}</p>
                     <span className="text-xs opacity-70 mt-1 block">
                       {message.timestamp.toLocaleTimeString([], {
                         hour: "2-digit",
@@ -587,45 +583,34 @@ Please provide a helpful, accurate, and friendly response to the user's latest m
                     </span>
                   </div>
                 </div>
-                {message.sender === "naevv" && (
+                {message.sender === "naevv" && detectedIntent.type !== 'none' && (
                   <div className="flex justify-start mt-2 mb-2 gap-2 flex-wrap">
-                    {(() => {
-                      const shopProduct = isShopRelated(message.text, userQuestion);
-                      if (shopProduct) {
-                        return (
-                          <Button
-                            onClick={() => navigate(`/shop?highlight=${shopProduct.id}`)}
-                            variant="default"
-                            size="sm"
-                            className="gap-2"
-                          >
-                            <ShoppingBag className="w-4 h-4" />
-                            View {shopProduct.name}
-                          </Button>
-                        );
-                      }
-                      return null;
-                    })()}
-                    {isQuestRelated(message.text, userQuestion) && (
+                    {/* Specific product button */}
+                    {detectedIntent.specificProduct && (
                       <Button
-                        onClick={() => navigate("/")}
+                        onClick={() => navigate(`/shop?highlight=${detectedIntent.specificProduct!.id}`)}
                         variant="default"
                         size="sm"
                         className="gap-2"
                       >
-                        <Target className="w-4 h-4" />
-                        View Quests
+                        <ShoppingBag className="w-4 h-4" />
+                        View {detectedIntent.specificProduct.name}
                       </Button>
                     )}
-                    {isEventRelated(message.text, userQuestion) && (
+                    
+                    {/* General intent button */}
+                    {!detectedIntent.specificProduct && INTENT_PATTERNS[detectedIntent.type]?.actionButton && (
                       <Button
-                        onClick={() => navigate("/events")}
+                        onClick={() => navigate(INTENT_PATTERNS[detectedIntent.type].actionButton!.navigateTo)}
                         variant="default"
                         size="sm"
                         className="gap-2"
                       >
-                        <Calendar className="w-4 h-4" />
-                        View Events
+                        {(() => {
+                          const IconComponent = INTENT_PATTERNS[detectedIntent.type].actionButton!.icon;
+                          return <IconComponent className="w-4 h-4" />;
+                        })()}
+                        {INTENT_PATTERNS[detectedIntent.type].actionButton!.label}
                       </Button>
                     )}
                   </div>
@@ -671,7 +656,6 @@ Please provide a helpful, accurate, and friendly response to the user's latest m
           </div>
         </Card>
       </div>
-
     </div>
   );
 };
