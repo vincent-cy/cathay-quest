@@ -53,6 +53,7 @@ interface Quest {
   qrEnabled: boolean;
   requirements: string[];
   verification: string;
+  progress?: number;
 }
 
 interface CompactQuestCardProps {
@@ -230,21 +231,22 @@ export const CompactQuestCard = ({
                 "filter 250ms ease, opacity 250ms ease, transform 200ms ease",
             }}
           >
-            {/* duplicated next card content (unchanged) */}
+            {/* duplicated next card content (simplified) */}
             <div className="flex gap-4 p-4">
               <div
                 className={`${
                   isInFlight ? "bg-white/20 border border-white/30" : "bg-muted"
                 } w-16 h-16 flex-shrink-0 rounded-lg flex items-center justify-center`}
               >
-                {NextQuestIcon ? (
+                {NextQuestIcon && (
                   <NextQuestIcon
                     className={`w-8 h-8 ${
                       isInFlight ? "text-white/80" : "text-muted-foreground"
                     }`}
                   />
-                ) : null}
+                )}
               </div>
+
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <h3
@@ -371,40 +373,88 @@ export const CompactQuestCard = ({
                 Show more
               </button>
             )}
-            {!isExpanded && (
-              <div className="flex items-center gap-4 text-xs">
-                <div className="flex items-center gap-1">
-                  <Clock
-                    className={`w-3 h-3 ${
-                      isInFlight ? "text-white/70" : "text-muted-foreground"
-                    }`}
-                  />
-                  <span
-                    className={
-                      isInFlight ? "text-white/70" : "text-muted-foreground"
-                    }
-                  >
-                    {quest.timeLeft}
-                  </span>
-                </div>
-                {quest.location && (
-                  <div className="flex items-center gap-1">
-                    <MapPin
-                      className={`w-3 h-3 ${
-                        isInFlight ? "text-white/70" : "text-muted-foreground"
-                      }`}
-                    />
-                    <span
-                      className={`line-clamp-1 ${
-                        isInFlight ? "text-white/70" : "text-muted-foreground"
-                      }`}
-                    >
-                      {quest.location}
-                    </span>
+            {!isExpanded &&
+              (() => {
+                const hasProgress = typeof quest.progress === "number";
+
+                if (hasProgress) {
+                  return (
+                    <div className="flex items-center gap-3 text-xs">
+                      <div className="flex-1">
+                        <div
+                          className={`text-xs mb-1 ${
+                            isInFlight
+                              ? "text-white/70"
+                              : "text-muted-foreground"
+                          }`}
+                        >
+                          Progress
+                        </div>
+                        <div
+                          className={`w-full h-2 rounded-full ${
+                            isInFlight ? "bg-white/10" : "bg-muted"
+                          }`}
+                        >
+                          <div
+                            className={`${
+                              isInFlight ? "bg-secondary" : "bg-emerald-700"
+                            } h-2 rounded-full`}
+                            style={{ width: `${quest.progress}%` }}
+                          />
+                        </div>
+                      </div>
+                      <div
+                        className={`w-12 text-right ${
+                          isInFlight
+                            ? "text-white/80 font-medium"
+                            : "text-foreground font-medium"
+                        }`}
+                      >
+                        {quest.progress}%
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="flex items-center gap-4 text-xs">
+                    <div className="flex items-center gap-1">
+                      <Clock
+                        className={`w-3 h-3 ${
+                          isInFlight ? "text-white/70" : "text-muted-foreground"
+                        }`}
+                      />
+                      <span
+                        className={
+                          isInFlight ? "text-white/70" : "text-muted-foreground"
+                        }
+                      >
+                        {quest.timeLeft}
+                      </span>
+                    </div>
+                    {quest.location && (
+                      <div className="flex items-center gap-1">
+                        <MapPin
+                          className={`w-3 h-3 ${
+                            isInFlight
+                              ? "text-white/70"
+                              : "text-muted-foreground"
+                          }`}
+                        />
+                        <span
+                          className={`line-clamp-1 ${
+                            isInFlight
+                              ? "text-white/70"
+                              : "text-muted-foreground"
+                          }`}
+                        >
+                          {quest.location}
+                        </span>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            )}
+                );
+              })()}
           </div>
 
           {/* Expand Icon */}
@@ -432,39 +482,82 @@ export const CompactQuestCard = ({
               isInFlight ? "border-white/20" : "border-border"
             }`}
           >
-            {/* Time and Location */}
-            <div className="flex items-center gap-4 text-sm pt-4">
-              <div className="flex items-center gap-1">
-                <Clock
-                  className={`w-4 h-4 ${
-                    isInFlight ? "text-white/70" : "text-muted-foreground"
-                  }`}
-                />
-                <span
-                  className={
-                    isInFlight ? "text-white/80" : "text-muted-foreground"
-                  }
-                >
-                  {quest.timeLeft}
-                </span>
-              </div>
-              {quest.location && (
-                <div className="flex items-center gap-1">
-                  <MapPin
-                    className={`w-4 h-4 ${
-                      isInFlight ? "text-white/70" : "text-muted-foreground"
-                    }`}
-                  />
-                  <span
-                    className={
-                      isInFlight ? "text-white/80" : "text-muted-foreground"
-                    }
-                  >
-                    {quest.location}
-                  </span>
+            {/* Progress bar (only for milestone quests) or Time & Location */}
+            {(() => {
+              const isMilestone =
+                quest.type === "Milestone" ||
+                (quest.title.includes("Complete") &&
+                  quest.title.includes("Quests"));
+
+              if (typeof quest.progress === "number") {
+                return (
+                  <div className="pt-4">
+                    <div
+                      className={`text-sm mb-2 ${
+                        isInFlight ? "text-white/70" : "text-muted-foreground"
+                      }`}
+                    >
+                      Progress
+                    </div>
+                    <div
+                      className={`w-full h-3 rounded-full ${
+                        isInFlight ? "bg-white/10" : "bg-muted"
+                      }`}
+                    >
+                      <div
+                        className={`h-3 rounded-full`}
+                        style={{
+                          width: `${quest.progress}%`,
+                          backgroundColor: "hsl(var(--foreground))",
+                        }}
+                      />
+                    </div>
+                    <div
+                      className={`text-xs mt-1 ${
+                        isInFlight ? "text-white/80" : "text-muted-foreground"
+                      }`}
+                    >
+                      {quest.progress}% complete
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
+                <div className="flex items-center gap-4 text-sm pt-4">
+                  <div className="flex items-center gap-1">
+                    <Clock
+                      className={`w-4 h-4 ${
+                        isInFlight ? "text-white/70" : "text-muted-foreground"
+                      }`}
+                    />
+                    <span
+                      className={
+                        isInFlight ? "text-white/80" : "text-muted-foreground"
+                      }
+                    >
+                      {quest.timeLeft}
+                    </span>
+                  </div>
+                  {quest.location && (
+                    <div className="flex items-center gap-1">
+                      <MapPin
+                        className={`w-4 h-4 ${
+                          isInFlight ? "text-white/70" : "text-muted-foreground"
+                        }`}
+                      />
+                      <span
+                        className={
+                          isInFlight ? "text-white/80" : "text-muted-foreground"
+                        }
+                      >
+                        {quest.location}
+                      </span>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              );
+            })()}
 
             {/* Requirements */}
             <div>
@@ -638,7 +731,10 @@ export const CompactQuestCard = ({
 
                 {/* green centered square viewfinder */}
                 <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                  <div className="qr-viewfinder w-48 h-48 border-2 border-emerald-500/90" />
+                  <div
+                    className="qr-viewfinder w-48 h-48 border-2"
+                    style={{ borderColor: "hsl(var(--foreground) / 0.9)" }}
+                  />
                 </div>
               </div>
             ) : (
