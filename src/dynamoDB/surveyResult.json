@@ -1,0 +1,144 @@
+[
+  {
+    "userId": "USER_1763199058484",
+    "userName": "Guest User",
+    "email": "user@example.com",
+    "timestamp": "2025-11-15T09:30:58.484Z",
+    "responses": {
+      "travel": [
+        "adventure"
+      ],
+      "sustainability": "neutral",
+      "activities": [
+        "reading"
+      ],
+      "frequency": "rare",
+      "tripDuration": "weekend",
+      "accessibility": [
+        "none"
+      ],
+      "rewards": [
+        "global"
+      ],
+      "groupTravel": "family"
+    },
+    "completedAt": "15/11/2025, 17:30:58"
+  },
+  {
+    "userId": "USER_1763199211435",
+    "userName": "Guest User",
+    "email": "user@example.com",
+    "timestamp": "2025-11-15T09:33:31.435Z",
+    "responses": {
+      "travel": [
+        "culture",
+        "relaxation",
+        "nightlife"
+      ],
+      "sustainability": "not",
+      "activities": [
+        "fitness",
+        "water"
+      ],
+      "frequency": "frequent",
+      "tripDuration": "extended",
+      "accessibility": [
+        "family",
+        "elderly"
+      ],
+      "rewards": [
+        "discounts"
+      ],
+      "groupTravel": "colleagues"
+    },
+    "completedAt": "15/11/2025, 17:33:31"
+  },
+  {
+    "userId": "USER_1763199248336",
+    "userName": "Guest User",
+    "email": "user@example.com",
+    "timestamp": "2025-11-15T09:34:08.336Z",
+    "responses": {
+      "travel": [
+        "relaxation"
+      ],
+      "sustainability": "not",
+      "activities": [
+        "water"
+      ],
+      "frequency": "frequent",
+      "tripDuration": "longWeek",
+      "accessibility": [
+        "quiet",
+        "petFriendly",
+        "visual"
+      ],
+      "rewards": [
+        "wifi"
+      ],
+      "groupTravel": "solo"
+    },
+    "completedAt": "15/11/2025, 17:34:08"
+  },
+  {
+    "userId": "USER_1763199274420",
+    "userName": "Guest User",
+    "email": "user@example.com",
+    "timestamp": "2025-11-15T09:34:34.420Z",
+    "responses": {
+      "travel": [
+        "nature",
+        "art",
+        "nightlife"
+      ],
+      "sustainability": "very",
+      "activities": [
+        "shopping",
+        "gaming"
+      ],
+      "frequency": "rare",
+      "tripDuration": "shortWeek",
+      "accessibility": [
+        "visual",
+        "elderly",
+        "family"
+      ],
+      "rewards": [
+        "status",
+        "cashback",
+        "upgrades"
+      ],
+      "groupTravel": "colleagues"
+    },
+    "completedAt": "15/11/2025, 17:34:34"
+  },
+  {
+    "userId": "USER_1763199295769",
+    "userName": "Guest User",
+    "email": "user@example.com",
+    "timestamp": "2025-11-15T09:34:55.769Z",
+    "responses": {
+      "travel": [
+        "nature",
+        "food"
+      ],
+      "sustainability": "somewhat",
+      "activities": [
+        "reading",
+        "business",
+        "gaming"
+      ],
+      "frequency": "occasional",
+      "tripDuration": "extended",
+      "accessibility": [
+        "family"
+      ],
+      "rewards": [
+        "experiences",
+        "upgrades"
+      ],
+      "groupTravel": "family"
+    },
+    "completedAt": "15/11/2025, 17:34:55"
+  }
+]
