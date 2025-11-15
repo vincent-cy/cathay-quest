@@ -4,7 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { AlertCircle, CheckCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
@@ -91,20 +96,20 @@ export const NaevvConfigDialog = ({ open, onOpenChange }: NaevvConfigProps) => {
               type="password"
               placeholder="Enter your Naevv API Key"
               value={config.apiKey || ""}
-              onChange={(e) =>
-                setConfig({ ...config, apiKey: e.target.value })
-              }
+              onChange={(e) => setConfig({ ...config, apiKey: e.target.value })}
               className="font-mono text-sm"
             />
             <p className="text-xs text-muted-foreground">
-              Your API key is stored locally in your browser and never sent to our servers.
+              Your API key is stored locally in your browser and never sent to
+              our servers.
             </p>
           </div>
 
           {/* LLM Boundary Input */}
           <div className="space-y-2">
             <Label htmlFor="llm-boundary" className="text-base font-semibold">
-              LLM Boundary / System Prompt <span className="text-red-500">*</span>
+              LLM Boundary / System Prompt{" "}
+              <span className="text-red-500">*</span>
             </Label>
             <Textarea
               id="llm-boundary"
@@ -117,7 +122,8 @@ export const NaevvConfigDialog = ({ open, onOpenChange }: NaevvConfigProps) => {
               className="font-mono text-sm resize-none"
             />
             <p className="text-xs text-muted-foreground">
-              This prompt defines how Naevv behaves and what boundaries it operates within.
+              This prompt defines how Naevv behaves and what boundaries it
+              operates within.
             </p>
           </div>
 
@@ -126,10 +132,13 @@ export const NaevvConfigDialog = ({ open, onOpenChange }: NaevvConfigProps) => {
             <h4 className="font-semibold mb-2 text-sm">About Naevv</h4>
             <p className="text-xs text-muted-foreground space-y-2">
               <div>
-                Naevv is an AI assistant designed to help users with personalized quest recommendations and assistance throughout the Cathay Quest application.
+                Naevv is an AI assistant designed to help users with
+                personalized quest recommendations and assistance throughout the
+                Cathay Quest application.
               </div>
               <div>
-                Configure your API key and system prompt to customize Naevv's behavior for your needs.
+                Configure your API key and system prompt to customize Naevv's
+                behavior for your needs.
               </div>
             </p>
           </Card>
@@ -143,11 +152,7 @@ export const NaevvConfigDialog = ({ open, onOpenChange }: NaevvConfigProps) => {
             >
               Clear Configuration
             </Button>
-            <Button
-              onClick={handleSave}
-              disabled={!isValid}
-              className="gap-2"
-            >
+            <Button onClick={handleSave} disabled={!isValid} className="gap-2">
               {isSaved && <CheckCircle className="w-4 h-4" />}
               {isSaved ? "Saved!" : "Save Configuration"}
             </Button>

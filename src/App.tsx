@@ -19,7 +19,8 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const AppContent = () => {
-  const { hasCompletedSurvey, setHasCompletedSurvey, setUserPreferences } = useQuests();
+  const { hasCompletedSurvey, setHasCompletedSurvey, setUserPreferences } =
+    useQuests();
   const [showLoader, setShowLoader] = useState(false);
 
   const handleSurveyComplete = (responses: Record<string, string>) => {
@@ -37,7 +38,9 @@ const AppContent = () => {
       {!hasCompletedSurvey && !showLoader && (
         <InitialSurvey onComplete={handleSurveyComplete} />
       )}
-      {showLoader && <PersonalizationLoader onComplete={handleLoaderComplete} />}
+      {showLoader && (
+        <PersonalizationLoader onComplete={handleLoaderComplete} />
+      )}
       {hasCompletedSurvey && (
         <BrowserRouter>
           <NaevvProvider>

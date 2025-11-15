@@ -154,9 +154,7 @@ export const NaevvAssistant = () => {
               }
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              onKeyPress={(e) =>
-                e.key === "Enter" && handleSendMessage()
-              }
+              onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
               disabled={!isConfigured}
               className="flex-1"
             />

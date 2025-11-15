@@ -1,5 +1,9 @@
 import { createContext, useContext, useState, useCallback } from "react";
-import { isNaevvConfigured, getNaevvConfig, type NaevvConfig } from "@/config/naevv.config";
+import {
+  isNaevvConfigured,
+  getNaevvConfig,
+  type NaevvConfig,
+} from "@/config/naevv.config";
 
 interface NaevvContextType {
   isConfigured: boolean;
