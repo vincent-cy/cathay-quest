@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -32,6 +32,9 @@ import {
   QrCode,
   Check,
   X,
+  Upload,
+  RotateCcw,
+  Hourglass,
 } from "lucide-react";
 import { Scanner } from "@yudiel/react-qr-scanner";
 import {
@@ -51,6 +54,10 @@ interface Quest {
   location?: string;
   image?: string;
   qrEnabled: boolean;
+  snapPhoto?: boolean;
+  uploadPhoto?: boolean;
+  gpsLocation?: boolean;
+  freeQuest?: boolean;
   requirements: string[];
   verification: string;
   progress?: number;
@@ -142,6 +149,22 @@ export const CompactQuestCard = ({
   const [showQRScanner, setShowQRScanner] = useState(false);
   const [qrResult, setQrResult] = useState<string | null>(null);
   const [showVerified, setShowVerified] = useState(false);
+  
+  // Photo capture state
+  const [showPhotoCapture, setShowPhotoCapture] = useState(false);
+  const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
+  const [isPendingVerification, setIsPendingVerification] = useState(false);
+  const [isVerifyingPhoto, setIsVerifyingPhoto] = useState(false);
+  
+  // Photo upload state
+  const [showPhotoUpload, setShowPhotoUpload] = useState(false);
+  const [uploadedPhoto, setUploadedPhoto] = useState<string | null>(null);
+  const [isVerifyingUpload, setIsVerifyingUpload] = useState(false);
+  
+  // GPS location state
+  const [gpsTracking, setGpsTracking] = useState(false);
+  const [trackingStartTime, setTrackingStartTime] = useState<number | null>(null);
+  const [elapsedTime, setElapsedTime] = useState(0);
 
   // NEW: controls the unblur/fade-in of the next card
   const [promoteNext, setPromoteNext] = useState(false);
@@ -158,7 +181,28 @@ export const CompactQuestCard = ({
     setIsDragging(false);
     setIsRemoving(false);
     setPromoteNext(false);
+    // Reset verification states when quest changes
+    setCapturedPhoto(null);
+    setIsPendingVerification(false);
+    setUploadedPhoto(null);
+    setIsVerifyingUpload(false);
+    setIsVerifyingPhoto(false);
+    setGpsTracking(false);
+    setTrackingStartTime(null);
+    setElapsedTime(0);
   }, [quest?.id]);
+
+  // GPS tracking timer
+  useEffect(() => {
+    if (gpsTracking && trackingStartTime) {
+      const interval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - trackingStartTime) / 1000);
+        setElapsedTime(elapsed);
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [gpsTracking, trackingStartTime]);
 
   const handleHeaderClick = (e: React.MouseEvent) => {
     if (!hasMoved) {
@@ -580,32 +624,250 @@ export const CompactQuestCard = ({
               </p>
             </div>
 
-            {/* QR Code Scanner Button or Completed / Next actions */}
-            {quest.qrEnabled && !completed && (
-              <div className="pt-4 border-t border-border">
-                <button
-                  onClick={() => setShowQRScanner(true)}
-                  className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all ${
+            {/* Verification Buttons */}
+            {!completed && (
+              <div className={`pt-4 border-t space-y-2 ${
+                isInFlight ? "border-white/20" : "border-border"
+              }`}>
+                {/* QR Code Scanner */}
+                {quest.qrEnabled && (
+                  <button
+                    onClick={() => setShowQRScanner(true)}
+                    className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all ${
+                      isInFlight
+                        ? "bg-secondary/80 text-white hover:bg-secondary border border-secondary/20"
+                        : "bg-accent text-accent-foreground hover:bg-accent/90"
+                    }`}
+                  >
+                    <QrCode className="w-4 h-4" />
+                    Scan QR Code to Complete
+                  </button>
+                )}
+
+                {/* Snap Photo */}
+                {quest.snapPhoto && !isPendingVerification && (
+                  <button
+                    onClick={() => setShowPhotoCapture(true)}
+                    className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all ${
+                      isInFlight
+                        ? "bg-secondary/80 text-white hover:bg-secondary"
+                        : "bg-accent text-accent-foreground hover:bg-accent/90"
+                    }`}
+                  >
+                    <Camera className="w-4 h-4" />
+                    Snap Photo to Verify
+                  </button>
+                )}
+
+                {/* Pending Verification Status */}
+                {quest.snapPhoto && isPendingVerification && (
+                  <div className={`w-full p-4 rounded-lg border ${
                     isInFlight
-                      ? "bg-secondary/80 text-white hover:bg-secondary border border-secondary/20"
-                      : "bg-accent text-accent-foreground hover:bg-accent/90"
-                  }`}
-                >
-                  <QrCode className="w-4 h-4" />
-                  Scan QR Code to Complete
-                </button>
+                      ? "bg-yellow-500/20 border-yellow-500/40"
+                      : "bg-yellow-50 border-yellow-200"
+                  }`}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Hourglass className={`w-4 h-4 ${
+                        isInFlight ? "text-yellow-300" : "text-yellow-600"
+                      }`} />
+                      <span className={`font-semibold text-sm ${
+                        isInFlight ? "text-yellow-200" : "text-yellow-800"
+                      }`}>
+                        Pending Verification
+                      </span>
+                    </div>
+                    <p className={`text-xs mb-3 ${
+                      isInFlight ? "text-yellow-200/80" : "text-yellow-700"
+                    }`}>
+                      Your photo is being reviewed. You can retake the photo if needed.
+                    </p>
+                    {capturedPhoto && (
+                      <div className="mb-3">
+                        <img 
+                          src={capturedPhoto} 
+                          alt="Captured photo" 
+                          className="w-full rounded-lg border border-border"
+                        />
+                      </div>
+                    )}
+                    <button
+                      onClick={() => {
+                        setIsPendingVerification(false);
+                        setCapturedPhoto(null);
+                        setShowPhotoCapture(true);
+                      }}
+                      className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                        isInFlight
+                          ? "bg-yellow-500/30 text-yellow-200 hover:bg-yellow-500/40 border border-yellow-500/40"
+                          : "bg-yellow-100 text-yellow-800 hover:bg-yellow-200 border border-yellow-300"
+                      }`}
+                    >
+                      <RotateCcw className="w-4 h-4" />
+                      Retake Photo
+                    </button>
+                  </div>
+                )}
+
+                {/* Upload Photo */}
+                {quest.uploadPhoto && (
+                  <button
+                    onClick={() => setShowPhotoUpload(true)}
+                    className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all ${
+                      isInFlight
+                        ? "bg-secondary/80 text-white hover:bg-secondary border border-secondary/20"
+                        : "bg-accent text-accent-foreground hover:bg-accent/90"
+                    }`}
+                  >
+                    <Upload className="w-4 h-4" />
+                    Upload Photo to Verify
+                  </button>
+                )}
+
+                {/* Free Quest - Self Verify */}
+                {quest.freeQuest && !completed && (
+                  <button
+                    onClick={() => {
+                      onComplete?.();
+                    }}
+                    className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all ${
+                      isInFlight
+                        ? "bg-secondary/80 text-white hover:bg-secondary border border-secondary/20"
+                        : "bg-accent text-accent-foreground hover:bg-accent/90"
+                    }`}
+                  >
+                    <Check className="w-4 h-4" />
+                    Self-Verify
+                  </button>
+                )}
+
+                {/* Self-Reported Completion */}
+                {quest.verification === "Self-reported completion" && !quest.freeQuest && (
+                  <button
+                    onClick={() => {
+                      onComplete?.();
+                    }}
+                    className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all ${
+                      isInFlight
+                        ? "bg-secondary/80 text-white hover:bg-secondary border border-secondary/20"
+                        : "bg-accent text-accent-foreground hover:bg-accent/90"
+                    }`}
+                  >
+                    <Check className="w-4 h-4" />
+                    Mark as Completed
+                  </button>
+                )}
+
+                {/* Automatically Tracked - Open Quiz */}
+                {(quest.verification.toLowerCase().includes("automatic") || quest.verification.toLowerCase().includes("tracked")) 
+                && quest.verification.toLowerCase().includes("quiz") && (
+                  <button
+                    className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all ${
+                      isInFlight
+                        ? "bg-secondary/80 text-white hover:bg-secondary border border-secondary/20"
+                        : "bg-accent text-accent-foreground hover:bg-accent/90"
+                    }`}
+                  >
+                    <Brain className="w-4 h-4" />
+                    Open Quiz
+                  </button>
+                )}
+
+                {/* GPS Location Tracking */}
+                {quest.gpsLocation && (
+                  <div className="space-y-2">
+                    {!gpsTracking ? (
+                      <button
+                        onClick={() => {
+                          setGpsTracking(true);
+                          setTrackingStartTime(Date.now());
+                        }}
+                        className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all ${
+                          isInFlight
+                            ? "bg-secondary/80 text-white hover:bg-secondary border border-secondary/20"
+                            : "bg-accent text-accent-foreground hover:bg-accent/90"
+                        }`}
+                      >
+                        <MapPin className="w-4 h-4" />
+                        Start Location Tracking
+                      </button>
+                    ) : (
+                      <div className={`p-4 rounded-lg border ${
+                        isInFlight
+                          ? "bg-emerald-500/20 border-emerald-500/40"
+                          : "bg-emerald-50 border-emerald-200"
+                      }`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <MapPin className={`w-4 h-4 ${
+                              isInFlight ? "text-emerald-300" : "text-emerald-600"
+                            }`} />
+                            <span className={`font-semibold text-sm ${
+                              isInFlight ? "text-emerald-200" : "text-emerald-800"
+                            }`}>
+                              Tracking Active
+                            </span>
+                          </div>
+                          <button
+                            onClick={() => {
+                              setGpsTracking(false);
+                              setTrackingStartTime(null);
+                              setElapsedTime(0);
+                            }}
+                            className={`text-xs px-2 py-1 rounded ${
+                              isInFlight
+                                ? "bg-emerald-500/30 text-emerald-200 hover:bg-emerald-500/40"
+                                : "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                            }`}
+                          >
+                            Stop
+                          </button>
+                        </div>
+                        <div className={`text-xs ${
+                          isInFlight ? "text-emerald-200/80" : "text-emerald-700"
+                        }`}>
+                          Time elapsed: {Math.floor(elapsedTime / 60)}:{String(Math.floor(elapsedTime % 60)).padStart(2, '0')}
+                        </div>
+                        {elapsedTime >= 3600 && (
+                          <button
+                            onClick={() => {
+                              onComplete?.();
+                              setGpsTracking(false);
+                              setTrackingStartTime(null);
+                              setElapsedTime(0);
+                            }}
+                            className={`w-full mt-3 flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all ${
+                              isInFlight
+                                ? "bg-emerald-600/80 text-white hover:bg-emerald-600 border border-emerald-500/20"
+                                : "bg-emerald-600 text-white hover:bg-emerald-700"
+                            }`}
+                          >
+                            <Check className="w-4 h-4" />
+                            Complete Quest
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 
             {completed && (
-              <div className="pt-4 border-t border-border flex flex-col gap-2">
-                <div className="text-sm font-medium text-emerald-600">
+              <div className={`pt-4 border-t flex flex-col gap-2 ${
+                isInFlight ? "border-white/20" : "border-border"
+              }`}>
+                <div className={`text-sm font-medium ${
+                  isInFlight ? "text-emerald-300" : "text-emerald-600"
+                }`}>
                   Quest completed
                 </div>
                 <div className="flex gap-2">
                   <button
-                    onClick={() => onNext?.()}
-                    className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-all ${
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onNext?.();
+                    }}
+                    className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-all z-10 relative ${
                       isInFlight
                         ? "bg-emerald-600/80 text-white hover:bg-emerald-600 border border-emerald-500/20"
                         : "bg-emerald-600 text-white hover:bg-emerald-700"
@@ -784,6 +1046,289 @@ export const CompactQuestCard = ({
                     <div className="font-semibold">Verified successfully</div>
                     <div className="text-xs opacity-90">
                       Preparing confirmation…
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Photo Capture Dialog */}
+      <Dialog open={showPhotoCapture} onOpenChange={(open) => {
+        setShowPhotoCapture(open);
+        if (!open) {
+          setCapturedPhoto(null);
+          setIsVerifyingPhoto(false);
+        }
+      }}>
+        <DialogContent
+          className={`${
+            isInFlight ? "bg-primary border-white/30" : "bg-background"
+          }`}
+        >
+          <DialogHeader>
+            <DialogTitle
+              className={isInFlight ? "text-white" : "text-foreground"}
+            >
+              Snap Photo
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 relative">
+            {!capturedPhoto && !isVerifyingPhoto ? (
+              <div className="space-y-4">
+                <div className="w-full rounded-lg overflow-hidden relative qr-scanner-container">
+                  <style>{`
+                    /* remove typical overlay elements the scanner may inject */
+                    .qr-scanner-container svg,
+                    .qr-scanner-container canvas,
+                    .qr-scanner-container [role="presentation"],
+                    .qr-scanner-container::before,
+                    .qr-scanner-container::after,
+                    .qr-scanner-container *::before,
+                    .qr-scanner-container *::after {
+                      display: none !important;
+                      visibility: hidden !important;
+                      opacity: 0 !important;
+                      pointer-events: none !important;
+                    }
+
+                    /* Force any borders/lines to be transparent */
+                    .qr-scanner-container *,
+                    .qr-scanner-container svg path,
+                    .qr-scanner-container svg rect,
+                    .qr-scanner-container svg line,
+                    .qr-scanner-container svg circle {
+                      stroke: transparent !important;
+                      fill: transparent !important;
+                      border-color: transparent !important;
+                      box-shadow: none !important;
+                      outline: none !important;
+                      background: transparent !important;
+                    }
+
+                    /* Make the camera video fill the square container */
+                    .qr-scanner-container video {
+                      object-fit: cover !important;
+                      width: 100% !important;
+                      height: 100% !important;
+                      display: block !important;
+                    }
+                  `}</style>
+                  <div className="w-full aspect-square bg-black rounded-lg overflow-hidden">
+                    <Scanner
+                      onScan={(detectedCodes) => {
+                        // Disable QR code detection - do nothing
+                        // We only want to use the camera view
+                      }}
+                      onError={(error) => {
+                        console.error("Camera Error:", error);
+                      }}
+                    />
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    // Access the video element from the scanner - wait a bit for it to be ready
+                    setTimeout(() => {
+                      const videoElement = document.querySelector('[data-qr-scanner] video') as HTMLVideoElement || 
+                                         document.querySelector('.w-full.aspect-square video') as HTMLVideoElement;
+                      if (videoElement && videoElement.readyState >= 2) {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = videoElement.videoWidth;
+                        canvas.height = videoElement.videoHeight;
+                        const ctx = canvas.getContext('2d');
+                        if (ctx) {
+                          ctx.drawImage(videoElement, 0, 0);
+                          const dataUrl = canvas.toDataURL('image/jpeg');
+                          setCapturedPhoto(dataUrl);
+                          // Start verification
+                          setIsVerifyingPhoto(true);
+                          setTimeout(() => {
+                            setIsVerifyingPhoto(false);
+                            setIsPendingVerification(true);
+                            setShowPhotoCapture(false);
+                            onComplete?.();
+                          }, 3000);
+                        }
+                      }
+                    }, 100);
+                  }}
+                  className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-semibold transition-all ${
+                    isInFlight
+                      ? "bg-secondary/80 text-white hover:bg-secondary border border-secondary/20"
+                      : "bg-accent text-accent-foreground hover:bg-accent/90"
+                  }`}
+                >
+                  <Camera className="w-5 h-5" />
+                  Snap Photo
+                </button>
+              </div>
+            ) : isVerifyingPhoto ? (
+              <div className="w-full aspect-square bg-black rounded-lg overflow-hidden relative flex items-center justify-center">
+                <div className="absolute inset-0 flex items-center justify-center p-6 bg-black/50 rounded-lg">
+                  <div className="flex items-center gap-3 p-4 rounded-md bg-emerald-600/95 text-white shadow-lg">
+                    <Hourglass className="w-6 h-6 animate-spin" />
+                    <div>
+                      <div className="font-semibold">Verifying photo...</div>
+                      <div className="text-xs opacity-90">
+                        Please wait while we verify your submission
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="w-full rounded-lg overflow-hidden">
+                  <img
+                    src={capturedPhoto}
+                    alt="Captured photo"
+                    className="w-full h-auto"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setCapturedPhoto(null);
+                    }}
+                    className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-all ${
+                      isInFlight
+                        ? "bg-white/10 text-white hover:bg-white/20 border border-white/20"
+                        : "bg-muted text-foreground hover:bg-muted/80 border border-border"
+                    }`}
+                  >
+                    Retake
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Photo Upload Dialog */}
+      <Dialog open={showPhotoUpload} onOpenChange={(open) => {
+        setShowPhotoUpload(open);
+        if (!open) {
+          setIsVerifyingUpload(false);
+          setUploadedPhoto(null);
+        }
+      }}>
+        <DialogContent
+          className={`${
+            isInFlight ? "bg-primary border-white/30" : "bg-background"
+          }`}
+        >
+          <DialogHeader>
+            <DialogTitle
+              className={isInFlight ? "text-white" : "text-foreground"}
+            >
+              Upload Photo
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 relative">
+            {!uploadedPhoto ? (
+              <div className="space-y-4">
+                <div className="w-full aspect-square bg-muted rounded-lg overflow-hidden flex items-center justify-center border-2 border-dashed border-border">
+                  <div className="text-center space-y-2">
+                    <Upload className={`w-12 h-12 mx-auto ${isInFlight ? "text-white/50" : "text-muted-foreground"}`} />
+                    <p className={`text-sm ${isInFlight ? "text-white/70" : "text-muted-foreground"}`}>
+                      Upload a screenshot or photo
+                    </p>
+                  </div>
+                </div>
+                <input
+                  type="file"
+                  id="photo-upload-input"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        setUploadedPhoto(reader.result as string);
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                />
+                <button
+                  onClick={() => {
+                    document.getElementById('photo-upload-input')?.click();
+                  }}
+                  className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-semibold transition-all ${
+                    isInFlight
+                      ? "bg-secondary/80 text-white hover:bg-secondary border border-secondary/20"
+                      : "bg-accent text-accent-foreground hover:bg-accent/90"
+                  }`}
+                >
+                  <Upload className="w-5 h-5" />
+                  Choose Photo
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="w-full rounded-lg overflow-hidden">
+                  <img
+                    src={uploadedPhoto}
+                    alt="Uploaded photo"
+                    className="w-full h-auto"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setUploadedPhoto(null);
+                    }}
+                    className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-all ${
+                      isInFlight
+                        ? "bg-white/10 text-white hover:bg-white/20 border border-white/20"
+                        : "bg-muted text-foreground hover:bg-muted/80 border border-border"
+                    }`}
+                  >
+                    Change Photo
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsVerifyingUpload(true);
+                      // 3 second verification delay
+                      setTimeout(() => {
+                        setIsVerifyingUpload(false);
+                        onComplete?.();
+                        setShowPhotoUpload(false);
+                        setUploadedPhoto(null);
+                      }, 3000);
+                    }}
+                    disabled={isVerifyingUpload}
+                    className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-all ${
+                      isVerifyingUpload
+                        ? "opacity-50 cursor-not-allowed"
+                        : ""
+                    } ${
+                      isInFlight
+                        ? "bg-secondary/80 text-white hover:bg-secondary border border-secondary/20"
+                        : "bg-accent text-accent-foreground hover:bg-accent/90"
+                    }`}
+                  >
+                    {isVerifyingUpload ? "Verifying..." : "Submit"}
+                  </button>
+                </div>
+              </div>
+            )}
+            {/* Verification overlay for photo upload */}
+            {isVerifyingUpload && (
+              <div className="absolute inset-0 flex items-center justify-center p-6 bg-black/50 rounded-lg">
+                <div className="flex items-center gap-3 p-4 rounded-md bg-emerald-600/95 text-white shadow-lg">
+                  <Hourglass className="w-6 h-6 animate-spin" />
+                  <div>
+                    <div className="font-semibold">Verifying photo...</div>
+                    <div className="text-xs opacity-90">
+                      Please wait while we verify your submission
                     </div>
                   </div>
                 </div>
