@@ -286,6 +286,7 @@
     "timeLeft": "No limit",
     "location": "Any location",
     "qrEnabled": false,
+    "progress": 68,
     "requirements": ["Complete any 50 quests from weekly or in-flight categories"],
     "verification": "Automatically tracked through your quest history"
   },
@@ -310,6 +311,7 @@
     "timeLeft": "No limit",
     "location": "Any location",
     "qrEnabled": false,
+    "progress": 48,
     "requirements": ["Complete 25 eco-friendly or sustainability quests"],
     "verification": "Tracked automatically via quest completion data"
   },
@@ -322,6 +324,7 @@
     "timeLeft": "No limit",
     "location": "Any location",
     "qrEnabled": false,
+    "progress": 24,
     "requirements": ["Accumulate 100,000 total miles in your account"],
     "verification": "Verified through your mileage balance"
   },
