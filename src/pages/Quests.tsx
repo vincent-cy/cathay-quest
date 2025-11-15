@@ -26,6 +26,7 @@ const Quests = () => {
     removeVoucher,
     cathayPoints,
     addCathayPoints,
+    incrementResetCount,
   } = useQuests();
   const [isInFlight, setIsInFlight] = useState(false);
   const [daysUntilRefresh] = useState(4);
@@ -235,6 +236,9 @@ const Quests = () => {
     ownedVouchers.forEach((voucher) => {
       removeVoucher(voucher.id);
     });
+
+    // Increment reset count (will trigger survey after 5 presses)
+    incrementResetCount();
 
     toast({
       title: "Variables Reset",
