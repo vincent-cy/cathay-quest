@@ -356,23 +356,6 @@ export const CompactQuestCard = ({
             >
               {quest.description}
             </p>
-
-            {!isExpanded && quest.description.length > 80 && (
-              <button
-                type="button"
-                className={`${
-                  isInFlight
-                    ? "text-white/80 hover:text-white"
-                    : "text-accent hover:text-accent"
-                } text-xs font-medium underline`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsExpanded(true);
-                }}
-              >
-                Show more
-              </button>
-            )}
             {!isExpanded &&
               (() => {
                 const hasProgress = typeof quest.progress === "number";

@@ -51,18 +51,18 @@ const AppContent = () => {
               <Route path="/shop" element={<Shop />} />
               <Route path="/naevv" element={<AIAssistantPage />} />
               <Route path="/home" element={<Home />} />
+              <Route path="/admin/survey-results" element={<AdminSurveyResults />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </NaevvProvider>
-          <Routes>
+          {/* <Routes>
             <Route path="/" element={<Quests />} />
             <Route path="/events" element={<Events />} />
             <Route path="/shop" element={<Shop />} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/home" element={<Home />} />
-            <Route path="/admin/survey-results" element={<AdminSurveyResults />} />
             <Route path="*" element={<NotFound />} />
-          </Routes>
+          </Routes> */}
         </BrowserRouter>
       )}
     </>
