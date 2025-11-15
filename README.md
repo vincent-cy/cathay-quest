@@ -101,7 +101,7 @@ export NGROK_AUTHTOKEN=your_ngrok_authtoken_here
 # $Env:NGROK_AUTHTOKEN = "your_ngrok_authtoken_here"
 ```
 
-4. Start your dev server (default port used by the project is 8080):
+4. Start your dev server (default port used by the project is 5173):
 
 ```bash
 npm run dev
@@ -114,7 +114,7 @@ npm run dev
 npm run ngrok
 
 # OR without adding the script, you can run directly:
-# npx ngrok http 8080 --log=stdout
+# npx ngrok http 5173 --log=stdout
 ```
 
 The helper will print the public ngrok URL (https://xxxx.ngrok.io). Open that URL on another device to access your local app.

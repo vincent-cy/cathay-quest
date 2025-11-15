@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-// Minimal helper to start ngrok for the local dev server (default port 8080).
+// Minimal helper to start ngrok for the local dev server (default port 5173).
 // Tries to use the local `ngrok` package if installed, otherwise falls back to `npx ngrok`.
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 5173;
 
 (async () => {
   try {

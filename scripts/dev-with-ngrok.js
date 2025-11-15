@@ -13,7 +13,7 @@
 import { spawn } from "child_process";
 import net from "net";
 
-const PORT = process.env.PORT ? Number(process.env.PORT) : 8080;
+const PORT = process.env.PORT ? Number(process.env.PORT) : 5173;
 const HOST = "127.0.0.1";
 const USE_VITE_CLI = !!process.env.USE_VITE_CLI; // optional flag to use npx vite
 

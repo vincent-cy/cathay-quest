@@ -189,9 +189,9 @@ const Home = () => {
 
         <Card className="p-6 shadow-card text-center">
           <Avatar className="w-24 h-24 mx-auto mb-4">
-            <AvatarFallback className="bg-primary text-white text-2xl">JD</AvatarFallback>
+            <AvatarFallback className="bg-primary text-white text-2xl">AJ</AvatarFallback>
           </Avatar>
-          <h2 className="text-xl font-bold text-foreground mb-1">John Doe</h2>
+          <h2 className="text-xl font-bold text-foreground mb-1">Albert Joe</h2>
           <p className="text-sm text-muted-foreground mb-4">Hong Kong</p>
           <Badge className="bg-accent">Asia Miles Member</Badge>
         </Card>
