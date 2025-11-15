@@ -298,6 +298,7 @@
     "type": "One-Time",
     "timeLeft": "No limit",
     "location": "Any location",
+    "progress": 10,
     "qrEnabled": false,
     "requirements": ["Book 15 flights through the Cathay Pacific mobile app"],
     "verification": "Automatically verified through booking system"
@@ -336,6 +337,7 @@
     "type": "One-Time",
     "timeLeft": "No limit",
     "location": "Any location",
+    "progress": 80,
     "qrEnabled": false,
     "requirements": ["Book 5 separate flights with Cathay Pacific"],
     "verification": "Automatically verified through booking system"
@@ -348,6 +350,7 @@
     "type": "One-Time",
     "timeLeft": "No limit",
     "location": "Any location",
+    "progress": 50,
     "qrEnabled": false,
     "requirements": ["Accumulate 500,000 total miles"],
     "verification": "Verified through your mileage balance"
@@ -360,6 +363,7 @@
     "type": "One-Time",
     "timeLeft": "No limit",
     "location": "Any location",
+    "progress": 10,
     "qrEnabled": false,
     "requirements": ["Fly to 10 different countries"],
     "verification": "Verified through your flight history"
@@ -372,6 +376,7 @@
     "type": "One-Time",
     "timeLeft": "No limit",
     "location": "Any location",
+    "progress": 20,
     "qrEnabled": false,
     "requirements": ["Complete at least one quest daily for 30 days"],
     "verification": "Automatically tracked through quest completion"
@@ -384,6 +389,7 @@
     "type": "One-Time",
     "timeLeft": "No limit",
     "location": "Any location",
+    "progress": 50,
     "qrEnabled": false,
     "requirements": ["Complete 50 sustainability-focused quests"],
     "verification": "Tracked automatically via quest categories"
@@ -396,6 +402,7 @@
     "type": "One-Time",
     "timeLeft": "No limit",
     "location": "Inflight",
+    "progress": 10,
     "qrEnabled": false,
     "requirements": ["Order 10 different meal options"],
     "verification": "Tracked through meal order history"
@@ -408,6 +415,7 @@
     "type": "One-Time",
     "timeLeft": "No limit",
     "location": "Inflight",
+    "progress": 80,
     "qrEnabled": false,
     "requirements": ["Complete 25 full-length entertainment items"],
     "verification": "Watch time tracked in entertainment system"
@@ -420,6 +428,7 @@
     "type": "One-Time",
     "timeLeft": "No limit",
     "location": "Inflight",
+    "progress": 10,
     "qrEnabled": false,
     "requirements": ["Score 100% on 20 different quizzes"],
     "verification": "Automatically tracked through quiz system"
@@ -432,6 +441,7 @@
     "type": "One-Time",
     "timeLeft": "No limit",
     "location": "Inflight",
+    "progress": 10,
     "qrEnabled": false,
     "requirements": ["Watch 10 complete documentaries"],
     "verification": "Watch time tracked automatically"
@@ -444,6 +454,7 @@
     "type": "One-Time",
     "timeLeft": "No limit",
     "location": "Inflight",
+    "progress": 10,
     "qrEnabled": false,
     "requirements": ["Rate crew 5-stars on 10 separate flights"],
     "verification": "Tracked through rating system"
@@ -456,6 +467,7 @@
     "type": "One-Time",
     "timeLeft": "No limit",
     "location": "Inflight",
+    "progress": 50,
     "qrEnabled": false,
     "requirements": ["Complete 40 meditation sessions"],
     "verification": "Session tracking through system"
@@ -468,6 +480,7 @@
     "type": "One-Time",
     "timeLeft": "No limit",
     "location": "Any destination",
+    "progress": 30,
     "qrEnabled": false,
     "requirements": ["Witness 10 sunrises at different places"],
     "verification": "Geotagged sunrise photos with timestamps"
@@ -480,6 +493,7 @@
     "type": "One-Time",
     "timeLeft": "No limit",
     "location": "Any destination",
+    "progress": 40,
     "qrEnabled": false,
     "requirements": ["Witness 10 sunsets at scenic spots"],
     "verification": "Geotagged sunset photos with timestamps"
@@ -492,6 +506,7 @@
     "type": "One-Time",
     "timeLeft": "No limit",
     "location": "Any location",
+    "progress": 10,
     "qrEnabled": false,
     "requirements": ["Complete 100 total quests in one year"],
     "verification": "Automatically tracked through quest history"
