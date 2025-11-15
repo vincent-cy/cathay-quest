@@ -4,8 +4,8 @@ import { EarnStarIcon } from "./EarnStarIcon";
 
 const navItems = [
   { icon: Trophy, label: "Events", path: "/events" },
-  { icon: EarnStarIcon, label: "Earn", path: "/", isCenter: true },
-  { icon: Bot, label: "Naevv", path: "/naevv" },
+  { icon: EarnStarIcon, label: "Earn", path: "/"},
+  { icon: Bot, label: "Naevv", path: "/naevv", isCenter: true  },
   { icon: ShoppingBag, label: "Redeem", path: "/shop" },
   { icon: Users, label: "Profile", path: "/home" },
 ];
