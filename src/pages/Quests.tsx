@@ -573,11 +573,10 @@ const Quests = () => {
                   isInFlight ? "text-white/70" : "text-muted-foreground"
                 }`}
               >
-                <br />
-                Cathay Points
+                <br /> Cathay Points
               </p>
               <p
-                className={`text-base font-semibold ${
+                className={`text-3xl font-bold ${
                   isInFlight ? "text-white" : "text-foreground"
                 }`}
               >
