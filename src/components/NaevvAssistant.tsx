@@ -16,22 +16,109 @@ interface Message {
   timestamp: Date;
 }
 
-// Google Gemini API Configuration
-const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
-// Available models: gemini-2.5-flash-lite (fastest), gemini-2.5-flash, gemini-2.5-pro, gemini-1.5-flash, gemini-1.5-pro
-const GEMINI_MODEL = import.meta.env.VITE_GEMINI_MODEL || "gemini-2.5-flash-lite";
-const CUSTOM_API_ENDPOINT = import.meta.env.VITE_NAEVV_API_URL;
+const OPENROUTER_API_KEY = "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";
+const OPENROUTER_MODEL = "qwen/qwen2.5-vl-32b-instruct:free";
+const OPENROUTER_API_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
 
-// Only construct Gemini endpoint if API key is available
-const GEMINI_API_ENDPOINT = API_KEY 
-  ? `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${API_KEY}`
-  : null;
-const API_ENDPOINT = CUSTOM_API_ENDPOINT || GEMINI_API_ENDPOINT;
+// // OpenRouter API Configuration
+// const OPENROUTER_API_KEY = import.meta.env.OPENROUTER_API_KEY;
+// const OPENROUTER_MODEL = import.meta.env.OPENROUTER_MODEL || "qwen/qwen3-235b-a22b:free";
+// const OPENROUTER_API_ENDPOINT = import.meta.env.OPENROUTER_API_ENDPOINT;
+
+// Configurable Intent Detection System
+interface IntentPattern {
+  id: string;
+  keywords: string[];
+  requiredMatches?: number;
+  excludeKeywords?: string[];
+  confidenceThreshold?: number;
+  actionButton?: {
+    icon: React.ComponentType<any>;
+    label: string;
+    navigateTo: string;
+  };
+}
+
+interface DetectedIntent {
+  type: 'shop' | 'quest' | 'event' | 'none';
+  confidence: number;
+  specificProduct?: ShopItem | null;
+  metadata?: any;
+}
+
+// Easily configurable patterns - modify these without touching code logic
+const INTENT_PATTERNS: Record<string, IntentPattern> = {
+  shop: {
+    id: 'shop',
+    keywords: [
+      'shop', 'buy', 'purchase', 'redeem', 'voucher', 'reward', 
+      'points', 'item', 'product', 'cost', 'price', 'afford',
+      'available in shop', 'what can i get', 'rewards shop',
+      'exchange points', 'use my points', 'purchase with points'
+    ],
+    requiredMatches: 2,
+    excludeKeywords: ['quest', 'event', 'activity'],
+    confidenceThreshold: 0.5,
+    actionButton: {
+      icon: ShoppingBag,
+      label: 'View Shop',
+      navigateTo: '/shop'
+    }
+  },
+  quest: {
+    id: 'quest',
+    keywords: [
+      'quest', 'mission', 'task', 'challenge', 'achievement',
+      'complete', 'accept', 'active quest', 'weekly quest',
+      'progress', 'milestone', 'objective', 'goal',
+      'recommend quest', 'find quest', 'available quest'
+    ],
+    requiredMatches: 2,
+    excludeKeywords: ['shop', 'buy', 'event'],
+    confidenceThreshold: 0.5,
+    actionButton: {
+      icon: Target,
+      label: 'View Quests',
+      navigateTo: '/'
+    }
+  },
+  event: {
+    id: 'event',
+    keywords: [
+      'event', 'activity', 'happening', 'schedule', 'calendar',
+      'upcoming', 'join', 'participate', 'special event',
+      'limited time', 'exclusive', 'current event',
+      'what events', 'find events', 'event recommendation'
+    ],
+    requiredMatches: 2,
+    excludeKeywords: ['shop', 'quest'],
+    confidenceThreshold: 0.5,
+    actionButton: {
+      icon: Calendar,
+      label: 'View Events',
+      navigateTo: '/events'
+    }
+  }
+};
+
+// Enhanced product detection with fuzzy matching
+const PRODUCT_SYNONYMS: Record<string, string[]> = {
+  'snack-voucher': ['snack box', 'premium snack', 'snack voucher', 'snacks', 'food box', 'snack pack'],
+  'wifi-pass': ['wifi pass', 'wifi', 'wi-fi pass', 'one hour wifi', 'internet', 'wifi access'],
+  'wifi-full': ['full flight wifi', 'unlimited wifi', 'complete wifi', 'entire flight wifi'],
+  'meal-voucher': ['meal voucher', 'complimentary meal', 'free meal', 'food voucher', 'dining voucher'],
+  'priority-checkin': ['priority check', 'priority check-in', 'check-in', 'fast check-in'],
+  'baggage-voucher': ['baggage', 'extra baggage', 'checked bag', 'luggage', 'baggage allowance'],
+  'asia-miles-500': ['500 miles', '500 asia miles', 'five hundred miles'],
+  'asia-miles-1000': ['1000 miles', '1,000 miles', '1000 asia miles', 'thousand miles'],
+  'seat-selection': ['seat selection', 'preferred seat', 'choose seat', 'seat choice', 'select seat'],
+  'lounge-pass': ['lounge pass', 'lounge day pass', 'lounge access', 'airport lounge'],
+  'upgrade-voucher': ['upgrade voucher', 'upgrade', 'premium economy', 'economy upgrade', 'class upgrade']
+};
 
 export const NaevvAssistant = () => {
   const navigate = useNavigate();
   
-  // Get user data from QuestContext
   const { 
     cathayPoints, 
     acceptedQuests, 
@@ -52,176 +139,98 @@ export const NaevvAssistant = () => {
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Function to find a specific product mentioned in the conversation
+  // Flexible intent detection using configurable patterns
+  const detectIntent = (
+    naevvResponse: string, 
+    userQuestion?: string
+  ): DetectedIntent => {
+    const combinedText = `${userQuestion || ''} ${naevvResponse}`.toLowerCase();
+    
+    let bestIntent: DetectedIntent = { type: 'none', confidence: 0 };
+    const words = combinedText.split(/\s+/);
+
+    // Check each intent pattern
+    Object.entries(INTENT_PATTERNS).forEach(([intentType, pattern]) => {
+      let matches = 0;
+      
+      // Count keyword matches
+      pattern.keywords.forEach(keyword => {
+        if (combinedText.includes(keyword)) {
+          matches++;
+        }
+      });
+      
+      // Check for exclusion (negative matches)
+      let exclusions = 0;
+      pattern.excludeKeywords?.forEach(excludeWord => {
+        if (combinedText.includes(excludeWord)) {
+          exclusions++;
+        }
+      });
+      
+      // Calculate confidence score
+      let confidence = matches / Math.max(pattern.keywords.length, 1);
+      
+      // Penalize for exclusion matches
+      if (exclusions > 0) {
+        confidence *= 0.3;
+      }
+      
+      // Boost confidence if we meet required matches
+      if (matches >= (pattern.requiredMatches || 1)) {
+        confidence *= 1.5;
+      }
+      
+      // Normalize confidence
+      confidence = Math.min(confidence, 1);
+      
+      // Update best intent if this one is better
+      if (confidence > bestIntent.confidence && confidence >= (pattern.confidenceThreshold || 0.3)) {
+        bestIntent = {
+          type: intentType as 'shop' | 'quest' | 'event',
+          confidence,
+          specificProduct: intentType === 'shop' ? findMentionedProduct(combinedText) : null
+        };
+      }
+    });
+
+    return bestIntent;
+  };
+
+  // Enhanced product detection with fuzzy matching
   const findMentionedProduct = (text: string): ShopItem | null => {
     const lowerText = text.toLowerCase();
     
-    // Match product names (case-insensitive, partial matches)
+    // First, try exact product name matches
     for (const item of shopItems) {
       const itemNameLower = item.name.toLowerCase();
-      // Check for exact product name matches or key words from product name
       if (lowerText.includes(itemNameLower)) {
         return item;
       }
+    }
+    
+    // Then try synonym matching
+    for (const item of shopItems) {
+      const synonyms = PRODUCT_SYNONYMS[item.id] || [];
+      const foundSynonym = synonyms.some(synonym => lowerText.includes(synonym.toLowerCase()));
       
-      // Also check for common aliases/variations
-      const nameWords = itemNameLower.split(' ');
-      if (nameWords.length > 1) {
-        // Check if multiple words from product name appear
-        const wordMatches = nameWords.filter(word => 
-          word.length > 3 && lowerText.includes(word)
-        );
-        if (wordMatches.length >= 2) {
-          return item;
-        }
+      if (foundSynonym) {
+        return item;
       }
+    }
+    
+    // Finally, try partial word matching for longer product names
+    for (const item of shopItems) {
+      const nameWords = item.name.toLowerCase().split(' ').filter(word => word.length > 3);
+      const wordMatches = nameWords.filter(word => lowerText.includes(word));
       
-      // Check for specific keywords that match products
-      const keywords: { [key: string]: string[] } = {
-        'snack-voucher': ['snack box', 'premium snack', 'snack voucher'],
-        'wifi-pass': ['wifi pass', 'wifi', 'wi-fi pass', 'one hour wifi'],
-        'wifi-full': ['full flight wifi', 'unlimited wifi', 'complete wifi'],
-        'meal-voucher': ['meal voucher', 'complimentary meal', 'free meal'],
-        'priority-checkin': ['priority check', 'priority check-in', 'check-in'],
-        'baggage-voucher': ['baggage', 'extra baggage', 'checked bag', 'luggage'],
-        'asia-miles-500': ['500 miles', '500 asia miles'],
-        'asia-miles-1000': ['1000 miles', '1,000 miles', '1000 asia miles'],
-        'seat-selection': ['seat selection', 'preferred seat', 'choose seat', 'seat choice'],
-        'lounge-pass': ['lounge pass', 'lounge day pass', 'lounge access'],
-        'upgrade-voucher': ['upgrade voucher', 'upgrade', 'premium economy', 'economy upgrade']
-      };
-      
-      if (keywords[item.id]) {
-        const foundKeyword = keywords[item.id].some(keyword => lowerText.includes(keyword));
-        if (foundKeyword) {
-          return item;
-        }
+      // If majority of important words match, consider it a match
+      if (wordMatches.length >= Math.max(1, nameWords.length / 2)) {
+        return item;
       }
     }
     
     return null;
-  };
-
-  // Function to detect if the conversation is about shop products
-  const isShopRelated = (naevvResponse: string, userQuestion?: string): ShopItem | null => {
-    const lowerResponse = naevvResponse.toLowerCase();
-    const lowerQuestion = userQuestion?.toLowerCase() || '';
-    const combinedText = `${lowerQuestion} ${lowerResponse}`;
-    
-    // First check if a specific product is mentioned
-    const mentionedProduct = findMentionedProduct(combinedText);
-    if (mentionedProduct) {
-      return mentionedProduct;
-    }
-    
-    // Strong shop intent indicators - these phrases suggest clear shop interest
-    const strongShopPatterns = [
-      'reward shop', 'rewards shop', 'visit the shop', 'go to the shop',
-      'what can i buy', 'what can you buy', 'what items', 'what products',
-      'redeem points', 'redeem your points', 'use your points',
-      'shop items', 'available shop', 'affordable items', 'can redeem',
-      'available in the shop', 'check out the shop', 'browse the shop',
-      'shop for', 'buy with points', 'purchase with points'
-    ];
-    
-    // Check for strong shop intent in either user question or response
-    const hasStrongIntent = strongShopPatterns.some(pattern => 
-      lowerQuestion.includes(pattern) || lowerResponse.includes(pattern)
-    );
-    
-    if (hasStrongIntent) {
-      return null; // Shop related but no specific product
-    }
-    
-    // Multiple keywords suggesting shop context (need at least 2)
-    const shopKeywords = ['shop', 'product', 'item', 'buy', 'purchase', 'redeem', 'voucher'];
-    const keywordCount = shopKeywords.filter(keyword => 
-      lowerResponse.includes(keyword) || lowerQuestion.includes(keyword)
-    ).length;
-    
-    // Only show if multiple keywords AND the response actually mentions shop/redeem/buy context
-    const mentionsShopAction = lowerResponse.includes('shop') || 
-                               lowerResponse.includes('redeem') ||
-                               lowerResponse.includes('buy') ||
-                               lowerResponse.includes('purchase');
-    
-    if (keywordCount >= 2 && mentionsShopAction) {
-      return null; // Shop related but no specific product
-    }
-    
-    return null; // Not shop related
-  };
-
-  // Function to detect if the conversation is about quests
-  const isQuestRelated = (naevvResponse: string, userQuestion?: string): boolean => {
-    const lowerResponse = naevvResponse.toLowerCase();
-    const lowerQuestion = userQuestion?.toLowerCase() || '';
-    
-    // Strong quest intent indicators
-    const strongQuestPatterns = [
-      'quest', 'quests', 'available quest', 'active quest', 'weekly quest',
-      'recommend quest', 'quest recommendation', 'what quest', 'new quest',
-      'complete quest', 'accept quest', 'find quest', 'discover quest',
-      'quest section', 'quest page', 'go to quest', 'check quest',
-      'achievement', 'milestone', 'challenge'
-    ];
-    
-    // Check for strong quest intent in either user question or response
-    const hasStrongIntent = strongQuestPatterns.some(pattern => 
-      lowerQuestion.includes(pattern) || lowerResponse.includes(pattern)
-    );
-    
-    if (hasStrongIntent) return true;
-    
-    // Multiple keywords suggesting quest context (need at least 2)
-    const questKeywords = ['quest', 'challenge', 'task', 'mission', 'achievement', 'milestone', 'complete'];
-    const keywordCount = questKeywords.filter(keyword => 
-      lowerResponse.includes(keyword) || lowerQuestion.includes(keyword)
-    ).length;
-    
-    // Only show if multiple keywords AND the response actually mentions quest context
-    const mentionsQuestAction = lowerResponse.includes('quest') || 
-                               lowerResponse.includes('challenge') ||
-                               lowerResponse.includes('achievement') ||
-                               lowerResponse.includes('complete');
-    
-    return keywordCount >= 2 && mentionsQuestAction;
-  };
-
-  // Function to detect if the conversation is about events
-  const isEventRelated = (naevvResponse: string, userQuestion?: string): boolean => {
-    const lowerResponse = naevvResponse.toLowerCase();
-    const lowerQuestion = userQuestion?.toLowerCase() || '';
-    
-    // Strong event intent indicators
-    const strongEventPatterns = [
-      'event', 'events', 'upcoming event', 'available event', 'current event',
-      'what event', 'new event', 'join event', 'participate event',
-      'event section', 'event page', 'go to event', 'check event',
-      'special event', 'exclusive event', 'limited event', 'find event',
-      'discover event', 'event calendar', 'event schedule'
-    ];
-    
-    // Check for strong event intent in either user question or response
-    const hasStrongIntent = strongEventPatterns.some(pattern => 
-      lowerQuestion.includes(pattern) || lowerResponse.includes(pattern)
-    );
-    
-    if (hasStrongIntent) return true;
-    
-    // Multiple keywords suggesting event context (need at least 2)
-    const eventKeywords = ['event', 'events', 'activity', 'activities', 'happening', 'schedule', 'calendar'];
-    const keywordCount = eventKeywords.filter(keyword => 
-      lowerResponse.includes(keyword) || lowerQuestion.includes(keyword)
-    ).length;
-    
-    // Only show if multiple keywords AND the response actually mentions event context
-    const mentionsEventAction = lowerResponse.includes('event') || 
-                               lowerResponse.includes('activity') ||
-                               lowerResponse.includes('happening') ||
-                               lowerResponse.includes('schedule');
-    
-    return keywordCount >= 2 && mentionsEventAction;
   };
 
   // Function to build user context information for the LLM
@@ -291,9 +300,7 @@ export const NaevvAssistant = () => {
   }, [messages, isLoading]);
 
   const callNaevvAPI = async (userMessage: string): Promise<string> => {
-    // Check if API endpoint is configured
-    if (!API_ENDPOINT) {
-      // No API configured - provide helpful fallback response
+    if (!OPENROUTER_API_KEY) {
       const lowerMessage = userMessage.toLowerCase();
       
       if (lowerMessage.includes("quest") || lowerMessage.includes("recommend")) {
@@ -303,30 +310,23 @@ export const NaevvAssistant = () => {
       } else if (lowerMessage.includes("help") || lowerMessage.includes("how")) {
         return "I'm here to help! I can assist you with quest recommendations, explain how the points system works, guide you through the app features, and answer questions about Cathay Quest. What would you like to know?";
       } else {
-        return "Thanks for your message! The AI assistant is currently not configured. Please set up the VITE_GOOGLE_API_KEY or VITE_NAEVV_API_URL environment variable to enable full functionality. For now, feel free to explore the Quests, Shop, and Events sections of the app!";
+        return "Thanks for your message! The AI assistant is currently not configured. Please set up the OpenRouter API key to enable full functionality. For now, feel free to explore the Quests, Shop, and Events sections of the app!";
       }
     }
 
     try {
-      // Build conversation context for Gemini API
+      // Build conversation history in OpenRouter format
       const conversationHistory = messages.slice(1).map((msg) => ({
-        role: msg.sender === "user" ? "user" : "model",
-        parts: [{ text: msg.text }],
+        role: msg.sender === "user" ? "user" : "assistant",
+        content: msg.text,
       }));
 
       const requestBody = {
-        contents: [
-          ...conversationHistory,
+        model: OPENROUTER_MODEL,
+        messages: [
           {
-            role: "user",
-            parts: [{ text: userMessage }],
-          },
-        ],
-        systemInstruction: {
-          parts: [{ 
-            text: `You are Cathay Pacific's AI Travel Concierge, an expert in helping customers plan and optimize their travel experiences while staying within their specified budget constraints.
-
-${getUserContext()}
+            role: "system",
+            content: `You are Cathay Pacific's AI Travel Concierge, an expert in helping customers plan and optimize their travel experiences while staying within their specified budget constraints.
 
 PRIMARY ROLE
 DO NOT GO OUT OF CATHAY PACIFIC OR OUR ASSISTANT'S AUTHORITY.
@@ -347,52 +347,40 @@ MANDATORY DATA USAGE RULES:
 NEVER make up, guess, or estimate user data. ALWAYS use the exact information provided in the context above. If the context shows "0 active quests", say "0 active quests", not "you have some quests". If the context shows specific point amounts, use those exact amounts.
 
 CORE CAPABILITIES
-
 - Budget Analysis: Carefully analyze the user's stated budget and provide realistic travel options within those constraints
 - Flight Planning: Suggest optimal Cathay Pacific flight routes, timing, and fare classes that offer the best value
 - Multi-destination Itineraries: Create efficient multi-city itineraries using Cathay Pacific's extensive route network
 - Value Optimization: Identify cost-saving opportunities through strategic timing, package deals, and partner offers
 - Experience Planning: Recommend activities, dining, and accommodations that match both budget and travel preferences
 
-BUDGET PLANNING FRAMEWORK
-
-When users provide a budget, you will:
-
-1. Budget Breakdown Analysis:
-   - Allocate percentages to flights, accommodation, activities, and contingencies
-   - Suggest optimal spending distribution based on travel duration and destination
-   - Identify areas where splurging vs. saving makes the most impact
-
-2. Smart Cost Optimization:
-   - Recommend best booking windows for flights
-   - Suggest alternative airports or routes for cost savings
-   - Identify Cathay Pacific partner hotels and services for bundled savings
-   - Highlight seasonal promotions and Marco Polo member benefits
-
-3. Tiered Budget Scenarios:
-   - Provide multiple options at different price points within their budget
-   - Show trade-offs between cost and experience quality
-   - Suggest budget-stretching strategies for longer trips
-
-STRICT FORMATTING RULES:
-- USE markdown formatting (**bold**, *italic*, # headers, - bullets, etc.)
-- Use asterisks, underscores, or special symbols for formatting
+RESPONSE FORMAT:
 - Keep responses concise, friendly, and conversational
-- If you want to give a bullet point list, use the following format:
-  - Bullet point 1
-  - Bullet point 2
-  - Bullet point 3
-  - ...
-- Don't be shy to add emojis to make the response more engaging and friendly.
-`
-          }],
-        },
+- Use natural line breaks and paragraphs for readability
+- Feel free to use emojis to make the response more engaging and friendly
+- Provide clear, actionable advice
+
+USER CONTEXT:
+${getUserContext()}
+
+Please provide a helpful, accurate, and friendly response to the user's latest message based on the above context.`
+          },
+          ...conversationHistory,
+          {
+            role: "user",
+            content: userMessage,
+          },
+        ],
+        max_tokens: 2000,
+        temperature: 0.7,
       };
 
-      const response = await fetch(API_ENDPOINT, {
+      const response = await fetch(OPENROUTER_API_ENDPOINT, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+          "HTTP-Referer": window.location.origin,
+          "X-Title": "Cathay Quest",
         },
         body: JSON.stringify(requestBody),
       });
@@ -400,71 +388,41 @@ STRICT FORMATTING RULES:
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         const errorMessage = errorData?.error?.message || errorData?.message || response.statusText;
-        
-        // Handle specific error cases
-        if (errorMessage.includes("location is not supported") || errorMessage.includes("FAILED_PRECONDITION")) {
-          throw new Error("GEO_RESTRICTION: Your API key has geographic restrictions. Please check your Google Cloud API key settings or use a VPN.");
-        }
-        
-        throw new Error(`API error: ${response.status} - ${errorMessage}`);
+        throw new Error(`OpenRouter API error: ${response.status} - ${errorMessage}`);
       }
 
       const data = await response.json();
       
-      // Extract response from Gemini API format
       let responseText = "";
-      if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-        responseText = data.candidates[0].content.parts[0].text;
+      if (data.choices && data.choices[0] && data.choices[0].message) {
+        responseText = data.choices[0].message.content;
       } else {
-        responseText = data.response || data.message || "I apologize, but I couldn't process your request at this time.";
+        responseText = "I apologize, but I couldn't process your request at this time.";
       }
       
-      // Clean markdown formatting from response
+      // Clean up response while preserving line breaks
       responseText = responseText
-        .replace(/\*\*(.*?)\*\*/g, '$1') // Remove **bold**
-        .replace(/\*(.*?)\*/g, '$1') // Remove *italic*
-        .replace(/#{1,6}\s+/g, '') // Remove headers
-        .replace(/`(.*?)`/g, '$1') // Remove code backticks
-        .replace(/\[(.*?)\]\(.*?\)/g, '$1') // Remove markdown links
-        .replace(/^\s*[-*+]\s+/gm, '') // Remove bullet points
-        .replace(/^\s*\d+\.\s+/gm, '') // Remove numbered lists
-        .replace(/\n{3,}/g, '\n\n') // Remove excessive line breaks
+        .replace(/\*\*(.*?)\*\*/g, '$1')
+        .replace(/\*(.*?)\*/g, '$1')
+        .replace(/`(.*?)`/g, '$1')
+        .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+        .replace(/\n{4,}/g, '\n\n\n')
         .trim();
       
       return responseText;
     } catch (err) {
-      // Handle geographic restriction errors
-      if (err instanceof Error && err.message.includes("GEO_RESTRICTION")) {
-        // Provide helpful fallback response for geo-restricted API
-        const lowerMessage = userMessage.toLowerCase();
-        
-        if (lowerMessage.includes("quest") || lowerMessage.includes("recommend")) {
-          return "I'd love to help you with quest recommendations! Based on your preferences, I suggest checking out the Weekly Quests section. You can find eco-friendly quests, in-flight activities, and achievement milestones. What type of quest interests you most?";
-        } else if (lowerMessage.includes("point") || lowerMessage.includes("reward")) {
-          return "Great question! You earn Cathay Points by completing quests. Each quest has different point rewards - Weekly quests typically give 10-30 points, while One-Time achievements can give up to 100 points. You can redeem your points in the Shop for vouchers and upgrades!";
-        } else if (lowerMessage.includes("help") || lowerMessage.includes("how")) {
-          return "I'm here to help! I can assist you with quest recommendations, explain how the points system works, guide you through the app features, and answer questions about Cathay Quest. What would you like to know?";
-        } else {
-          return "Thanks for your message! I'm here to help with quest recommendations, points information, and guide you through Cathay Quest. What would you like to know?";
-        }
-      }
+      // Fallback responses for API errors
+      const lowerMessage = userMessage.toLowerCase();
       
-      // If API is not available, provide a helpful fallback response
-      if (err instanceof TypeError && err.message.includes("Failed to fetch")) {
-        // API server is not running - provide a helpful response
-        const lowerMessage = userMessage.toLowerCase();
-        
-        if (lowerMessage.includes("quest") || lowerMessage.includes("recommend")) {
-          return "I'd love to help you with quest recommendations! Based on your preferences, I suggest checking out the Weekly Quests section. You can find eco-friendly quests, in-flight activities, and achievement milestones. What type of quest interests you most?";
-        } else if (lowerMessage.includes("point") || lowerMessage.includes("reward")) {
-          return "Great question! You earn Cathay Points by completing quests. Each quest has different point rewards - Weekly quests typically give 10-30 points, while One-Time achievements can give up to 100 points. You can redeem your points in the Shop for vouchers and upgrades!";
-        } else if (lowerMessage.includes("help") || lowerMessage.includes("how")) {
-          return "I'm here to help! I can assist you with quest recommendations, explain how the points system works, guide you through the app features, and answer questions about Cathay Quest. What would you like to know?";
-        } else {
-          return "Thanks for your message! I'm currently in development mode. Once the API is connected, I'll be able to provide more personalized assistance. For now, feel free to explore the Quests, Shop, and Events sections of the app!";
-        }
+      if (lowerMessage.includes("quest") || lowerMessage.includes("recommend")) {
+        return "I'd love to help you with quest recommendations! Based on your preferences, I suggest checking out the Weekly Quests section. You can find eco-friendly quests, in-flight activities, and achievement milestones. What type of quest interests you most?";
+      } else if (lowerMessage.includes("point") || lowerMessage.includes("reward")) {
+        return "Great question! You earn Cathay Points by completing quests. Each quest has different point rewards - Weekly quests typically give 10-30 points, while One-Time achievements can give up to 100 points. You can redeem your points in the Shop for vouchers and upgrades!";
+      } else if (lowerMessage.includes("help") || lowerMessage.includes("how")) {
+        return "I'm here to help! I can assist you with quest recommendations, explain how the points system works, guide you through the app features, and answer questions about Cathay Quest. What would you like to know?";
+      } else {
+        return "Thanks for your message! I'm currently experiencing some technical difficulties. Please try again in a moment, or feel free to explore the Quests, Shop, and Events sections of the app!";
       }
-      throw err;
     }
   };
 
@@ -475,7 +433,6 @@ STRICT FORMATTING RULES:
     setInputValue("");
     setError(null);
 
-    // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
       text: userMessageText,
@@ -487,10 +444,8 @@ STRICT FORMATTING RULES:
     setIsLoading(true);
 
     try {
-      // Call the API
       const responseText = await callNaevvAPI(userMessageText);
 
-      // Add Naevv response
       const naevvResponse: Message = {
         id: (Date.now() + 1).toString(),
         text: responseText,
@@ -500,26 +455,16 @@ STRICT FORMATTING RULES:
 
       setMessages((prev) => [...prev, naevvResponse]);
     } catch (err) {
-      // Handle errors - fallback responses are already handled in callNaevvAPI
-      // Only show error alert for unexpected errors (not geo-restriction or network errors)
-      if (
-        err instanceof Error && 
-        !err.message.includes("GEO_RESTRICTION") &&
-        !(err instanceof TypeError && err.message.includes("Failed to fetch"))
-      ) {
-        const errorMessage = err.message || "Failed to get response from Naevv";
-        setError(errorMessage);
+      const errorMessage = err instanceof Error ? err.message : "Failed to get response from Naevv";
+      setError(errorMessage);
 
-        // Add error message to chat for unexpected errors
-        const errorResponse: Message = {
-          id: (Date.now() + 1).toString(),
-          text: "I'm sorry, I encountered an error. Please try again in a moment.",
-          sender: "naevv",
-          timestamp: new Date(),
-        };
-        setMessages((prev) => [...prev, errorResponse]);
-      }
-      // For geo-restriction and network errors, the fallback response is already returned from callNaevvAPI
+      const errorResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        text: "I'm sorry, I encountered an error. Please try again in a moment.",
+        sender: "naevv",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorResponse]);
     } finally {
       setIsLoading(false);
     }
@@ -556,10 +501,14 @@ STRICT FORMATTING RULES:
       <ScrollArea className="h-[calc(100vh-250px)]">
         <div className="p-4 space-y-4">
           {messages.map((message, index) => {
-            // Find the corresponding user question for this Naevv response
             const userQuestion = message.sender === "naevv" && index > 0
               ? messages[index - 1]?.sender === "user" ? messages[index - 1].text : undefined
               : undefined;
+            
+            // Use the flexible intent detection
+            const detectedIntent = message.sender === "naevv" 
+              ? detectIntent(message.text, userQuestion)
+              : { type: 'none' as const, confidence: 0 };
             
             return (
               <div key={message.id}>
@@ -575,7 +524,7 @@ STRICT FORMATTING RULES:
                         : "bg-muted text-foreground rounded-bl-none"
                     }`}
                   >
-                    <p className="text-sm">{message.text}</p>
+                    <p className="text-sm whitespace-pre-wrap">{message.text}</p>
                     <span className="text-xs opacity-70 mt-1 block">
                       {message.timestamp.toLocaleTimeString([], {
                         hour: "2-digit",
@@ -584,45 +533,34 @@ STRICT FORMATTING RULES:
                     </span>
                   </div>
                 </div>
-                {message.sender === "naevv" && (
+                {message.sender === "naevv" && detectedIntent.type !== 'none' && (
                   <div className="flex justify-start mt-2 mb-2 gap-2 flex-wrap">
-                    {(() => {
-                      const shopProduct = isShopRelated(message.text, userQuestion);
-                      if (shopProduct) {
-                        return (
-                          <Button
-                            onClick={() => navigate(`/shop?highlight=${shopProduct.id}`)}
-                            variant="default"
-                            size="sm"
-                            className="gap-2"
-                          >
-                            <ShoppingBag className="w-4 h-4" />
-                            View {shopProduct.name}
-                          </Button>
-                        );
-                      }
-                      return null;
-                    })()}
-                    {isQuestRelated(message.text, userQuestion) && (
+                    {/* Specific product button */}
+                    {detectedIntent.specificProduct && (
                       <Button
-                        onClick={() => navigate("/")}
+                        onClick={() => navigate(`/shop?highlight=${detectedIntent.specificProduct!.id}`)}
                         variant="default"
                         size="sm"
                         className="gap-2"
                       >
-                        <Target className="w-4 h-4" />
-                        View Quests
+                        <ShoppingBag className="w-4 h-4" />
+                        View {detectedIntent.specificProduct.name}
                       </Button>
                     )}
-                    {isEventRelated(message.text, userQuestion) && (
+                    
+                    {/* General intent button */}
+                    {!detectedIntent.specificProduct && INTENT_PATTERNS[detectedIntent.type]?.actionButton && (
                       <Button
-                        onClick={() => navigate("/events")}
+                        onClick={() => navigate(INTENT_PATTERNS[detectedIntent.type].actionButton!.navigateTo)}
                         variant="default"
                         size="sm"
                         className="gap-2"
                       >
-                        <Calendar className="w-4 h-4" />
-                        View Events
+                        {(() => {
+                          const IconComponent = INTENT_PATTERNS[detectedIntent.type].actionButton!.icon;
+                          return <IconComponent className="w-4 h-4" />;
+                        })()}
+                        {INTENT_PATTERNS[detectedIntent.type].actionButton!.label}
                       </Button>
                     )}
                   </div>
@@ -668,7 +606,6 @@ STRICT FORMATTING RULES:
           </div>
         </Card>
       </div>
-
     </div>
   );
 };
