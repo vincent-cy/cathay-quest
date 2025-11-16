@@ -1,22 +1,135 @@
-# Welcome to your Lovable project
+# Cathay Quest — App + Backend (Flask) + DynamoDB
 
-## Project info
+This repo contains a React (Vite + TypeScript) frontend and a Python Flask backend exposing DynamoDB APIs for saving survey results.
 
-**URL**: https://lovable.dev/projects/8fd82166-ad15-41d0-8309-2e773783d008
+## Quick Start
 
-## How can I edit this code?
+1) Prerequisites
 
-There are several ways of editing your application.
+- Node.js 18+ and npm
+- Python 3.9+
+- AWS account with access to DynamoDB
+- AWS CLI configured locally
 
-**Use Lovable**
+2) Backend setup (Flask + DynamoDB)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/8fd82166-ad15-41d0-8309-2e773783d008) and start prompting.
+```sh
+# from repo root
+cd src/dynamoDB
 
-Changes made via Lovable will be committed automatically to this repo.
+# (recommended) create and activate a virtual environment
+python -m venv .venv
+# Windows PowerShell
+.venv\Scripts\Activate.ps1
+# macOS/Linux
+# source .venv/bin/activate
+
+# install Python dependencies
+pip install -r ../../requirements.txt
+```
+
+3) Configure AWS credentials
+
+Make sure your AWS credentials are available so boto3 can authenticate:
+
+```sh
+aws configure
+# Provide AWS Access Key ID, Secret Access Key, default region (e.g. ap-southeast-2), and output format
+```
+
+Alternatively, set environment variables before running the backend:
+
+```sh
+# Windows PowerShell
+$Env:AWS_ACCESS_KEY_ID="YOUR_KEY_ID"
+$Env:AWS_SECRET_ACCESS_KEY="YOUR_SECRET"
+$Env:AWS_DEFAULT_REGION="ap-southeast-2"
+
+# macOS/Linux
+# export AWS_ACCESS_KEY_ID=YOUR_KEY_ID
+# export AWS_SECRET_ACCESS_KEY=YOUR_SECRET
+# export AWS_DEFAULT_REGION=ap-southeast-2
+```
+
+4) Create the DynamoDB table
+
+Backend expects a table named `InitialSurvey` in region `ap-southeast-2`. Recommended key schema:
+
+- Partition key: `userId` (String)
+- Sort key: `timestamp` (String)
+
+You can create it via AWS Console or with AWS CLI:
+
+```sh
+aws dynamodb create-table \
+  --table-name InitialSurvey \
+  --attribute-definitions AttributeName=userId,AttributeType=S AttributeName=timestamp,AttributeType=S \
+  --key-schema AttributeName=userId,KeyType=HASH AttributeName=timestamp,KeyType=RANGE \
+  --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
+  --region ap-southeast-2
+```
+
+5) Run the backend
+
+```sh
+# from src/dynamoDB (virtualenv active)
+python .\postSurvey.py
+```
+
+- Server runs at http://localhost:5000
+- Health check: GET http://localhost:5000/health
+- Root: GET http://localhost:5000/
+- Save survey: POST http://localhost:5000/api/save-survey
+
+Example request:
+
+```bash
+curl -X POST http://localhost:5000/api/save-survey \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": "user-123",
+    "userName": "Alex",
+    "email": "alex@example.com",
+    "responses": {"q1":"yes","q2":"no"}
+  }'
+```
+
+6) Frontend setup (Vite + React + TypeScript)
+
+```sh
+# from repo root
+npm i
+npm run dev
+```
+
+- Frontend runs at http://localhost:5173
+- When calling the backend from the frontend during local development, use `http://localhost:5000` as the API base (CORS is enabled in the Flask app).
+
+7) Run both together (local dev)
+
+- Start backend: http://localhost:5000
+- Start frontend: http://localhost:5173
+
+Confirm the backend is healthy:
+
+```bash
+curl http://localhost:5000/health
+```
+
+Then interact with the app at http://localhost:5173, which should POST to the backend endpoint at http://localhost:5000/api/save-survey.
+
+## Troubleshooting
+
+- DynamoDB AccessDenied: Verify AWS credentials and IAM permissions for DynamoDB PutItem on `InitialSurvey`.
+- Table not found: Ensure table `InitialSurvey` exists in region `ap-southeast-2` (or update `AWS_REGION` and `DYNAMODB_TABLE_NAME` in `src/dynamoDB/postSurvey.py`).
+- CORS issues: The Flask app enables CORS via `flask-cors`. Ensure you are hitting `http://localhost:5000` from the frontend.
+- Port conflicts: Change ports or stop conflicting processes (frontend default 5173, backend 5000).
+
+
 
 **Use your preferred IDE**
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+If you want to work locally using your own IDE, you can clone this repo and push changes.
 
 The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
@@ -59,91 +172,34 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
+- AWS
+- Flask
+- OpenRouter
 
-## How can I deploy this project?
 
-Simply open [Lovable](https://lovable.dev/projects/8fd82166-ad15-41d0-8309-2e773783d008) and click on Share -> Publish.
+## Frontend install and run (npm or Yarn)
 
-## Can I connect a custom domain to my Lovable project?
+Use either npm or Yarn to install and launch the frontend.
 
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
-
-## Using ngrok to expose the local dev server
-
-If you want to access your local Vite app from another device (phone, tablet, remote machine) you can use ngrok to create a secure public URL that tunnels to your local server.
-
-1. Install ngrok as a dev dependency (preferred) or run with npx:
+Using npm:
 
 ```bash
-# install locally (recommended)
-npm install --save-dev ngrok
-
-# OR use npx without installing
-# (npx is available with npm >= 5.2)
-```
-
-2. Add an npm script to your package.json (example):
-
-```json
-// add to "scripts" in package.json
-"ngrok": "node ./scripts/start-ngrok.js"
-```
-
-3. Optionally set your ngrok auth token (recommended so you avoid rate limits):
-
-```bash
-export NGROK_AUTHTOKEN=your_ngrok_authtoken_here
-# or on Windows PowerShell:
-# $Env:NGROK_AUTHTOKEN = "your_ngrok_authtoken_here"
-```
-
-4. Start your dev server (default port used by the project is 5173):
-
-```bash
+npm install
 npm run dev
 ```
 
-5. In a separate terminal, run the ngrok helper:
+Using Yarn:
 
 ```bash
-# if you added the script above
-npm run ngrok
-
-# OR without adding the script, you can run directly:
-# npx ngrok http 5173 --log=stdout
+yarn
+yarn dev
 ```
 
-The helper will print the public ngrok URL (https://xxxx.ngrok.io). Open that URL on another device to access your local app.
+The app will be available at http://localhost:5173.
 
-### Run dev server + ngrok in one terminal
+Optional: to temporarily share your local app, you can use ngrok without adding scripts:
 
-You can run both the Vite dev server and ngrok from a single terminal by using the helper script included in ./scripts/dev-with-ngrok.js.
-
-1. (Optional) install the ngrok package so the helper uses the programmatic API:
 ```bash
-npm install --save-dev ngrok
+# expose Vite dev server (port 5173)
+npx ngrok http 5173
 ```
-
-2. (Optional) add an npm script to package.json:
-```json
-// add to "scripts"
-"dev:ngrok": "node ./scripts/dev-with-ngrok.js"
-```
-
-3. Start the combined process:
-```bash
-# if you added the npm script:
-npm run dev:ngrok
-
-# OR directly:
-node ./scripts/dev-with-ngrok.js
-```
-
-Notes
-- The helper runs your normal dev script (`npm run dev`) by default. If you prefer to run `npx vite` directly, set USE_VITE_CLI=1 in the environment.
-- Provide NGROK_AUTHTOKEN in the environment to avoid rate limits:
-  export NGROK_AUTHTOKEN=<your-token>
