@@ -95,6 +95,7 @@ curl -X POST http://localhost:5000/api/save-survey \
 ```
 
 6) Frontend setup (Vite + React + TypeScript)
+
 Use either npm or Yarn to install and launch the frontend.
 
 Using npm:
