@@ -95,11 +95,29 @@ curl -X POST http://localhost:5000/api/save-survey \
 ```
 
 6) Frontend setup (Vite + React + TypeScript)
+Use either npm or Yarn to install and launch the frontend.
 
-```sh
-# from repo root
-npm i
+Using npm:
+
+```bash
+npm install
 npm run dev
+```
+
+Using Yarn:
+
+```bash
+yarn
+yarn dev
+```
+
+The app will be available at http://localhost:5173.
+
+Optional: to temporarily share your local app, you can use ngrok without adding scripts:
+
+```bash
+# expose Vite dev server (port 5173)
+npx ngrok http 5173
 ```
 
 - Frontend runs at http://localhost:5173
@@ -124,8 +142,6 @@ Then interact with the app at http://localhost:5173, which should POST to the ba
 - Table not found: Ensure table `InitialSurvey` exists in region `ap-southeast-2` (or update `AWS_REGION` and `DYNAMODB_TABLE_NAME` in `src/dynamoDB/postSurvey.py`).
 - CORS issues: The Flask app enables CORS via `flask-cors`. Ensure you are hitting `http://localhost:5000` from the frontend.
 - Port conflicts: Change ports or stop conflicting processes (frontend default 5173, backend 5000).
-
-
 
 **Use your preferred IDE**
 
@@ -177,29 +193,4 @@ This project is built with:
 - OpenRouter
 
 
-## Frontend install and run (npm or Yarn)
 
-Use either npm or Yarn to install and launch the frontend.
-
-Using npm:
-
-```bash
-npm install
-npm run dev
-```
-
-Using Yarn:
-
-```bash
-yarn
-yarn dev
-```
-
-The app will be available at http://localhost:5173.
-
-Optional: to temporarily share your local app, you can use ngrok without adding scripts:
-
-```bash
-# expose Vite dev server (port 5173)
-npx ngrok http 5173
-```
